@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<!--
+  ============================================================
+  Privacy Policy — Marbles Rush (XOIGAME)
+  Đã điền đầy đủ, không còn placeholder.
+
+  KIỂM TRA LẦN CUỐI trước khi nộp cho Google Play:
+   - Mục 5 khẳng định game có hộp thoại consent UMP cho người chơi
+     EEA/UK và mở lại được trong màn settings. Chưa tích hợp thì phải làm.
+   - Mục 2 và 7 khẳng định game KHÔNG có tài khoản, IAP, chat, server riêng.
+   - Tờ khai Data safety trong Console phải khớp với văn bản này.
+  ============================================================
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy Policy — Marbles Rush</title>
+<meta name="description" content="Privacy policy for Marbles Rush: what data is collected, why, and how to control personalised ads.">
+<meta name="robots" content="index, follow">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%230B1F19'/><rect x='7' y='13' width='18' height='7' rx='2' fill='%23E8412A'/><rect x='10' y='9' width='4' height='4' fill='%238FD14F'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=Be+Vietnam+Pro:wght@400;600;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --leaf-900:#0B1F19; --leaf-800:#102A22; --line:#22503F;
+    --rice:#F4EDDC; --rice-dim:rgba(244,237,220,.66);
+    --gac:#E8412A; --pandan:#8FD14F; --brass:#D9A441;
+    --display:"Bungee","Be Vietnam Pro",system-ui,sans-serif;
+    --body:"Be Vietnam Pro",system-ui,-apple-system,sans-serif;
+    --mono:"DM Mono",ui-monospace,monospace;
+    --pad:clamp(20px,5vw,64px);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--leaf-900);color:var(--rice);font-family:var(--body);font-size:16px;line-height:1.7;-webkit-font-smoothing:antialiased}
+  a{color:var(--gac);text-underline-offset:3px}
+  a:hover{color:var(--pandan)}
+  :focus-visible{outline:2px solid var(--brass);outline-offset:3px}
+
+  .hud{
+    position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:16px;
+    padding:14px var(--pad);background:rgba(11,31,25,.9);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);
+  }
+  .hud__mark{font-family:var(--display);font-size:15px;letter-spacing:.04em;text-decoration:none;color:var(--rice)}
+  .hud__mark em{color:var(--gac);font-style:normal}
+  .hud__back{font-family:var(--mono);font-size:12px;color:var(--rice-dim);text-decoration:none}
+  .hud__back:hover{color:var(--rice)}
+
+  .shell{max-width:1080px;margin:0 auto;padding:clamp(36px,6vw,72px) var(--pad) 80px}
+
+  .docmast{border-bottom:1px solid var(--line);padding-bottom:32px;margin-bottom:40px}
+  .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--brass);margin:0 0 14px}
+  .doctitle{font-family:var(--display);font-size:clamp(30px,6vw,58px);line-height:1;margin:0;letter-spacing:.01em}
+  .docmeta{font-family:var(--mono);font-size:13px;color:var(--rice-dim);margin:18px 0 0}
+
+  .cols{display:grid;grid-template-columns:210px 1fr;gap:clamp(28px,5vw,64px);align-items:start}
+  .toc{position:sticky;top:76px;font-family:var(--mono);font-size:12.5px;line-height:1.5}
+  .toc ol{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:9px}
+  .toc a{color:var(--rice-dim);text-decoration:none;display:block}
+  .toc a:hover{color:var(--rice)}
+  .toc em{color:var(--brass);font-style:normal;margin-right:8px}
+
+  .tldr{border:1px solid var(--line);border-left:3px solid var(--pandan);background:var(--leaf-800);padding:22px 24px;margin:0 0 44px;border-radius:2px}
+  .tldr h2{font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--pandan);margin:0 0 12px;font-weight:500}
+  .tldr ul{margin:0;padding-left:20px;color:var(--rice-dim)}
+  .tldr li{margin-bottom:7px}
+
+  .sec{margin-bottom:44px;scroll-margin-top:84px}
+  .sec h2{font-size:clamp(18px,2.6vw,23px);font-weight:800;line-height:1.3;margin:0 0 14px;display:flex;gap:14px;align-items:baseline}
+  .sec h2 em{font-family:var(--mono);font-size:13px;font-style:normal;font-weight:400;color:var(--brass);flex:none}
+  .sec h3{font-size:16px;font-weight:600;margin:26px 0 10px;color:var(--rice)}
+  .sec p{margin:0 0 14px;color:var(--rice-dim);max-width:68ch}
+  .sec ul{margin:0 0 16px;padding-left:22px;color:var(--rice-dim);max-width:68ch}
+  .sec li{margin-bottom:8px}
+  .sec strong{color:var(--rice);font-weight:600}
+
+  .partner{border-top:1px solid var(--line);padding:14px 0;max-width:68ch}
+  .partner:last-of-type{border-bottom:1px solid var(--line)}
+  .partner__name{font-weight:600;margin:0 0 4px}
+  .partner__links{font-family:var(--mono);font-size:13px;margin:0;color:var(--rice-dim)}
+
+  .contactbox{border:1px solid var(--line);background:var(--leaf-800);padding:24px;border-radius:2px;max-width:68ch}
+  .contactbox p{margin:0 0 8px}
+
+  footer{border-top:1px solid var(--line);padding:26px var(--pad);font-family:var(--mono);font-size:12px;color:var(--rice-dim);display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between}
+
+  @media (max-width:800px){
+    .cols{grid-template-columns:1fr}
+    .toc{position:static;border:1px solid var(--line);border-radius:2px;padding:18px 20px;margin-bottom:36px}
+  }
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<header class="hud">
+  <a class="hud__mark" href="/">XOI<em>GAME</em></a>
+  <a class="hud__back" href="/">← Back to home</a>
+</header>
+
+<div class="shell">
+
+  <div class="docmast">
+    <p class="kicker">Legal</p>
+    <h1 class="doctitle">Privacy Policy</h1>
+    <p class="docmeta">For <strong>Marbles Rush</strong> · Last updated: 19 August 2026 · Effective: 19 August 2026</p>
+  </div>
+
+  <div class="cols">
+
+    <nav class="toc" aria-label="Sections">
+      <p class="kicker">Contents</p>
+      <ol>
+        <li><a href="#s1"><em>01</em>Who we are</a></li>
+        <li><a href="#s2"><em>02</em>Data we collect</a></li>
+        <li><a href="#s3"><em>03</em>Why we use it</a></li>
+        <li><a href="#s4"><em>04</em>Advertising partners</a></li>
+        <li><a href="#s5"><em>05</em>Your ad choices</a></li>
+        <li><a href="#s6"><em>06</em>Sharing and selling</a></li>
+        <li><a href="#s7"><em>07</em>Retention</a></li>
+        <li><a href="#s8"><em>08</em>International transfers</a></li>
+        <li><a href="#s9"><em>09</em>Children</a></li>
+        <li><a href="#s10"><em>10</em>Your rights</a></li>
+        <li><a href="#s11"><em>11</em>Security</a></li>
+        <li><a href="#s12"><em>12</em>Changes</a></li>
+        <li><a href="#s13"><em>13</em>Contact</a></li>
+      </ol>
+    </nav>
+
+    <main>
+
+      <section class="tldr">
+        <h2>The short version</h2>
+        <ul>
+          <li>There is no account and no login. We never ask for your name, email, phone number or address.</li>
+          <li>The game shows ads. Our advertising partners collect your device's advertising ID, IP address and basic device and ad-interaction data to serve and measure those ads.</li>
+          <li>You can switch off personalised ads at any time in your device settings, and the game keeps working.</li>
+          <li>The game is not directed to children under 13.</li>
+          <li>Questions or requests: <a href="mailto:xoistudio@gmail.com">xoistudio@gmail.com</a>.</li>
+        </ul>
+      </section>
+
+      <section class="sec" id="s1">
+        <h2><em>01</em>Who we are</h2>
+        <p>Marbles Rush (the "Game") is developed and published by XOIGAME ("we", "us"), based in Vietnam. This policy explains what data the Game collects, why we collect it, who we share it with, and what control you have.</p>
+        <p>It covers the Android and iOS versions of the Game distributed through Google Play and the Apple App Store. It does not cover websites, stores or apps operated by anyone else, even where we link to them.</p>
+        <p>For the purposes of the EU/UK General Data Protection Regulation, we are the data controller for the data described below. Where our advertising partners use that data for their own purposes, they act as independent controllers under their own policies, which are linked in section 4.</p>
+      </section>
+
+      <section class="sec" id="s2">
+        <h2><em>02</em>Data we collect</h2>
+
+        <h3>Data you give us directly</h3>
+        <p>None is required to play. The Game has no sign-up, no user profile and no in-game chat. The only way you give us data directly is by emailing our support address, in which case we receive your email address and whatever you write to us.</p>
+
+        <h3>Data collected automatically for advertising</h3>
+        <p>The Game includes advertising software (SDKs) supplied by the companies listed in section 4. When an ad is requested or shown, those SDKs collect:</p>
+        <ul>
+          <li><strong>Advertising identifiers</strong> — the Android Advertising ID (AAID) or Apple Identifier for Advertisers (IDFA), and similar app- or vendor-scoped identifiers. These are resettable IDs assigned by your device, not your name.</li>
+          <li><strong>IP address</strong>, which is used to estimate approximate location at country or city level, and to detect fraud. We do not collect GPS or precise location.</li>
+          <li><strong>Device and app information</strong> — device model and manufacturer, operating system version, screen size, language, country, network type, and the version of the Game you are running.</li>
+          <li><strong>Ad interaction data</strong> — which ads were requested, shown, skipped, watched to completion or clicked, and coarse in-game context such as the moment an ad was triggered.</li>
+          <li><strong>Diagnostic data</strong> — crash reports and basic performance data generated by the advertising SDKs, used to diagnose faults.</li>
+        </ul>
+        <p>Advertising SDKs may also read and write identifiers in your device's local storage, which serve a purpose similar to cookies on the web.</p>
+
+        <h3>Data that stays on your device</h3>
+        <p>Your progress, scores and settings are saved in the Game's local storage on your device. We do not upload them, and we cannot read them. Uninstalling the Game deletes them.</p>
+
+        <h3>What we do not collect</h3>
+        <p>The Game does not access your contacts, photos, files, camera, microphone, call logs, SMS, health data or precise location, and does not require you to grant any of those permissions.</p>
+      </section>
+
+      <section class="sec" id="s3">
+        <h2><em>03</em>Why we use it</h2>
+        <ul>
+          <li><strong>To show ads and keep the Game free.</strong> Advertising is how the Game is funded.</li>
+          <li><strong>To measure ads and get paid.</strong> Counting impressions and clicks is what determines the revenue we receive.</li>
+          <li><strong>To prevent fraud and abuse</strong>, such as automated or faked ad impressions.</li>
+          <li><strong>To find and fix problems</strong> using crash and performance diagnostics.</li>
+          <li><strong>To comply with legal obligations</strong> and to respond to lawful requests.</li>
+        </ul>
+        <p>If you are in the European Economic Area, the United Kingdom or Switzerland, our legal basis is your <strong>consent</strong> for personalised advertising and for the storage of and access to information on your device. You give or refuse that consent in the dialog shown when you first open the Game, and you may change your mind at any time as described in section 5. Where we rely on <strong>legitimate interests</strong> — non-personalised advertising, fraud prevention and crash diagnostics — we have weighed those interests against your rights, and you may object as described in section 10.</p>
+      </section>
+
+      <section class="sec" id="s4">
+        <h2><em>04</em>Advertising partners</h2>
+        <p>We share the data described in section 2 with Google, which supplies the advertising software in the Game, so that it can select, deliver and measure ads. Google handles that data as an independent controller under its own privacy policy.</p>
+
+        <div class="partner">
+          <p class="partner__name">Google Ireland Limited / Google LLC — AdMob (Google Mobile Ads SDK)</p>
+          <p class="partner__links">
+            <a href="https://policies.google.com/privacy" rel="noopener">Privacy policy</a> ·
+            <a href="https://policies.google.com/technologies/partner-sites" rel="noopener">How Google uses data from apps</a> ·
+            <a href="https://support.google.com/ads/answer/2662922" rel="noopener">Ad settings and opt-out</a>
+          </p>
+        </div>
+
+        <p style="margin-top:20px">AdMob runs an auction for each ad request. Third-party advertisers and demand partners bidding in that auction may receive the same categories of data listed in section 2, under Google's terms and their own privacy policies. We have no direct relationship with those bidders and we do not receive your data back from them.</p>
+        <p>We may also disclose data where we are legally required to, or to protect our rights, safety or property, or in connection with a merger or acquisition, in which case this policy will continue to apply to the transferred data until it is replaced.</p>
+      </section>
+
+      <section class="sec" id="s5">
+        <h2><em>05</em>Your ad choices</h2>
+        <p>You can stop the use of your data for personalised ads without losing access to the Game. You will still see ads, but they will be non-personalised — selected from context rather than from a profile.</p>
+
+        <h3>In the Game</h3>
+        <p>If you are in the EEA, the UK or Switzerland, the Game shows a consent dialog on first launch, provided by Google's User Messaging Platform. You can reopen it and change your answer from the settings screen inside the Game at any time.</p>
+
+        <h3>On Android</h3>
+        <p>Open <strong>Settings → Google → Ads</strong>, then turn on "Opt out of Ads Personalisation" or select "Delete advertising ID". Deleting the ID stops apps from receiving it altogether.</p>
+
+        <h3>On iOS</h3>
+        <p>Open <strong>Settings → Privacy &amp; Security → Tracking</strong> and turn off "Allow Apps to Request to Track", or switch off tracking for the Game specifically. If you declined the App Tracking Transparency prompt, the Game does not receive your IDFA.</p>
+
+        <h3>Industry opt-outs</h3>
+        <p>You can also use the opt-out tools offered by each partner in section 4, and the industry programmes run by the <a href="https://optout.networkadvertising.org/" rel="noopener">Network Advertising Initiative</a> and the <a href="https://www.youradchoices.com/" rel="noopener">Digital Advertising Alliance</a>.</p>
+      </section>
+
+      <section class="sec" id="s6">
+        <h2><em>06</em>Sharing and "selling" of personal information</h2>
+        <p>We do not sell personal information for money. However, under the California Consumer Privacy Act as amended by the CPRA, and under similar laws in other US states, sharing an advertising identifier with ad networks for cross-context behavioural advertising can qualify as a "sale" or "share" of personal information.</p>
+        <p>To opt out, use the device controls in section 5, or email us at <a href="mailto:xoistudio@gmail.com">xoistudio@gmail.com</a> with the subject line "Do Not Sell or Share". We do not discriminate against you for exercising this right — the Game behaves the same either way.</p>
+        <p>We do not knowingly sell or share the personal information of anyone under 16.</p>
+      </section>
+
+      <section class="sec" id="s7">
+        <h2><em>07</em>How long data is kept</h2>
+        <p>We do not operate servers for the Game and do not maintain our own database of player data. What we see are aggregated, non-identifying reports in our advertising dashboards.</p>
+        <p>Our advertising partners keep the data they collect for the periods stated in their own policies, which is typically a matter of months for identifiers and event data. Support emails are kept for as long as needed to resolve your issue and then deleted, normally within 24 months.</p>
+      </section>
+
+      <section class="sec" id="s8">
+        <h2><em>08</em>International transfers</h2>
+        <p>Our advertising partners are global companies and process data on servers in several countries, including the United States, which may not offer the same level of data protection as your own. Where required, those transfers rely on safeguards such as the European Commission's Standard Contractual Clauses or an adequacy decision. Details are in each partner's privacy policy, linked in section 4.</p>
+      </section>
+
+      <section class="sec" id="s9">
+        <h2><em>09</em>Children</h2>
+        <p>The Game is not directed to children. It is intended for players aged 13 and over, or 16 and over in countries where that is the applicable age of digital consent. We do not knowingly collect personal information from children below those ages.</p>
+        <p>If you are a parent or guardian and believe your child has provided personal information through the Game, email <a href="mailto:xoistudio@gmail.com">xoistudio@gmail.com</a> and we will take steps to have it deleted, including asking our advertising partners to delete data tied to the device's advertising ID.</p>
+      </section>
+
+      <section class="sec" id="s10">
+        <h2><em>10</em>Your rights</h2>
+        <p>Depending on where you live, you may have the right to access the personal data held about you, to have it corrected or deleted, to restrict or object to its processing, to receive it in a portable format, to withdraw consent at any time, and to opt out of targeted advertising and of the sale or sharing of your data.</p>
+        <p>Because the Game collects no account data, we usually cannot identify you from a request on our own. The fastest route is to use the device controls in section 5 and the partner tools in section 4, which act directly on the identifier involved. If you write to us at <a href="mailto:xoistudio@gmail.com">xoistudio@gmail.com</a>, include your advertising ID and the approximate date and time you played, and we will pass the request to the relevant partner. We answer within 30 days.</p>
+        <p>If you are in the EEA or the UK and are unhappy with our response, you may lodge a complaint with your national data protection authority.</p>
+      </section>
+
+      <section class="sec" id="s11">
+        <h2><em>11</em>Security</h2>
+        <p>Data sent between the Game and our advertising partners travels over encrypted connections. No method of transmission or storage is completely secure, and we cannot guarantee absolute security, but we keep the SDKs we ship up to date and we hold no player database of our own that could be breached.</p>
+      </section>
+
+      <section class="sec" id="s12">
+        <h2><em>12</em>Changes to this policy</h2>
+        <p>We update this policy when the Game changes or when the law requires it. The date at the top always shows the current version. If a change materially affects how your data is used, we will give notice inside the Game before it takes effect, and ask for fresh consent where consent is the basis for the processing.</p>
+      </section>
+
+      <section class="sec" id="s13">
+        <h2><em>13</em>Contact</h2>
+        <div class="contactbox">
+          <p><strong>XOIGAME</strong></p>
+          <p>Email: <a href="mailto:xoistudio@gmail.com">xoistudio@gmail.com</a></p>
+          <p>Location: Vietnam</p>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<footer>
+  <span>© <span id="year"></span> XOIGAME</span>
+  <span><a href="/">xoigame.github.io</a></span>
+</footer>
+
+<script>document.getElementById("year").textContent = new Date().getFullYear();</script>
+</body>
+</html>
