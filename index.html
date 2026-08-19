@@ -1,0 +1,399 @@
+<!-- TEST -->
+<p>line2</p><!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>XOI GAME — Mobile game developer</title>
+<meta name="description" content="Trang giới thiệu các dự án game mobile của Xôi Game.">
+<meta property="og:title" content="XOI GAME">
+<meta property="og:description" content="Trang giới thiệu các dự án game mobile.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%230B1F19'/><rect x='7' y='13' width='18' height='7' rx='2' fill='%23E8412A'/><rect x='10' y='9' width='4' height='4' fill='%238FD14F'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=Be+Vietnam+Pro:wght@400;600;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --leaf-900:#0B1F19;
+    --leaf-800:#102A22;
+    --leaf-700:#17392E;
+    --line:#22503F;
+    --rice:#F4EDDC;
+    --rice-dim:rgba(244,237,220,.62);
+    --gac:#E8412A;
+    --pandan:#8FD14F;
+    --brass:#D9A441;
+
+    --display:"Bungee","Be Vietnam Pro",system-ui,sans-serif;
+    --body:"Be Vietnam Pro",system-ui,-apple-system,sans-serif;
+    --mono:"DM Mono",ui-monospace,"SFMono-Regular",monospace;
+
+    --pad:clamp(20px,5vw,64px);
+  }
+
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;
+    background:var(--leaf-900);
+    color:var(--rice);
+    font-family:var(--body);
+    font-size:16px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit}
+  :focus-visible{outline:2px solid var(--brass);outline-offset:3px}
+
+  .wrap{max-width:1120px;margin:0 auto;padding-inline:var(--pad)}
+  .label{
+    font-family:var(--mono);
+    font-size:12px;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    color:var(--brass);
+  }
+
+  /* ---------- HUD ---------- */
+  .hud{
+    position:sticky;top:0;z-index:20;
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+    padding:14px var(--pad);
+    background:rgba(11,31,25,.86);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+  }
+  .hud__mark{font-family:var(--display);font-size:15px;letter-spacing:.04em}
+  .hud__mark em{color:var(--gac);font-style:normal}
+  .hud__nav{display:flex;gap:18px;font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase}
+  .hud__nav a{color:var(--rice-dim);text-decoration:none;padding:4px 0;border-bottom:1px solid transparent}
+  .hud__nav a:hover{color:var(--rice);border-bottom-color:var(--gac)}
+
+  /* ---------- HERO ---------- */
+  .hero{position:relative;overflow:hidden;padding-block:clamp(56px,11vw,120px) clamp(40px,7vw,80px)}
+  .hero::after{
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background:repeating-linear-gradient(to bottom,rgba(0,0,0,.16) 0 1px,transparent 1px 4px);
+    opacity:.5;
+  }
+  .hero__avatar{display:block;width:68px;height:68px;border:2px solid var(--pandan);border-radius:2px;margin-bottom:24px;position:relative;z-index:1}
+  .hero__eyebrow{display:flex;align-items:center;gap:10px;margin-bottom:22px}
+  .hero__blink{width:9px;height:14px;background:var(--pandan);animation:blink 1.1s steps(1,end) infinite}
+  @keyframes blink{50%{opacity:0}}
+  .hero__title{
+    font-family:var(--display);
+    font-size:clamp(52px,15vw,150px);
+    line-height:.86;
+    margin:0;
+    letter-spacing:.01em;
+    text-shadow:4px 4px 0 var(--gac), 8px 8px 0 rgba(0,0,0,.35);
+  }
+  .hero__title span{display:block;color:var(--pandan);text-shadow:4px 4px 0 rgba(0,0,0,.4)}
+  .hero__lead{max-width:46ch;margin:30px 0 0;font-size:clamp(16px,2.1vw,19px);color:var(--rice-dim)}
+  .hero__meta{
+    display:flex;flex-wrap:wrap;gap:8px 10px;margin-top:28px;
+    font-family:var(--mono);font-size:12px;color:var(--rice-dim);
+  }
+  .hero__meta span{border:1px solid var(--line);border-radius:999px;padding:4px 12px}
+
+  /* ---------- SECTION ---------- */
+  .section{padding-block:clamp(48px,8vw,96px);border-top:1px solid var(--line)}
+  .section__head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:32px}
+  .section__title{font-family:var(--display);font-size:clamp(22px,3.6vw,34px);margin:0;letter-spacing:.02em}
+  .section__hint{font-family:var(--mono);font-size:12px;color:var(--rice-dim)}
+
+  /* ---------- GAME SELECT (signature) ---------- */
+  .select{display:grid;grid-template-columns:1.15fr 1fr;gap:clamp(20px,3vw,40px);align-items:start}
+  .select__list{display:grid;gap:12px;margin:0;padding:0}
+  .card{
+    position:relative;
+    display:grid;grid-template-columns:auto 1fr;align-items:center;gap:16px;
+    width:100%;text-align:left;
+    padding:18px 20px;
+    background:var(--leaf-800);
+    border:1px solid var(--line);
+    border-radius:2px;
+    color:inherit;font:inherit;cursor:pointer;
+    transition:transform .18s ease,background .18s ease,border-color .18s ease;
+  }
+  .card:hover{background:var(--leaf-700);transform:translateX(4px)}
+  .card__num{font-family:var(--mono);font-size:12px;color:var(--brass)}
+  .card__name{font-family:var(--display);font-size:clamp(15px,2.2vw,20px);line-height:1.25}
+  .card__tag{font-family:var(--mono);font-size:11px;color:var(--rice-dim);letter-spacing:.1em;text-transform:uppercase}
+  .card[aria-selected="true"]{background:var(--leaf-700);border-color:var(--gac);transform:translateX(4px)}
+  .card[aria-selected="true"] .card__num{color:var(--gac)}
+  .card[aria-selected="true"]::before,
+  .card[aria-selected="true"]::after{
+    content:"";position:absolute;width:12px;height:12px;border:2px solid var(--gac);
+  }
+  .card[aria-selected="true"]::before{top:-3px;left:-3px;border-right:0;border-bottom:0}
+  .card[aria-selected="true"]::after{bottom:-3px;right:-3px;border-left:0;border-top:0}
+
+  .panel{
+    position:sticky;top:76px;
+    background:linear-gradient(180deg,var(--leaf-800),var(--leaf-900));
+    border:1px solid var(--line);border-radius:2px;
+    padding:clamp(20px,3vw,30px);
+  }
+  .panel__name{font-family:var(--display);font-size:clamp(20px,3vw,28px);margin:10px 0 0;line-height:1.15}
+  .panel__desc{color:var(--rice-dim);margin:14px 0 22px}
+  .panel__specs{display:grid;gap:0;margin:0;padding:0;border-top:1px solid var(--line)}
+  .panel__row{display:flex;justify-content:space-between;gap:16px;padding:10px 0;border-bottom:1px solid var(--line);font-family:var(--mono);font-size:13px}
+  .panel__row dt{color:var(--rice-dim);margin:0}
+  .panel__row dd{margin:0;text-align:right}
+  .panel__link{
+    display:inline-block;margin-top:22px;padding:11px 22px;
+    background:var(--gac);color:var(--rice);text-decoration:none;
+    font-family:var(--mono);font-size:13px;letter-spacing:.08em;text-transform:uppercase;
+    border-radius:2px;
+  }
+  .panel__link:hover{background:#ff5238}
+
+  .state{
+    font-family:var(--mono);font-size:13px;color:var(--rice-dim);
+    border:1px dashed var(--line);border-radius:2px;padding:22px;margin:0;
+  }
+
+  /* ---------- PROFILE ---------- */
+  .profile{display:grid;grid-template-columns:1fr 1fr;gap:clamp(20px,4vw,56px)}
+  .profile p{margin:0 0 16px;color:var(--rice-dim);max-width:52ch}
+  .skills{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+  .skills li{display:flex;justify-content:space-between;gap:16px;padding-bottom:9px;border-bottom:1px solid var(--line);font-family:var(--mono);font-size:13px}
+  .skills span{color:var(--rice-dim)}
+
+  /* ---------- CONTACT ---------- */
+  .contact__big{font-family:var(--display);font-size:clamp(24px,5vw,52px);line-height:1.1;margin:12px 0 26px;max-width:16ch}
+  .contact__links{display:flex;flex-wrap:wrap;gap:12px}
+  .contact__links a{
+    font-family:var(--mono);font-size:13px;text-decoration:none;
+    padding:11px 20px;border:1px solid var(--line);border-radius:2px;color:var(--rice);
+  }
+  .contact__links a:hover{border-color:var(--pandan);color:var(--pandan)}
+
+  footer{
+    padding:26px var(--pad);border-top:1px solid var(--line);
+    display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;
+    font-family:var(--mono);font-size:12px;color:var(--rice-dim);
+  }
+
+  @media (max-width:820px){
+    .select,.profile{grid-template-columns:1fr}
+    .panel{position:static}
+    .hud__nav{gap:12px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important}
+    html{scroll-behavior:auto}
+  }
+</style>
+</head>
+<body>
+
+<header class="hud">
+  <span class="hud__mark">XOI<em>GAME</em></span>
+  <nav class="hud__nav" aria-label="Điều hướng chính">
+    <a href="#games">Game</a>
+    <a href="#about">Giới thiệu</a>
+    <a href="#contact">Liên hệ</a>
+    <a href="/privacy.html">Privacy</a>
+  </nav>
+</header>
+
+<main>
+
+  <section class="hero">
+    <div class="wrap">
+      <img class="hero__avatar" src="https://avatars.githubusercontent.com/u/19810520?s=200&v=4" alt="Ảnh đại diện GitHub của xoigame" width="68" height="68">
+      <p class="hero__eyebrow"><span class="hero__blink" aria-hidden="true"></span><span class="label">Insert coin — bắt đầu</span></p>
+      <h1 class="hero__title">XOI<span>GAME</span></h1>
+      <p class="hero__lead">Mình làm game mobile: dựng client bằng Unity &amp; C#, và đang lấn sang phần server. Đây là chỗ để các dự án đã và đang làm.</p>
+      <p class="hero__meta">
+        <span>Unity</span><span>C#</span><span>Go</span><span>iOS / Android</span><span>TP. Hồ Chí Minh</span>
+      </p>
+    </div>
+  </section>
+
+  <section class="section" id="games">
+    <div class="wrap">
+      <div class="section__head">
+        <h2 class="section__title">Game Select</h2>
+        <p class="section__hint" id="hint">Chạm để chọn — hoặc dùng phím ↑ ↓</p>
+      </div>
+      <div class="select">
+        <div class="select__list" role="tablist" aria-label="Danh sách dự án" id="list"></div>
+        <div class="panel" role="tabpanel" id="panel" tabindex="0"></div>
+      </div>
+      <noscript><p class="section__hint">Bật JavaScript để xem danh sách dự án.</p></noscript>
+    </div>
+  </section>
+
+  <section class="section" id="about">
+    <div class="wrap">
+      <div class="section__head"><h2 class="section__title">Giới thiệu</h2></div>
+      <div class="profile">
+        <div>
+          <p>Mình là client developer, làm game mobile được vài năm. Công việc chính là dựng gameplay, UI và tối ưu build cho iOS/Android.</p>
+          <p>Gần đây mình học thêm backend — Go, MySQL, kiến trúc server — để hiểu trọn vẹn đường đi của một tính năng, từ nút bấm trong game cho tới bảng dữ liệu.</p>
+        </div>
+        <ul class="skills">
+          <li>Unity <span>Gameplay · UI · Build</span></li>
+          <li>C# <span>OOP · async/await</span></li>
+          <li>Go <span>Đang học</span></li>
+          <li>MySQL <span>Đang học</span></li>
+          <li>Protobuf <span>Client ↔ Server</span></li>
+          <li>Git <span>Cơ bản</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="contact">
+    <div class="wrap">
+      <p class="label">Continue?</p>
+      <p class="contact__big">Có dự án hay, nhắn mình.</p>
+      <p class="contact__links">
+        <a href="https://github.com/xoigame">GitHub</a>
+        <a href="mailto:xoistudio@gmail.com">Email</a>
+      </p>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <span>© <span id="year"></span> XOI GAME</span>
+  <span><a href="/privacy.html" style="color:inherit">Privacy Policy</a> · Chạy trên GitHub Pages</span>
+</footer>
+
+<script>
+/* =========================================================
+   SỬA DỰ ÁN CỦA BẠN Ở ĐÂY — thêm/bớt thoải mái trong mảng này.
+   link: để "" nếu chưa có trang nào để dẫn tới.
+   ========================================================= */
+const USER = "xoigame";        // tài khoản GitHub được lấy repo về
+const HIDE  = [`${USER}.github.io`]; // repo không muốn hiện
+
+/* Dữ liệu dự phòng: chỉ hiện khi chưa có repo public nào. */
+const FALLBACK = [
+  {
+    name: "Marbles Rush",
+    tag: "Casual",
+    desc: "Sửa câu này thành mô tả thật của game: lối chơi, điểm thú vị, bạn làm phần nào.",
+    specs: { "Engine": "Unity", "Nền tảng": "Android", "Kiếm tiền": "AdMob", "Trạng thái": "Sắp phát hành" },
+    link: ""
+  },
+  {
+    name: "Tên game thứ hai",
+    tag: "Casual",
+    desc: "Mô tả ngắn. Nói rõ bạn phụ trách gì: gameplay, UI, tối ưu, hay tích hợp server.",
+    specs: { "Engine": "Unity", "Nền tảng": "Android", "Vai trò": "Client Developer", "Năm": "2024", "Trạng thái": "Hoàn thành" },
+    link: ""
+  },
+  {
+    name: "Dự án cá nhân",
+    tag: "Học tập",
+    desc: "Chỗ để khoe mấy thứ tự làm — prototype, tool trong Editor, hay server nhỏ viết bằng Go.",
+    specs: { "Ngôn ngữ": "Go · C#", "Nền tảng": "Web", "Vai trò": "Toàn bộ", "Năm": "2026", "Trạng thái": "Đang làm" },
+    link: ""
+  }
+];
+
+const list  = document.getElementById("list");
+const panel = document.getElementById("panel");
+const hint  = document.getElementById("hint");
+let items = [];
+let active = 0;
+
+function esc(s){ return String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+
+/* Đổi repo GitHub thành một thẻ dự án */
+function fromRepo(r){
+  return {
+    name: r.name,
+    tag: r.language || "Repo",
+    desc: r.description || "Repo chưa có mô tả. Thêm description trên GitHub là câu này thay bằng nó.",
+    specs: {
+      "Ngôn ngữ": r.language || "—",
+      "Sao": String(r.stargazers_count),
+      "Cập nhật": new Date(r.pushed_at).toLocaleDateString("vi-VN"),
+      "Giấy phép": r.license ? r.license.spdx_id : "—"
+    },
+    link: r.html_url
+  };
+}
+
+async function load(){
+  list.innerHTML = `<p class="state">Đang lấy repo từ github.com/${esc(USER)}…</p>`;
+  let repos = [];
+  try{
+    const res = await fetch(`https://api.github.com/users/${USER}/repos?per_page=100&sort=updated`);
+    if(!res.ok) throw new Error(res.status);
+    repos = await res.json();
+  }catch(err){
+    console.warn("Không gọi được GitHub API:", err);
+  }
+
+  const usable = repos
+    .filter(r => !r.fork && !r.archived && !r.private && !HIDE.includes(r.name))
+    .sort((a, b) => b.stargazers_count - a.stargazers_count || new Date(b.pushed_at) - new Date(a.pushed_at))
+    .map(fromRepo);
+
+  if(usable.length){
+    items = usable;
+    hint.textContent = "Tự lấy từ GitHub — chạm hoặc dùng ↑ ↓";
+  }else{
+    items = FALLBACK;
+    hint.textContent = "Chưa có repo public nào — đang hiện dữ liệu mẫu";
+  }
+  build();
+  select(0);
+}
+
+function build(){
+  list.innerHTML = "";
+  items.forEach((g, i) => {
+    const b = document.createElement("button");
+    b.className = "card";
+    b.type = "button";
+    b.setAttribute("role", "tab");
+    b.setAttribute("aria-selected", "false");
+    b.tabIndex = -1;
+    b.innerHTML = `<span class="card__num">${String(i+1).padStart(2,"0")}</span>
+      <span><span class="card__name">${esc(g.name)}</span><br><span class="card__tag">${esc(g.tag)}</span></span>`;
+    b.addEventListener("click", () => select(i));
+    list.appendChild(b);
+  });
+}
+
+function select(i, focus){
+  if(!items.length) return;
+  active = (i + items.length) % items.length;
+  const cards = list.querySelectorAll(".card");
+  cards.forEach((c, n) => {
+    const on = n === active;
+    c.setAttribute("aria-selected", on ? "true" : "false");
+    c.tabIndex = on ? 0 : -1;
+  });
+  if (focus) cards[active].focus();
+
+  const g = items[active];
+  const rows = Object.entries(g.specs)
+    .map(([k, v]) => `<div class="panel__row"><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("");
+  panel.innerHTML = `<p class="label">Dự án ${String(active+1).padStart(2,"0")} / ${String(items.length).padStart(2,"0")}</p>
+    <h3 class="panel__name">${esc(g.name)}</h3>
+    <p class="panel__desc">${esc(g.desc)}</p>
+    <dl class="panel__specs">${rows}</dl>
+    ${g.link ? `<a class="panel__link" href="${esc(g.link)}">Mở trên GitHub</a>` : ""}`;
+}
+
+list.addEventListener("keydown", e => {
+  if (e.key === "ArrowDown" || e.key === "ArrowRight") { e.preventDefault(); select(active + 1, true); }
+  if (e.key === "ArrowUp"   || e.key === "ArrowLeft")  { e.preventDefault(); select(active - 1, true); }
+});
+
+load();
+document.getElementById("year").textContent = new Date().getFullYear();
+</script>
+</body>
+</html>
