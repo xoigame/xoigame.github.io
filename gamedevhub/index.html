@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101724">
+  <meta name="description" content="GameDev Hub: bản đồ tiến trình game và sổ tay kinh nghiệm cá nhân của Xôi Game.">
+  <title>GameDev Hub · Xôi Game</title>
+  <link rel="stylesheet" href="./style.css">
+  <script src="./app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Đi tới nội dung</a>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="Xôi Game, về trang chủ"><span class="brand-mark">X</span><span>XÔI GAME <b>/ GAMEDEV HUB</b></span></a>
+    <nav class="topnav" aria-label="Điều hướng GameDev Hub">
+      <a href="#roadmap">Roadmap</a>
+      <a href="#lessons">Lessons</a>
+      <button id="sync-button" class="sync-button" type="button"><span class="sync-dot"></span><span id="sync-label">Kết nối GitHub</span></button>
+    </nav>
+  </header>
+
+  <main id="main" class="shell">
+    <section class="intro" aria-labelledby="page-title">
+      <div>
+        <p class="eyebrow"><span class="live-dot"></span> PERSONAL GAME DEVELOPMENT SYSTEM</p>
+        <h1 id="page-title">Từ ý tưởng đến<br><em>game hoàn chỉnh.</em></h1>
+        <p class="intro-copy">Theo dõi từng mốc làm game và giữ lại những điều đã học qua mỗi dự án.</p>
+      </div>
+      <div class="intro-aside" aria-label="Tổng quan tiến trình">
+        <span class="aside-kicker">PROJECT PULSE</span>
+        <strong id="hero-percent">0%</strong>
+        <span id="hero-count">0 / 0 task đã xác nhận</span>
+        <div class="hero-meter"><span id="hero-meter-fill"></span></div>
+        <small>Tiến trình dựa trên checklist bạn đã đánh dấu.</small>
+      </div>
+    </section>
+
+    <div class="section-tabs" role="navigation" aria-label="Nội dung trang">
+      <a class="active" href="#roadmap"><span>01</span> Tiến trình</a>
+      <a href="#lessons"><span>02</span> Kinh nghiệm</a>
+    </div>
+
+    <section id="roadmap" class="roadmap-section" aria-labelledby="roadmap-title">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">ROADMAP / MIND MAP</p>
+          <h2 id="roadmap-title">Bản đồ phát triển</h2>
+          <p class="section-copy">Mốc chính → mốc phụ → task. Mở từng nhánh để xem chi tiết và đánh dấu khi bạn đã nghiệm thu.</p>
+        </div>
+        <div class="map-actions">
+          <button id="expand-all" class="text-button" type="button">Bung tất cả</button>
+          <button id="collapse-all" class="text-button" type="button">Thu gọn</button>
+        </div>
+      </div>
+
+      <div class="workspace">
+        <aside class="project-panel" aria-label="Chọn dự án">
+          <div class="panel-topline"><span>WORKSPACE</span><span>01 / PROJECTS</span></div>
+          <label for="project-select">Đang xem</label>
+          <select id="project-select" aria-label="Chọn dự án hoặc khuôn mẫu"></select>
+          <div id="project-meta" class="project-meta"></div>
+          <div class="panel-divider"></div>
+          <p class="panel-note"><span class="note-icon">↗</span><span><b>Template dùng chung</b><br>Các phase chính giữ ổn định. Mỗi game có milestone và task riêng.</span></p>
+          <p class="panel-note"><span class="note-icon">✓</span><span><b>Chỉ tích khi đã kiểm</b><br>Checklist không tự lấy trạng thái từ code hoặc hồ sơ dự án.</span></p>
+        </aside>
+
+        <div class="map-panel">
+          <div class="map-toolbar"><div class="map-caption"><span class="map-spark"></span><span id="map-project-name">LAST TOWER</span><span class="caption-slash">/</span><span id="map-kind">PROJECT MAP</span></div><span id="map-total">0 TASK</span></div>
+          <div id="map" class="mindmap" aria-live="polite"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="lessons" class="lessons-section" aria-labelledby="lessons-title">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">PERSONAL KNOWLEDGE BASE</p>
+          <h2 id="lessons-title">Kinh nghiệm giữ lại</h2>
+          <p class="section-copy">Những điều bạn tự đúc kết sau khi làm game. Mỗi bài gắn với dự án và điều sẽ làm khác đi lần sau.</p>
+        </div>
+        <span id="lesson-count" class="lesson-count">00 LESSONS</span>
+      </div>
+      <div id="lessons-list" class="lessons-grid"></div>
+      <div class="lesson-prompt">
+        <div class="prompt-icon">✳</div>
+        <div><strong>Thêm kinh nghiệm của bạn</strong><p>Viết cho tôi theo mẫu bên dưới; tôi sẽ đưa lên trang này và gắn với đúng dự án.</p></div>
+        <button id="copy-lesson-template" class="primary-button" type="button">Sao chép mẫu ghi</button>
+      </div>
+    </section>
+
+    <footer class="footer"><span>GAMEDEV HUB <i>×</i> XÔI GAME</span><span>Built to remember. Made to ship.</span><a href="https://github.com/xoigame/GameDevHub">Hub repository ↗</a></footer>
+  </main>
+
+  <dialog id="sync-dialog" aria-labelledby="dialog-title">
+    <form method="dialog" class="dialog-close-row"><button class="close-button" aria-label="Đóng" value="cancel" type="submit">×</button></form>
+    <div class="dialog-content">
+      <span class="dialog-icon">⌁</span>
+      <p class="eyebrow">GITHUB SYNC</p>
+      <h2 id="dialog-title">Lưu checklist lên web</h2>
+      <p>Mỗi lần tích task, trang sẽ ghi thay đổi vào repo <b>xoigame.github.io</b>. Mọi người sẽ thấy trạng thái mới sau khi GitHub Pages build xong.</p>
+      <label for="token-input">Fine-grained personal access token</label>
+      <input id="token-input" type="password" autocomplete="off" spellcheck="false" placeholder="github_pat_…">
+      <p class="token-help">Token cần quyền <b>Contents: Read and write</b> cho riêng repo <b>xoigame.github.io</b>. Token chỉ giữ trong bộ nhớ tab này, không ghi vào trang hoặc localStorage. <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener noreferrer">Tạo token trên GitHub ↗</a></p>
+      <div class="dialog-actions"><button id="disconnect-button" class="text-button" type="button">Ngắt kết nối</button><button id="connect-button" class="primary-button" type="button">Kết nối</button></div>
+    </div>
+  </dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
