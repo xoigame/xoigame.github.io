@@ -4,20 +4,19 @@ Trang công khai: <https://xoigame.github.io/gamedevhub/>
 
 ## Dữ liệu
 
-`data.json` gồm `template` (6 phase chung), `projects` (milestone và task của từng game) và `lessons` (kinh nghiệm cá nhân). Mỗi `id` phải duy nhất trong project và giữ ổn định khi sửa tiêu đề. Task mới để `done: false` cho tới khi Nhân xác nhận đã nghiệm thu.
+`data.json` gồm `template` (6 phase chung), `projects` (milestone và task của từng game) và `lessons` (kinh nghiệm cá nhân dùng chung cho mọi dự án). Mỗi `id` phải duy nhất trong project và giữ ổn định khi sửa tiêu đề. Task mới để `done: false` cho tới khi Nhân xác nhận đã nghiệm thu.
 
 Thêm game mới bằng cách thêm phần tử vào `projects`, dùng cùng 6 phase chính và viết milestone/task riêng. Không tự suy trạng thái hoàn thành từ code hoặc hồ sơ dự án.
 
-Thêm bài học do Nhân viết vào `lessons` với mẫu:
+Thêm bài học do Nhân viết vào `lessons` với mẫu dưới đây. Bài học không có `projectId` và không bị lọc theo game đang chọn; tình huống ban đầu có thể đến từ bất kỳ dự án nào nhưng điều rút ra phải dùng được cho các game sau.
 
 ```json
 {
   "id": "ma-bai-hoc-duy-nhat",
-  "projectId": "last-tower",
   "kind": "lesson",
   "title": "Tên kinh nghiệm",
-  "summary": "Điều đã học trong tình huống cụ thể.",
-  "nextTime": "Lần sau sẽ làm gì.",
+  "summary": "Nguyên tắc rút ra từ tình huống đã gặp, dùng được cho mọi game.",
+  "nextTime": "Cách áp dụng trong các dự án sau.",
   "date": "YYYY-MM-DD"
 }
 ```

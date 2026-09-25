@@ -1,6 +1,6 @@
 const DATA_URL = './data.json';
 const GITHUB_CONTENT_URL = 'https://api.github.com/repos/xoigame/xoigame.github.io/contents/gamedevhub/data.json';
-const LESSON_TEMPLATE = 'Dự án: \nTên kinh nghiệm: \nLoại (Lesson / Pitfall / Decision / Pattern): \nTình huống: \nTôi đã học được: \nLần sau tôi sẽ: ';
+const LESSON_TEMPLATE = 'Tên kinh nghiệm: \nLoại (Lesson / Pitfall / Decision / Pattern): \nTình huống đã gặp: \nĐiều rút ra dùng chung: \nQuy tắc áp dụng cho các game sau: ';
 
 const state = { data: null, selectedId: 'last-tower', openPhases: new Set(['prototype', 'production']), openMilestones: new Set(['prototype-navigation', 'production-bows']), token: '', saving: false };
 const $ = (selector) => document.querySelector(selector);
@@ -154,7 +154,7 @@ function renderLessons() {
   list.replaceChildren();
   if (!lessons.length) {
     const empty = make('div', 'lesson-empty');
-    empty.append(make('span', '', '✳'), make('strong', '', 'Chưa có bài học cá nhân nào'), make('p', '', 'Khi bạn gửi kinh nghiệm đầu tiên, nó sẽ xuất hiện ở đây cùng dự án và điều áp dụng cho lần sau.'));
+    empty.append(make('span', '', '✳'), make('strong', '', 'Chưa có bài học cá nhân nào'), make('p', '', 'Khi bạn gửi kinh nghiệm đầu tiên, nó sẽ xuất hiện trong sổ tay chung để dùng lại cho mọi game.'));
     list.append(empty);
     return;
   }
@@ -162,8 +162,7 @@ function renderLessons() {
     const card = make('article', 'lesson-card');
     card.append(make('span', 'lesson-type', (lesson.kind || 'LESSON').toUpperCase()), make('h3', '', lesson.title), make('p', '', lesson.summary));
     if (lesson.nextTime) card.append(make('p', '', `Lần sau: ${lesson.nextTime}`));
-    const project = state.data.projects.find(item => item.id === lesson.projectId);
-    card.append(make('footer', '', `${project ? project.name : lesson.projectId || 'GameDev Hub'} · ${lesson.date || ''}`));
+    card.append(make('footer', '', `DÙNG CHUNG CHO MỌI DỰ ÁN${lesson.date ? ` · ${lesson.date}` : ''}`));
     list.append(card);
   }
 }
@@ -240,7 +239,7 @@ async function connectGithub() {
 
 async function copyLessonTemplate() {
   try { await navigator.clipboard.writeText(LESSON_TEMPLATE); toast('Đã sao chép mẫu. Gửi nội dung đó cho tôi để cập nhật web.'); }
-  catch (_) { toast('Không sao chép được. Hãy gửi: dự án, kinh nghiệm, tình huống và lần sau sẽ làm gì.', true); }
+  catch (_) { toast('Không sao chép được. Hãy gửi: kinh nghiệm, tình huống và quy tắc dùng lại.', true); }
 }
 
 async function init() {
