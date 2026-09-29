@@ -1,0 +1,5 @@
+# Ban do Stickman: chi mo o local, khong publish len GitHub Pages.
+stickman/
+
+# Trang thai server local (pid/log).
+.gamedevhub/
