@@ -23,10 +23,11 @@
   .top{background:var(--wood);color:var(--parch);padding:12px 20px;display:flex;justify-content:space-between;align-items:center;gap:16px;border-bottom:3px solid var(--gold)}
   .brand{font:900 16px "Cinzel",serif;letter-spacing:.12em;color:var(--gold2);text-decoration:none}
   .top nav{display:flex;gap:18px;flex-wrap:wrap}.top nav a{color:var(--parch2);text-decoration:none;font-size:15px}.top nav a:hover{color:var(--gold2)}
-  .hero{position:relative;min-height:min(78vh,640px);display:grid;place-items:center;text-align:center;padding:40px 16px 56px;
-        background:linear-gradient(180deg,rgba(20,10,4,.15),rgba(20,10,4,.55)),url("img/hero.jpg") center/cover no-repeat;color:#fff}
-  .hero img{width:min(560px,88vw);height:auto;filter:drop-shadow(0 6px 10px rgba(0,0,0,.45))}
-  .tag{font:700 clamp(20px,3.2vw,30px) "Cinzel",serif;margin:18px 0 22px;text-shadow:0 2px 6px rgba(0,0,0,.7);letter-spacing:.03em}
+  .hero{background:var(--wood);color:#fff;text-align:center;padding:0 0 44px}
+  .hero .art{display:block;width:100%;height:auto;border-bottom:3px solid var(--gold)}
+  @media(min-width:900px){.hero .art{max-height:72vh;object-fit:cover;object-position:center 40%}}
+  .hero .logo{width:min(520px,84vw);height:auto;margin-top:clamp(-54px,-6vw,-24px);filter:drop-shadow(0 6px 10px rgba(0,0,0,.55));position:relative}
+  .tag{font:700 clamp(20px,3.2vw,30px) "Cinzel",serif;margin:14px 0 20px;text-shadow:0 2px 6px rgba(0,0,0,.7);letter-spacing:.03em}
   .cta{display:inline-flex;align-items:center;gap:10px;background:linear-gradient(#ffd76b,#e9a22d);color:#4a2708;border:3px solid #7a4a14;border-radius:14px;
        padding:12px 26px;font:900 18px "Cinzel",serif;text-decoration:none;box-shadow:0 5px 0 #7a4a14,0 10px 18px rgba(0,0,0,.35)}
   .cta small{font:600 13px "Alegreya",serif;opacity:.8}
@@ -57,8 +58,9 @@
 </header>
 
 <section class="hero">
+  <img class="art" src="img/hero.jpg" width="1600" height="900" alt="An archer on a stone tower fires fire, ice, poison and piercing arrows at a horde of monsters">
   <div>
-    <img src="img/logo.png" width="820" height="284" alt="Last Tower: Monster Siege">
+    <img class="logo" src="img/logo.png" width="820" height="284" alt="Last Tower: Monster Siege">
     <p class="tag">Aim. Pull. Rain arrows.</p>
     <span class="cta">GOOGLE PLAY <small>coming soon</small></span>
   </div>
