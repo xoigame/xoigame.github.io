@@ -284,3 +284,4 @@ video { display: block; width: 100%; max-height: 75svh; aspect-ratio: 16 / 9; ob
 .card-art { aspect-ratio:16/9; }
 @media(max-width:700px) { .game-grid,.video-grid { grid-template-columns:1fr; } }
 .game-hero .hero-art > img { height:auto;aspect-ratio:auto; }
+video { height:auto; }
