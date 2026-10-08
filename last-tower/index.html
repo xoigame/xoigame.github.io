@@ -1,116 +1,35 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#111216">
 <title>Last Tower: Monster Siege — XOI GAME</title>
-<meta name="description" content="Last Tower: Monster Siege — a one-thumb archery tower defense game. Aim, pull and rain arrows on endless monster waves, roll a new skill in the gacha, and collect helmets, armor and bows from 8 civilizations.">
-<meta property="og:title" content="Last Tower: Monster Siege">
-<meta property="og:description" content="Aim. Pull. Rain arrows. Defend the last tower against endless monster waves.">
-<meta property="og:image" content="https://xoigame.github.io/last-tower/img/og.jpg">
+<meta name="description" content="One archer. One tower. A whole horde to stop. Aim your bow, discover powerful skills and hold the line.">
+<link rel="canonical" href="https://xoigame.com/last-tower/">
 <meta property="og:type" content="website">
-<meta name="robots" content="index, follow">
-<link rel="icon" type="image/png" href="img/icon-192.png">
-<link rel="apple-touch-icon" href="img/icon-192.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Alegreya:wght@400;500;700&display=swap" rel="stylesheet">
-<style>
-  :root{--wood:#3b2414;--wood2:#5a3820;--gold:#f2c35a;--gold2:#ffd98a;--parch:#f4e9d2;--parch2:#eadbbd;--ink:#3a2618;--muted:#6f5a45;--red:#a3321f;--line:#d3bf98}
-  *{box-sizing:border-box}
-  html{scroll-behavior:smooth}
-  body{margin:0;background:var(--parch);color:var(--ink);font:18px/1.65 "Alegreya",Georgia,serif}
-  a{color:var(--red);text-underline-offset:3px}
-  .top{background:var(--wood);color:var(--parch);padding:12px 20px;display:flex;justify-content:space-between;align-items:center;gap:16px;border-bottom:3px solid var(--gold)}
-  .brand{font:900 16px "Cinzel",serif;letter-spacing:.12em;color:var(--gold2);text-decoration:none}
-  .top nav{display:flex;gap:18px;flex-wrap:wrap}.top nav a{color:var(--parch2);text-decoration:none;font-size:15px}.top nav a:hover{color:var(--gold2)}
-  .hero{background:var(--wood);color:#fff;text-align:center;padding:0 0 44px}
-  .hero .art{display:block;width:100%;height:auto;border-bottom:3px solid var(--gold)}
-  @media(min-width:900px){.hero .art{max-height:72vh;object-fit:cover;object-position:center 40%}}
-  .hero .logo{width:min(520px,84vw);height:auto;margin-top:clamp(-54px,-6vw,-24px);filter:drop-shadow(0 6px 10px rgba(0,0,0,.55));position:relative}
-  .tag{font:700 clamp(20px,3.2vw,30px) "Cinzel",serif;margin:14px 0 20px;text-shadow:0 2px 6px rgba(0,0,0,.7);letter-spacing:.03em}
-  .cta{display:inline-flex;align-items:center;gap:10px;background:linear-gradient(#ffd76b,#e9a22d);color:#4a2708;border:3px solid #7a4a14;border-radius:14px;
-       padding:12px 26px;font:900 18px "Cinzel",serif;text-decoration:none;box-shadow:0 5px 0 #7a4a14,0 10px 18px rgba(0,0,0,.35)}
-  .cta small{font:600 13px "Alegreya",serif;opacity:.8}
-  .wrap{max-width:1080px;margin:auto;padding:56px 20px}
-  h2{font:900 clamp(24px,3.4vw,34px) "Cinzel",serif;color:var(--wood2);margin:0 0 8px;text-align:center}
-  .lead{text-align:center;color:var(--muted);max-width:720px;margin:0 auto 34px}
-  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px}
-  .card{background:var(--parch2);border:3px solid var(--wood2);border-radius:14px;padding:20px 20px 16px;box-shadow:inset 0 0 0 3px #f6ecd6,0 6px 14px rgba(59,36,20,.18)}
-  .card h3{font:700 19px "Cinzel",serif;margin:0 0 6px;color:var(--wood)}
-  .card p{margin:0;color:#4d3726;font-size:17px}
-  .ico{font-size:28px;line-height:1;margin-bottom:8px}
-  .shots{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}.shots img{width:100%;height:auto;border-radius:12px;border:3px solid var(--wood2);display:block}
-  .band{background:var(--wood);color:var(--parch)}
-  .band h2{color:var(--gold2)}.band .lead{color:var(--parch2)}
-  .civs{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:6px}
-  .civ{border:2px solid var(--gold);border-radius:999px;padding:6px 16px;font:700 15px "Cinzel",serif;color:var(--gold2)}
-  .civ.gem{border-color:#8fb4ff;color:#cfe0ff}
-  .note{text-align:center;color:var(--parch2);font-size:15px;margin-top:16px}
-  .links{display:flex;flex-wrap:wrap;justify-content:center;gap:14px;margin-top:10px}
-  .links a{border:2px solid var(--wood2);border-radius:12px;padding:10px 18px;text-decoration:none;color:var(--wood);font-weight:700;background:var(--parch2)}
-  footer{border-top:1px solid var(--line);padding:22px 20px;color:var(--muted);font-size:14px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
-  @media(max-width:560px){.top{padding:10px 16px}.top nav{gap:12px}.wrap{padding:44px 16px}}
-</style>
+<meta property="og:title" content="Last Tower: Monster Siege — XOI GAME">
+<meta property="og:description" content="One archer. One tower. A whole horde to stop. Aim your bow, discover powerful skills and hold the line.">
+<meta property="og:url" content="https://xoigame.com/last-tower/">
+<meta property="og:image" content="https://xoigame.com/last-tower/img/hero.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="/assets/brand.png">
+<link rel="stylesheet" href="/assets/site.css">
 </head>
-<body>
-<header class="top">
-  <a class="brand" href="/">XOI GAME</a>
-  <nav><a href="#features">Features</a><a href="#screens">Screens</a><a href="#collect">Collection</a><a href="privacy.html">Privacy</a><a href="#support">Support</a></nav>
-</header>
-
-<section class="hero">
-  <img class="art" src="img/hero.jpg" width="1600" height="900" alt="An archer on a stone tower fires fire, ice, poison and piercing arrows at a horde of monsters">
-  <div>
-    <img class="logo" src="img/logo.png" width="820" height="284" alt="Last Tower: Monster Siege">
-    <p class="tag">Aim. Pull. Rain arrows.</p>
-    <span class="cta">GOOGLE PLAY <small>coming soon</small></span>
-  </div>
-</section>
-
-<section class="wrap" id="features">
-  <h2>Defend the last tower</h2>
-  <p class="lead">A one-thumb archery tower defense game. Drag to aim, release to fire, and hold the line against endless waves of monsters.</p>
-  <div class="grid">
-    <div class="card"><div class="ico">🏹</div><h3>Drag, aim, fire</h3><p>Simple one-finger controls with a real bow feel — pull farther for a stronger shot.</p></div>
-    <div class="card"><div class="ico">🎰</div><h3>Skill gacha</h3><p>Roll a new skill at key waves: fire, ice, piercing and poison bows, time stop, slow motion — and the rare LEGENDARY.</p></div>
-    <div class="card"><div class="ico">👹</div><h3>Boss waves</h3><p>Monsters split, charge and swarm. Survive the boss at the end of every chapter.</p></div>
-    <div class="card"><div class="ico">📅</div><h3>Daily challenge</h3><p>A new twist every day, plus endless mode for chasing your best wave.</p></div>
-  </div>
-</section>
-
-<section class="wrap" id="screens">
-  <h2>Screenshots</h2>
-  <div class="shots">
-    <img loading="lazy" src="img/screen_01.jpg" width="1120" height="630" alt="Defend the last tower against waves of monsters">
-    <img loading="lazy" src="img/screen_02.jpg" width="1120" height="630" alt="Skill gacha revealing a LEGENDARY Fire Bow">
-    <img loading="lazy" src="img/screen_05.jpg" width="1120" height="630" alt="Helmets from 8 civilizations with 5 tiers">
-    <img loading="lazy" src="img/screen_07.jpg" width="1120" height="630" alt="Endless waves: how long can you hold?">
-  </div>
-</section>
-
-<section class="band" id="collect">
-  <div class="wrap">
-    <h2>Collect 8 civilizations</h2>
-    <p class="lead">Helmets and armor that grow stronger with every upgrade, and bows to collect just for style.</p>
-    <div class="civs">
-      <span class="civ">Europe</span><span class="civ">Byzantine</span><span class="civ">China</span><span class="civ">Dai Viet</span>
-      <span class="civ gem">Crusader</span><span class="civ gem">Japan</span><span class="civ gem">Mongol</span><span class="civ gem">Viking</span>
-    </div>
-    <p class="note">Every civilization can be earned by playing. Optional in-app purchases are available.</p>
-  </div>
-</section>
-
-<section class="wrap" id="support">
-  <h2>Support</h2>
-  <p class="lead">Questions, bug reports or data requests — write to us and we will reply as soon as we can.</p>
-  <div class="links">
-    <a href="mailto:xoistudio@gmail.com?subject=Last%20Tower%3A%20Monster%20Siege">xoistudio@gmail.com</a>
-    <a href="privacy.html">Privacy Policy</a>
-  </div>
-</section>
-
-<footer><span>© <span id="year"></span> XOI GAME · Vietnam</span><a href="/">xoigame.github.io</a></footer>
-<script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+<body style="--accent:#ffb351">
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header"><div class="wrap"><a class="brand" href="/" aria-label="XOI GAME home"><img class="brand-mark" src="/assets/brand.png" width="44" height="44" alt=""><span>XOI GAME</span></a><nav class="nav" aria-label="Main navigation"><a href="/#games">Our games</a><a href="/#studio">The studio</a><a href="#support">Support</a></nav></div></header>
+<main id="main">
+<div class="wrap breadcrumb"><a href="/">Home</a><span aria-hidden="true"> / </span><span>Last Tower: Monster Siege</span></div>
+<section class="hero game-hero wrap" aria-labelledby="game-title"><div class="hero-copy"><p class="eyebrow">Archery · Tower defense</p><span class="pill live">Available now</span><h1 id="game-title">Last Tower: Monster Siege</h1><p class="tagline">The last tower. Your first legendary shot.</p><p class="hero-description">Pull back your bow and stand between the tower and an advancing monster horde. Every wave brings another chance to build a stronger archer.</p><div class="hero-actions"><a class="button primary" href="https://play.google.com/store/apps/details?id=com.xoigame.lasttowermonster">Get it on Google Play <span aria-hidden="true">↗</span></a><a class="button secondary" href="#trailer">Watch trailer <span aria-hidden="true">▶</span></a></div><div class="facts"><dl><dt>Genre</dt><dd>Archery · Tower defense</dd></dl><dl><dt>Status</dt><dd>Available now</dd></dl><dl><dt>Studio</dt><dd>XOI GAME</dd></dl></div></div><figure class="hero-art"><img src="/last-tower/img/hero.jpg" alt="Last Tower: Monster Siege promotional artwork" width="1280" height="720" fetchpriority="high"></figure></section>
+<section class="wrap section" id="about" aria-labelledby="about-title"><div class="section-head"><div><p class="eyebrow">Made to play</p><h2 id="about-title">The last tower. Your first legendary shot.</h2></div></div><div class="feature-grid"><article class="feature-card"><span class="feature-number">01</span><h3>Aim with one finger</h3><p>Drag, aim and release. Put every arrow where it matters as monsters close in on your tower.</p></article>
+<article class="feature-card"><span class="feature-number">02</span><h3>Build a powerful run</h3><p>Discover fire, ice, poison and piercing arrows. Mix your skills to meet the next wave.</p></article>
+<article class="feature-card"><span class="feature-number">03</span><h3>Keep the siege going</h3><p>Take on boss waves, return for daily challenges, or chase your best wave in endless mode.</p></article></div></section>
+<section class="wrap section" id="trailer" aria-labelledby="trailer-title"><div class="section-head"><div><p class="eyebrow">See it in motion</p><h2 id="trailer-title">Watch the trailer</h2></div></div><video controls playsinline preload="none" poster="/last-tower/img/hero.jpg" width="1280" height="720" aria-label="Last Tower: Monster Siege promotional trailer"><source src="/assets/video/last-tower.mp4" type="video/mp4">Your browser does not support video. <a href="/assets/video/last-tower.mp4">Open the trailer</a>.</video><p class="muted"><a href="/assets/video/last-tower.mp4">Open the trailer</a></p></section>
+<section class="wrap section" aria-labelledby="gallery-title"><div class="section-head"><div><p class="eyebrow">Inside the game</p><h2 id="gallery-title">A closer look</h2></div></div><div class="gallery"><figure class="shot"><img src="/last-tower/img/screen_01.jpg" alt="Hold the line against the monster horde." loading="lazy" width="1280" height="720"><figcaption>Hold the line against the monster horde.</figcaption></figure><figure class="shot"><img src="/last-tower/img/screen_02.jpg" alt="Discover skills that change your next shot." loading="lazy" width="1280" height="720"><figcaption>Discover skills that change your next shot.</figcaption></figure><figure class="shot"><img src="/last-tower/img/screen_07.jpg" alt="Push further in endless mode." loading="lazy" width="1280" height="720"><figcaption>Push further in endless mode.</figcaption></figure></div></section>
+<section class="wrap section" aria-labelledby="related-title"><div class="section-head"><div><p class="eyebrow">Keep exploring</p><h2 id="related-title">More from XOI GAME</h2></div><a href="/#games">All games <span aria-hidden="true">↗</span></a></div><div class="related-grid"><a class="feature-card" href="/stickman-archer-duel/"><p class="eyebrow">Turn-based archery</p><h3>Stickman Archer Duel ↗</h3><p>Read the wind. Draw your bow. Make the shot count in a new adventure of rival archers and champion duels.</p></a></div></section>
+<section class="contact-band wrap" id="support" aria-labelledby="support-title"><div><p class="eyebrow">We're here to help</p><h2 id="support-title">Questions about Last Tower: Monster Siege?</h2><p>For support or feedback, get in touch with our studio.</p></div><a class="button secondary" href="mailto:xoistudio@gmail.com?subject=last-tower%20support">Email support <span aria-hidden="true">↗</span></a></section>
+</main>
+<footer class="site-footer"><div class="wrap"><a class="brand" href="/">XOI GAME</a><p>© 2026 XOI GAME. Made for the joy of play.</p><nav class="footer-links" aria-label="Footer"><a href="/">Home</a><a href="/last-tower/privacy.html">Privacy policy</a><a href="mailto:xoistudio@gmail.com">Contact</a></nav></div></footer>
 </body>
 </html>

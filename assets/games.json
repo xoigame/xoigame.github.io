@@ -1,0 +1,22 @@
+[
+  {
+    "slug": "last-tower",
+    "name": "Last Tower: Monster Siege",
+    "genre": "Archery · Tower defense",
+    "status": "Available now",
+    "description": "One archer. One tower. A whole horde to stop. Aim your bow, discover powerful skills and hold the line.",
+    "image": "/last-tower/img/hero.jpg",
+    "accent": "#ffb351",
+    "playUrl": "https://play.google.com/store/apps/details?id=com.xoigame.lasttowermonster"
+  },
+  {
+    "slug": "stickman-archer-duel",
+    "name": "Stickman Archer Duel",
+    "genre": "Turn-based archery",
+    "status": "In development",
+    "description": "Read the wind. Draw your bow. Make the shot count in a new adventure of rival archers and champion duels.",
+    "image": "/assets/games/archer-hero.jpg",
+    "accent": "#e7ba73",
+    "playUrl": null
+  }
+]
