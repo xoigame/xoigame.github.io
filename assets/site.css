@@ -383,3 +383,21 @@ body { background-image:radial-gradient(ellipse at 85% 8%,#d9f66f07,transparent 
 @media(max-width:700px) { .films-intro,.films-follow { align-items:flex-start;flex-direction:column;gap:16px; } .films-section { padding-top:65px; } .film-copy { padding:25px; } .film-copy h3 { font-size:2rem; } .studio-home .nav { gap:16px;flex-wrap:nowrap; } .studio-home .nav .nav-cta { display:none; } }
 @media(max-width:440px) { .film-card { grid-template-columns:1fr; } .film-screen { width:100%;max-width:280px;justify-self:center; } .film-copy { padding:24px; } .film-copy .eyebrow { margin-bottom:14px; } .films-follow .footer-links { flex-wrap:wrap; } }
 @media(prefers-reduced-motion:reduce) { .film-play img { transition:none; } .film-play:hover img { transform:none; } }
+
+/* The film library has its own entrance and an uninterrupted portrait shelf. */
+.film-library-main { padding-top:70px; }
+.film-library-hero { padding-bottom:50px;border-bottom:1px solid var(--line);margin-bottom:40px; }
+.film-library-hero h1 { font-size:clamp(3.3rem,7.5vw,6.5rem);max-width:1000px;margin-bottom:26px; }
+.film-library-hero p.muted { max-width:680px;font-size:1.05rem; }
+.film-library-hero .eyebrow { color:var(--orange); }
+.film-library-grid { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px; }
+.film-library-grid .film-card { grid-template-columns:1fr; }
+.film-library-grid .film-screen { width:100%; }
+.film-library-grid .film-copy { min-height:310px;padding:28px; }
+.film-library-grid .film-copy h3 { font-size:2.1rem; }
+.films-page .films-follow { margin-block:35px 65px; }
+.films-page .site-footer { padding-block:30px;flex-wrap:wrap;gap:20px; }
+.films-page .site-footer .footer-links { flex-wrap:wrap; }
+@media(max-width:1000px) { .film-library-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media(max-width:700px) { .film-library-main { padding-top:42px; } .film-library-hero { padding-bottom:30px;margin-bottom:28px; } .film-library-hero h1 { font-size:clamp(2.8rem,11vw,4.2rem); } .film-library-grid { grid-template-columns:1fr; } .film-library-grid .film-card { grid-template-columns:minmax(150px,40%) 1fr; } .film-library-grid .film-copy { min-height:0;padding:24px; } }
+@media(max-width:440px) { .film-library-grid .film-card { grid-template-columns:1fr; } .film-library-grid .film-copy { min-height:290px; } }
