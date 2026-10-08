@@ -1,7 +1,68 @@
 const grid = document.querySelector('#game-grid');
 const status = document.querySelector('#catalog-status');
 let games = [];
+const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
+const revealSelector = '.intro-line, .home-hero, .section-head, .video-card, .studio-section, .contact-band, .game-card';
+let revealObserver;
+function showReveal(element) {
+  element.classList.add('is-visible');
+  revealObserver?.unobserve(element);
+}
+function observeReveals(scope = document) {
+  if (!revealObserver || motionPreference.matches) return;
+  scope.querySelectorAll(revealSelector).forEach(element => {
+    if (element.classList.contains('is-visible')) return;
+    element.classList.add('reveal');
+    revealObserver.observe(element);
+  });
+}
+function configureReveals() {
+  revealObserver?.disconnect();
+  revealObserver = undefined;
+  document.documentElement.classList.remove('reveal-ready');
+  if (motionPreference.matches || !('IntersectionObserver' in window)) {
+    document.querySelectorAll('.reveal').forEach(showReveal);
+    return;
+  }
+  try {
+    revealObserver = new IntersectionObserver(entries => {
+      entries.forEach(entry => { if (entry.isIntersecting) showReveal(entry.target); });
+    }, { threshold: 0, rootMargin: '0px 0px -24px 0px' });
+    observeReveals();
+    document.documentElement.classList.add('reveal-ready');
+  } catch {
+    document.querySelectorAll('.reveal').forEach(showReveal);
+  }
+}
+configureReveals();
+if (motionPreference.addEventListener) motionPreference.addEventListener('change', configureReveals);
+else motionPreference.addListener?.(configureReveals);
+document.addEventListener('focusin', event => {
+  const element = event.target.closest('.reveal');
+  if (element) showReveal(element);
+});
+let refreshScrollProgress = () => {};
+const progress = document.querySelector('.scroll-progress, #scroll-progress');
+if (progress) {
+  let scheduled = false;
+  const updateProgress = () => {
+    const distance = document.documentElement.scrollHeight - window.innerHeight;
+    const fraction = distance > 0 ? Math.min(1, Math.max(0, window.scrollY / distance)) : 0;
+    document.documentElement.style.setProperty('--scroll-progress', fraction);
+    scheduled = false;
+  };
+  const scheduleProgress = () => {
+    if (!scheduled) { scheduled = true; requestAnimationFrame(updateProgress); }
+  };
+  refreshScrollProgress = scheduleProgress;
+  window.addEventListener('scroll', scheduleProgress, { passive: true });
+  window.addEventListener('resize', scheduleProgress);
+  window.addEventListener('load', scheduleProgress, { once: true });
+  updateProgress();
+}
+
 function render(filter = 'all') {
+  grid.querySelectorAll('.reveal').forEach(element => revealObserver?.unobserve(element));
   grid.replaceChildren();
   const selected = games.filter(game => filter === 'all' || game.status === filter);
   for (const game of selected) {
@@ -23,7 +84,14 @@ function render(filter = 'all') {
     const link = document.createElement('a'); link.className = 'card-link'; link.href = `/${game.slug}/`; link.textContent = 'Explore game →'; link.setAttribute('aria-label', `Explore ${game.name}`);
     body.append(top, title, desc, link); card.append(art, body); grid.append(card);
   }
-  status.textContent = `${selected.length} games · ${filter === 'In development' ? 'Upcoming games are still in development.' : 'Available on Android. More adventures on the way.'}`;
+  const available = selected.filter(game => Boolean(game.playUrl)).length;
+  const upcoming = selected.length - available;
+  const counts = [];
+  if (available) counts.push(`${available} available now on Android`);
+  if (upcoming) counts.push(`${upcoming} in development`);
+  status.textContent = counts.length ? counts.join(' · ') : 'No games in this category yet.';
+  observeReveals(grid);
+  refreshScrollProgress();
 }
 fetch('/assets/games.json').then(response => {
   if (!response.ok) throw new Error('Catalog unavailable');
