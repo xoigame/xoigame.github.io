@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Download Last Tower: Monster Siege — XOI GAME</title>
+<meta name="description" content="One archer. One tower. Endless monsters. Free on Google Play.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Play Last Tower: Monster Siege — free download">
+<meta property="og:description" content="One archer. One tower. Endless monsters. Free on Google Play.">
+<meta property="og:url" content="https://xoigame.com/go/lasttower/">
+
+<meta property="og:image" content="https://xoigame.com/last-tower/img/og.jpg">
+<meta name="robots" content="noindex">
+<style>
+:root{color-scheme:dark}
+body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0b1020;color:#fff;font:16px/1.4 system-ui,Segoe UI,Arial,sans-serif}
+main{width:100%;max-width:420px;padding:24px 16px;text-align:center}
+h1{font-size:26px;margin:12px 0 4px} p{color:#b9c3dc;margin:4px 0 22px}
+.icon{width:120px;height:120px;border-radius:26px;object-fit:cover}
+a.btn{display:block;margin:12px 0;padding:18px 16px;border-radius:999px;background:#22c55e;color:#fff;font-weight:700;font-size:20px;text-decoration:none}
+a.btn.alt{background:#1f2a48;font-size:16px;font-weight:600}
+small{color:#8b97b5;display:block;margin-top:18px}
+</style></head><body><main>
+<img class="icon" src="/last-tower/img/icon-192.png" alt="">
+
+<h1>Last Tower: Monster Siege</h1><p id="msg">One archer. One tower. Endless monsters. Free on Google Play.</p>
+<a class="btn" id="android" href="https://play.google.com/store/apps/details?id=com.xoigame.lasttowermonster">▶ PLAY NOW — Google Play</a>
+<a class="btn alt" id="ios" href="#" hidden>iPhone / iPad: App Store</a>
+<small id="note"></small>
+<small>XOI GAME · free to play, ads and in-app purchases</small>
+</main>
+<script>
+(function(){
+  var play="https://play.google.com/store/apps/details?id=com.xoigame.lasttowermonster", ios="", ua=navigator.userAgent||"";
+  var isIOS=/iPhone|iPad|iPod/i.test(ua)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+  var isAndroid=/Android/i.test(ua);
+  if(isAndroid){location.replace(play);return;}
+  if(isIOS){
+    if(ios){location.replace(ios);return;}
+    document.getElementById("android").hidden=true;
+    document.getElementById("msg").textContent="The iPhone version is coming soon. Follow XOI GAME to be the first to play.";
+    var a=document.getElementById("ios");a.hidden=false;a.textContent="Follow XOI GAME";a.href="https://www.facebook.com/GameStickMan/";
+  }else{
+    document.getElementById("note").textContent="Open this link on your phone to install, or tap the button.";
+  }
+})();
+</script></body></html>
