@@ -11,12 +11,42 @@
   },
   {
     "slug": "stickman-archer-duel",
-    "name": "Stickman Archer Duel",
+    "name": "Stickman Archer Duel: Bow War",
     "genre": "Turn-based archery",
-    "status": "In development",
-    "description": "Read the wind. Draw your bow. Make the shot count in a new adventure of rival archers and champion duels.",
+    "status": "Available now",
+    "description": "Read the wind, land the perfect headshot and challenge the champions of eight civilizations. Pull, aim and let the arrows fly.",
     "image": "/assets/games/archer-hero.jpg",
     "accent": "#e7ba73",
+    "playUrl": "https://play.google.com/store/apps/details?id=com.xoigame.stickmanarcherduel"
+  },
+  {
+    "slug": "marble-rush",
+    "name": "Marble Rush: Quick Brain Game",
+    "genre": "Brain training · Reflex puzzle",
+    "status": "Available now",
+    "description": "Biggest or smallest? Spot the right marble and tap its color before time runs out. One rule. One tap. One more try.",
+    "image": "/assets/games/marble-hero.jpg",
+    "accent": "#8edbff",
+    "playUrl": "https://play.google.com/store/apps/details?id=com.xoigame.marblerush"
+  },
+  {
+    "slug": "find-numbers",
+    "name": "Find Numbers 1 to 100",
+    "genre": "Number puzzle · Casual",
+    "status": "Available now",
+    "description": "A hundred numbers. One sharp eye. Find and tap them in order, challenge a friend or take on the AI.",
+    "image": "/assets/games/find-numbers-hero.jpg",
+    "accent": "#9fdbff",
+    "playUrl": "https://play.google.com/store/apps/details?id=com.xoigame.FindNumber"
+  },
+  {
+    "slug": "stickman-block-defense",
+    "name": "Stickman Block Defense",
+    "genre": "Block puzzle · Castle defense",
+    "status": "In development",
+    "description": "Stack your wall. Clear a line. Fire a volley. A new puzzle-defense adventure with mighty heroes and epic castle sieges.",
+    "image": "/assets/games/block-defense-hero.jpg",
+    "accent": "#ffbd6d",
     "playUrl": null
   }
 ]
