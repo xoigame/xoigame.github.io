@@ -16,6 +16,7 @@ Existing XOI GAME production artwork, resized as JPEG for the website. No new ar
 | sa002.jpg | inbox/flow-stickman-film/SA002/frames/start/N01.jpg | SA002 — Ninja Stick, L3clXb9ZC0g |
 | sa003.jpg | inbox/flow-stickman-film/SA003/frames/start/B01.jpg | SA003 — Rubber Stick, iJhwD6QlPYw |
 | sa004.jpg | inbox/flow-stickman-film/SA004/frames/start/K01.jpg | SA004 — Slash Stick, 4dmYStTMkM4 |
+| sa007.jpg | inbox/flow-stickman-film/SA007/frames/start/L10.jpg | SA007 — Alchemy Stick, g2VZHnWC5gk |
 | sm008.jpg | inbox/flow-stickman-film/SM008/frames/D01.jpg | SM008 — Death Loop, qzY5O1ZF4Tg |
 
 The 10 new episode IDs were verified from the public @xoigame Shorts channel on 2026-10-15. This supersedes stale local publication entries, including CR004 h4HYvRcSDE8 and CR006 Wv5VbJcoUVU. CR001–003 were previously verified Public in Studio on 2026-10-08. CR009 and SA005 remain excluded because their local files are review drafts. Playback uses existing public YouTube uploads; no MP4s are republished here.
