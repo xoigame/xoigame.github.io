@@ -17,8 +17,9 @@ Existing XOI GAME production artwork, resized as JPEG for the website. No new ar
 | sa003.jpg | inbox/flow-stickman-film/SA003/frames/start/B01.jpg | SA003 — Rubber Stick, iJhwD6QlPYw |
 | sa004.jpg | inbox/flow-stickman-film/SA004/frames/start/K01.jpg | SA004 — Slash Stick, 4dmYStTMkM4 |
 | sa007.jpg | inbox/flow-stickman-film/SA007/frames/start/L10.jpg | SA007 — Alchemy Stick, g2VZHnWC5gk |
+| sa008.jpg | inbox/flow-stickman-film/SA008/frames/start/S01.jpg | SA008 — Shadow Stick, 2CKd6n15l5M |
 | sm008.jpg | inbox/flow-stickman-film/SM008/frames/D01.jpg | SM008 — Death Loop, qzY5O1ZF4Tg |
 
-The 10 new episode IDs were verified from the public @xoigame Shorts channel on 2026-10-15. This supersedes stale local publication entries, including CR004 h4HYvRcSDE8 and CR006 Wv5VbJcoUVU. CR001–003 were previously verified Public in Studio on 2026-10-08. CR009 and SA005 remain excluded because their local files are review drafts. Playback uses existing public YouTube uploads; no MP4s are republished here.
+The 10 new episode IDs were verified from the public @xoigame Shorts channel on 2026-10-15. This supersedes stale local publication entries, including CR004 h4HYvRcSDE8 and CR006 Wv5VbJcoUVU. SA007 and SA008 were verified from the public @xoigame Shorts channel on 2026-10-20. CR001–003 were previously verified Public in Studio on 2026-10-08. CR009 and SA005 remain excluded because their local files are review drafts. Playback uses existing public YouTube uploads; no MP4s are republished here.
 
 Poster source files were inspected by path and optimized to a maximum of 720×1280, JPEG quality 85. Episode durations are rounded up from the local published/review export durations; public upload lengths may differ slightly.
