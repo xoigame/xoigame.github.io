@@ -3,3 +3,6 @@ stickman/
 
 # Trang thai server local (pid/log).
 .gamedevhub/
+
+# dashboard YouTube: bản rõ chỉ để xem local
+youtube/data.json
