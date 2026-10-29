@@ -48,5 +48,15 @@
     "image": "/assets/games/block-defense-hero.jpg",
     "accent": "#ffbd6d",
     "playUrl": null
+  },
+  {
+    "slug": "rooftop-last-stand",
+    "name": "Rooftop Last Stand",
+    "genre": "Zombie shooter · Wave defense",
+    "status": "In development",
+    "description": "Hold the roof. Survive the night. Aim, land headshots and crack open supply crates between waves to power up your arsenal.",
+    "image": "/assets/games/rooftop-hero.jpg",
+    "accent": "#8bd13f",
+    "playUrl": null
   }
 ]
