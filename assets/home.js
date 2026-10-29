@@ -93,12 +93,12 @@ function render(filter = 'all') {
   observeReveals(grid);
   refreshScrollProgress();
 }
-fetch('/assets/games.json?v=20261015').then(response => {
+fetch('/assets/games.json?v=20261029').then(response => {
   if (!response.ok) throw new Error('Catalog unavailable');
   return response.json();
 }).then(data => { games = data; render(); }).catch(() => {
   status.replaceChildren(document.createTextNode('Explore our games: '));
-  for (const [slug, name] of [['last-tower','Last Tower'],['stickman-archer-duel','Archer Duel'],['marble-rush','Marble Rush'],['find-numbers','Find Numbers'],['stickman-block-defense','Block Defense']]) {
+  for (const [slug, name] of [['last-tower','Last Tower'],['stickman-archer-duel','Archer Duel'],['marble-rush','Marble Rush'],['find-numbers','Find Numbers'],['stickman-block-defense','Block Defense'],['rooftop-last-stand','Rooftop Last Stand']]) {
     const link = document.createElement('a'); link.href = `/${slug}/`; link.textContent = name;
     status.append(link, document.createTextNode(' · '));
   }
