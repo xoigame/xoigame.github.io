@@ -1,7 +1,7 @@
 {
   "name": "Xoi Fortune",
   "short_name": "Fortune",
-  "description": "Tarot, I Ching and playing-card readings. Free and offline.",
+  "description": "Tarot, I Ching, playing cards, Tu Vi, Bat Tu, Plum Blossom and numerology. Free and offline.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

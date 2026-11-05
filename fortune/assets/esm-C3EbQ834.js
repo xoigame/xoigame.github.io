@@ -1,0 +1,2 @@
+const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["assets/web-DJI-8cvX.js","assets/index-7xWhC0j4.js","assets/index-Cj79sihN.css"])))=>i.map(i=>d[i]);
+import{i as e,t}from"./index-7xWhC0j4.js";var n=e(`SplashScreen`,{web:()=>t(()=>import(`./web-DJI-8cvX.js`).then(e=>new e.SplashScreenWeb),__vite__mapDeps([0,1,2]))});export{n as SplashScreen};
