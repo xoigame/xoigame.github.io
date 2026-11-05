@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://xoigame.com/fortune/sitemap.xml
