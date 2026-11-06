@@ -1,62 +1,72 @@
 [
-  {
-    "slug": "last-tower",
-    "name": "Last Tower: Monster Siege",
-    "genre": "Archery · Tower defense",
-    "status": "Available now",
-    "description": "One archer. One tower. A whole horde to stop. Aim your bow, discover powerful skills and hold the line.",
-    "image": "/last-tower/img/hero.jpg",
-    "accent": "#ffb351",
-    "playUrl": "https://play.google.com/store/apps/details?id=com.xoigame.lasttowermonster"
-  },
-  {
-    "slug": "stickman-archer-duel",
-    "name": "Stickman Archer Duel: Bow War",
-    "genre": "Turn-based archery",
-    "status": "Available now",
-    "description": "Read the wind, land the perfect headshot and challenge the champions of eight civilizations. Pull, aim and let the arrows fly.",
-    "image": "/assets/games/archer-hero.jpg",
-    "accent": "#e7ba73",
-    "playUrl": "https://play.google.com/store/apps/details?id=com.xoigame.stickmanarcherduel"
-  },
-  {
-    "slug": "marble-rush",
-    "name": "Marble Rush: Quick Brain Game",
-    "genre": "Brain training · Reflex puzzle",
-    "status": "Available now",
-    "description": "Biggest or smallest? Spot the right marble and tap its color before time runs out. One rule. One tap. One more try.",
-    "image": "/assets/games/marble-hero.jpg",
-    "accent": "#8edbff",
-    "playUrl": "https://play.google.com/store/apps/details?id=com.xoigame.marblerush"
-  },
-  {
-    "slug": "find-numbers",
-    "name": "Find Numbers 1 to 100",
-    "genre": "Number puzzle · Casual",
-    "status": "Available now",
-    "description": "A hundred numbers. One sharp eye. Find and tap them in order, challenge a friend or take on the AI.",
-    "image": "/assets/games/find-numbers-hero.jpg",
-    "accent": "#9fdbff",
-    "playUrl": "https://play.google.com/store/apps/details?id=com.xoigame.FindNumber"
-  },
-  {
-    "slug": "stickman-block-defense",
-    "name": "Stickman Block Defense",
-    "genre": "Block puzzle · Castle defense",
-    "status": "In development",
-    "description": "Stack your wall. Clear a line. Fire a volley. A new puzzle-defense adventure with mighty heroes and epic castle sieges.",
-    "image": "/assets/games/block-defense-hero.jpg",
-    "accent": "#ffbd6d",
-    "playUrl": null
-  },
-  {
-    "slug": "rooftop-last-stand",
-    "name": "Rooftop Last Stand",
-    "genre": "Zombie shooter · Wave defense",
-    "status": "In development",
-    "description": "Hold the roof. Survive the night. Aim, land headshots and crack open supply crates between waves to power up your arsenal.",
-    "image": "/assets/games/rooftop-hero.jpg",
-    "accent": "#8bd13f",
-    "playUrl": null
-  }
+ {
+  "slug": "last-tower",
+  "name": "Last Tower: Monster Siege",
+  "genre": "Archery · Tower defense",
+  "status": "Available now",
+  "description": "One archer. One tower. A whole horde to stop. Aim your bow, discover powerful skills and hold the line.",
+  "image": "/last-tower/img/hero.jpg",
+  "accent": "#ffb351",
+  "playUrl": "https://play.google.com/store/apps/details?id=com.xoigame.lasttowermonster"
+ },
+ {
+  "slug": "stickman-archer-duel",
+  "name": "Stickman Archer Duel: Bow War",
+  "genre": "Turn-based archery",
+  "status": "Available now",
+  "description": "Read the wind, land the perfect headshot and challenge the champions of eight civilizations. Pull, aim and let the arrows fly.",
+  "image": "/assets/games/archer-hero.jpg",
+  "accent": "#e7ba73",
+  "playUrl": "https://play.google.com/store/apps/details?id=com.xoigame.stickmanarcherduel"
+ },
+ {
+  "slug": "marble-rush",
+  "name": "Marble Rush: Quick Brain Game",
+  "genre": "Brain training · Reflex puzzle",
+  "status": "Available now",
+  "description": "Biggest or smallest? Spot the right marble and tap its color before time runs out. One rule. One tap. One more try.",
+  "image": "/assets/games/marble-hero.jpg",
+  "accent": "#8edbff",
+  "playUrl": "https://play.google.com/store/apps/details?id=com.xoigame.marblerush"
+ },
+ {
+  "slug": "find-numbers",
+  "name": "Find Numbers 1 to 100",
+  "genre": "Number puzzle · Casual",
+  "status": "Available now",
+  "description": "A hundred numbers. One sharp eye. Find and tap them in order, challenge a friend or take on the AI.",
+  "image": "/assets/games/find-numbers-hero.jpg",
+  "accent": "#9fdbff",
+  "playUrl": "https://play.google.com/store/apps/details?id=com.xoigame.FindNumber"
+ },
+ {
+  "slug": "stickman-block-defense",
+  "name": "Stickman Block Defense",
+  "genre": "Block puzzle · Castle defense",
+  "status": "In development",
+  "description": "Stack your wall. Clear a line. Fire a volley. A new puzzle-defense adventure with mighty heroes and epic castle sieges.",
+  "image": "/assets/games/block-defense-hero.jpg",
+  "accent": "#ffbd6d",
+  "playUrl": null
+ },
+ {
+  "slug": "rooftop-last-stand",
+  "name": "Rooftop Last Stand",
+  "genre": "Zombie shooter · Wave defense",
+  "status": "In development",
+  "description": "Hold the roof. Survive the night. Aim, land headshots and crack open supply crates between waves to power up your arsenal.",
+  "image": "/assets/games/rooftop-hero.jpg",
+  "accent": "#8bd13f",
+  "playUrl": null
+ },
+ {
+  "slug": "arrow-escape",
+  "name": "Arrow Escape: Tap Away Puzzle",
+  "genre": "Arrow puzzle · Casual",
+  "status": "In development",
+  "description": "Tap a paper arrow and watch it fly off the board. Find the right order, unlock keys, melt ice and decorate Pip's cozy home.",
+  "image": "/assets/games/arrow-escape-hero.jpg",
+  "accent": "#e4572e",
+  "playUrl": null
+ }
 ]
