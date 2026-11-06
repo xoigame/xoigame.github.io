@@ -1,2 +1,0 @@
-const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["assets/web-D0e-nsJ2.js","assets/index-Qf-27Qk7.js","assets/index-CouHgCqP.css"])))=>i.map(i=>d[i]);
-import{i as e,t}from"./index-Qf-27Qk7.js";var n=e(`SplashScreen`,{web:()=>t(()=>import(`./web-D0e-nsJ2.js`).then(e=>new e.SplashScreenWeb),__vite__mapDeps([0,1,2]))});export{n as SplashScreen};
