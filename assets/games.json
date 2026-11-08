@@ -79,5 +79,16 @@
   "image": "/assets/games/arrow-escape-hero.jpg",
   "accent": "#e4572e",
   "playUrl": null
+ },
+ {
+  "slug": "bolt-pop",
+  "name": "Bolt Pop: Unscrew Puzzle",
+  "genre": "Screw puzzle · Casual",
+  "status": "In development",
+  "description": "Unscrew colorful screws, drop them into matching toolboxes and watch the plates fall. 300 handcrafted levels and a Robot Garage to decorate.",
+  "image": "/assets/games/bolt-pop-hero.jpg",
+  "accent": "#f5b82e",
+  "playUrl": null,
+  "package": "com.xoigame.boltpop"
  }
 ]

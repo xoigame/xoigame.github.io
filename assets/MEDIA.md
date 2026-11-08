@@ -15,3 +15,8 @@ Videos are H.264/AAC, 1280×720, CRF 26, with faststart; audio and edit preserve
 - `games/ring-sort-hero.jpg`: RingSort/StoreAssets/play/feature-1024x500.png (studio-owned Play feature graphic), re-encoded as JPEG.
 - `games/ring-sort-01..04.jpg`: 720×1280 captures of the Ring Sort playable demo (art from the game itself), rendered in headless Edge.
 - `/ring-sort/play/{quick,challenge}.html`: playable demo builds from GameDevHub `packages/playable-ads` (`npm run build -- ringsort --network web`, variants `a-quick` / `b-challenge`). Single self-contained HTML, ~0.9 MB each; rebuild there and copy over, never edit by hand.
+
+## Bolt Pop (2026-11-09)
+
+- `games/bolt-pop-01..03.jpg`: 720×1280 JPEG re-encodes of captures from the game itself (BoltPop `Logs/Shots`, level 1, menu, decorated garage).
+- `games/bolt-pop-hero.jpg`: 1280×720 composite of the studio-owned logo, app icon and two of those captures. `games/bolt-pop-icon.png`: 512×512 app icon.
