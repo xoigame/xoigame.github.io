@@ -40,6 +40,17 @@
   "playUrl": "https://play.google.com/store/apps/details?id=com.xoigame.FindNumber"
  },
  {
+  "slug": "ring-sort",
+  "name": "Ring Sort: Color Hoop Puzzle",
+  "genre": "Color sort puzzle · Casual",
+  "status": "In development",
+  "description": "Stack colored wooden rings, fill each peg with one color and watch it snap shut. Play the free demo right in your browser.",
+  "image": "/assets/games/ring-sort-hero.jpg",
+  "accent": "#f5a623",
+  "playUrl": null,
+  "demoUrl": "/ring-sort/#demo"
+ },
+ {
   "slug": "stickman-block-defense",
   "name": "Stickman Block Defense",
   "genre": "Block puzzle · Castle defense",

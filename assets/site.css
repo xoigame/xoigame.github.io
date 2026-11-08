@@ -409,3 +409,4 @@ body { background-image:radial-gradient(ellipse at 85% 8%,#d9f66f07,transparent 
 @media(max-width:1000px) { .film-library-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 @media(max-width:700px) { .film-library-main { padding-top:42px; } .film-library-hero { padding-bottom:30px;margin-bottom:28px; } .film-library-hero h1 { font-size:clamp(2.8rem,11vw,4.2rem); } .film-library-grid { grid-template-columns:1fr; } .film-library-grid .film-card { grid-template-columns:minmax(150px,40%) 1fr; } .film-library-grid .film-copy { min-height:0;padding:24px; } }
 @media(max-width:440px) { .film-library-grid .film-card { grid-template-columns:1fr; } .film-library-grid .film-copy { min-height:290px; } }
+.card-demo + .card-link { margin-top: 0; }
