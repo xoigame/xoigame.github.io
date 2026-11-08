@@ -40,6 +40,17 @@
   "playUrl": "https://play.google.com/store/apps/details?id=com.xoigame.FindNumber"
  },
  {
+  "slug": "ring-sort",
+  "name": "Ring Sort: Color Hoop Puzzle",
+  "genre": "Color sort puzzle · Casual",
+  "status": "In development",
+  "description": "Stack colored wooden rings, fill each peg with one color and watch it snap shut. Play the free demo right in your browser.",
+  "image": "/assets/games/ring-sort-hero.jpg",
+  "accent": "#f5a623",
+  "playUrl": null,
+  "demoUrl": "/ring-sort/#demo"
+ },
+ {
   "slug": "stickman-block-defense",
   "name": "Stickman Block Defense",
   "genre": "Block puzzle · Castle defense",
@@ -67,16 +78,6 @@
   "description": "Tap a paper arrow and watch it fly off the board. Find the right order, unlock keys, melt ice and decorate Pip's cozy home.",
   "image": "/assets/games/arrow-escape-hero.jpg",
   "accent": "#e4572e",
-  "playUrl": null
- },
- {
-  "slug": "ring-sort",
-  "name": "Ring Sort: Color Hoop Puzzle",
-  "genre": "Sort puzzle · Casual",
-  "status": "In development",
-  "description": "Lift colorful wooden rings, sort them by color and lock every peg. A cozy, satisfying puzzle with 300 levels.",
-  "image": "/assets/games/ring-sort-hero.jpg",
-  "accent": "#2bb3a6",
   "playUrl": null
  }
 ]

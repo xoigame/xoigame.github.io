@@ -82,7 +82,12 @@ function render(filter = 'all') {
     const title = document.createElement('h3'); title.textContent = game.name;
     const desc = document.createElement('p'); desc.textContent = game.description;
     const link = document.createElement('a'); link.className = 'card-link'; link.href = `/${game.slug}/`; link.textContent = 'Explore game →'; link.setAttribute('aria-label', `Explore ${game.name}`);
-    body.append(top, title, desc, link); card.append(art, body); grid.append(card);
+    body.append(top, title, desc);
+    if (game.demoUrl) {
+      const demo = document.createElement('a'); demo.className = 'card-link card-demo'; demo.href = game.demoUrl; demo.textContent = 'Play the demo in your browser ▶'; demo.setAttribute('aria-label', `Play the ${game.name} demo`);
+      body.append(demo);
+    }
+    body.append(link); card.append(art, body); grid.append(card);
   }
   const available = selected.filter(game => Boolean(game.playUrl)).length;
   const upcoming = selected.length - available;
@@ -93,12 +98,12 @@ function render(filter = 'all') {
   observeReveals(grid);
   refreshScrollProgress();
 }
-fetch('/assets/games.json?v=20261029').then(response => {
+fetch('/assets/games.json?v=20261108').then(response => {
   if (!response.ok) throw new Error('Catalog unavailable');
   return response.json();
 }).then(data => { games = data; render(); }).catch(() => {
   status.replaceChildren(document.createTextNode('Explore our games: '));
-  for (const [slug, name] of [['last-tower','Last Tower'],['stickman-archer-duel','Archer Duel'],['marble-rush','Marble Rush'],['find-numbers','Find Numbers'],['stickman-block-defense','Block Defense'],['rooftop-last-stand','Rooftop Last Stand']]) {
+  for (const [slug, name] of [['last-tower','Last Tower'],['stickman-archer-duel','Archer Duel'],['marble-rush','Marble Rush'],['find-numbers','Find Numbers'],['stickman-block-defense','Block Defense'],['rooftop-last-stand','Rooftop Last Stand'],['ring-sort','Ring Sort']]) {
     const link = document.createElement('a'); link.href = `/${slug}/`; link.textContent = name;
     status.append(link, document.createTextNode(' · '));
   }
