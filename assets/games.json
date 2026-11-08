@@ -68,5 +68,15 @@
   "image": "/assets/games/arrow-escape-hero.jpg",
   "accent": "#e4572e",
   "playUrl": null
+ },
+ {
+  "slug": "ring-sort",
+  "name": "Ring Sort: Color Hoop Puzzle",
+  "genre": "Sort puzzle · Casual",
+  "status": "In development",
+  "description": "Lift colorful wooden rings, sort them by color and lock every peg. A cozy, satisfying puzzle with 300 levels.",
+  "image": "/assets/games/ring-sort-hero.jpg",
+  "accent": "#2bb3a6",
+  "playUrl": null
  }
 ]
