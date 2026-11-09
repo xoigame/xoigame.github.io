@@ -1,0 +1,82 @@
+/* XOI GAME — trang chủ "vào là chơi" (2026-11-09). Dùng cùng biến màu với site.css. */
+.arcade-home h1 { font-size: clamp(2.6rem, 6vw, 5.2rem); margin-bottom: 18px; }
+.arcade-home h1 span { color: var(--accent); }
+.arcade-home h2 { font-size: clamp(1.9rem, 3.6vw, 3rem); margin-bottom: 0; }
+.button.big { min-height: 60px; padding-inline: 34px; font-size: 1rem; }
+
+.arcade-hero { display: grid; grid-template-columns: 1fr 1.05fr; gap: 48px; align-items: center; padding-top: 48px; padding-bottom: 36px; }
+.hero-sub { color: var(--muted); max-width: 520px; font-size: 1.02rem; }
+.arcade-hero .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.hero-pick { position: relative; display: block; border-radius: 28px; overflow: hidden; border: 1px solid var(--line); background: var(--surface); }
+.hero-pick img { width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; transition: transform .4s; }
+.hero-pick:hover img { transform: scale(1.03); }
+.hero-pick-label { position: absolute; inset: auto 0 0 0; display: flex; align-items: center; gap: 14px; padding: 60px 24px 22px; background: linear-gradient(transparent, #000c); }
+.hero-pick-label .eyebrow { margin: 0; }
+.hero-pick-label strong { font-size: 1.5rem; letter-spacing: -.03em; flex: 1; }
+
+.play-chip { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 22px; border-radius: 100px; background: var(--accent); color: var(--ink); font-weight: 900; font-size: .9rem; letter-spacing: .02em; white-space: nowrap; }
+
+.arcade-section { padding-top: 56px; }
+.arcade-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 26px; }
+.arcade-head .eyebrow { margin-bottom: 12px; }
+.arcade-head > p { max-width: 360px; margin: 0; font-size: .9rem; }
+
+/* Thẻ game chơi được: chạm cả thẻ = chơi; nút phụ (app/giới thiệu) tách riêng bên dưới */
+.play-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; }
+.play-card { display: flex; flex-direction: column; border-radius: 24px; overflow: hidden; border: 1px solid var(--line); background: var(--surface); transition: transform .2s, border-color .2s; }
+.play-card:hover { transform: translateY(-3px); border-color: color-mix(in srgb, var(--card-accent, var(--accent)) 70%, transparent); }
+.play-main { position: relative; display: block; }
+.play-main img { width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; }
+.play-badges { position: absolute; top: 12px; left: 12px; right: 12px; display: flex; flex-wrap: wrap; gap: 6px; }
+.badge { display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 100px; background: #11120fd9; font-size: .68rem; font-weight: 800; letter-spacing: .03em; }
+.badge.instant { background: var(--accent); color: var(--ink); }
+.play-body { display: flex; align-items: center; gap: 14px; padding: 16px 16px 6px; }
+.play-icon { width: 52px; height: 52px; border-radius: 14px; flex-shrink: 0; object-fit: cover; background: var(--surface-raised); }
+.play-title { flex: 1; min-width: 0; }
+.play-title h3 { font-size: 1.12rem; letter-spacing: -.02em; margin: 0 0 3px; }
+.play-title p { margin: 0; color: var(--muted); font-size: .76rem; line-height: 1.35; }
+.play-main .play-chip { position: absolute; right: 14px; bottom: 14px; box-shadow: 0 8px 24px #0008; }
+.play-links { display: flex; gap: 8px; padding: 10px 16px 16px; margin-top: auto; }
+.play-links a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; border-radius: 100px; border: 1px solid var(--line); font-size: .74rem; font-weight: 750; color: #d2d5c9; }
+.play-links a:hover { border-color: var(--accent); color: var(--paper); }
+
+.tips { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; padding-top: 34px; }
+.tip { display: flex; gap: 14px; align-items: flex-start; padding: 18px; border-radius: 18px; background: var(--surface); border: 1px solid var(--line); }
+.tip-icon { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 12px; background: var(--surface-raised); color: var(--accent); font-size: 1.2rem; flex-shrink: 0; }
+.tip strong { display: block; font-size: .92rem; margin-bottom: 2px; }
+.tip p { margin: 0; color: var(--muted); font-size: .8rem; line-height: 1.45; }
+
+.soon-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+.soon-card { display: block; border-radius: 20px; overflow: hidden; border: 1px solid var(--line); background: var(--surface); }
+.soon-card img { width: 100%; height: auto; aspect-ratio: 16 / 10; object-fit: cover; filter: saturate(.85); }
+.soon-card div { padding: 14px 16px 16px; }
+.soon-card h3 { font-size: 1rem; margin: 0 0 4px; letter-spacing: -.02em; }
+.soon-card p { margin: 0; color: var(--muted); font-size: .75rem; line-height: 1.4; }
+.soon-card:hover { border-color: var(--orange); }
+
+.studio-strip { display: flex; align-items: center; gap: 32px; padding-top: 70px; }
+.studio-strip img { width: 120px; height: 120px; border-radius: 30px; flex-shrink: 0; }
+.studio-strip p { max-width: 640px; margin: 14px 0 0; }
+.noscript-list { line-height: 2.2; }
+.noscript-list a { color: var(--accent); }
+
+@media (max-width: 1000px) {
+  .arcade-hero { grid-template-columns: 1fr; gap: 26px; padding-top: 26px; }
+  .play-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .soon-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tips { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .arcade-home .site-header > .wrap { min-height: 64px; }
+  .arcade-home .nav { gap: 14px; }
+  .arcade-home .nav a:not(.nav-cta):nth-child(3) { display: none; }
+  .arcade-home .nav .nav-cta { display: none; }
+  .arcade-hero .hero-actions .button { flex: 1 1 100%; }
+  .hero-pick-label { padding: 50px 16px 16px; }
+  .hero-pick-label .eyebrow { display: none; }
+  .play-grid { grid-template-columns: 1fr; gap: 16px; }
+  .arcade-head { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .studio-strip { flex-direction: column; align-items: flex-start; gap: 18px; padding-top: 50px; }
+  .studio-strip img { width: 84px; height: 84px; border-radius: 22px; }
+}
+@media (prefers-reduced-motion: reduce) { .play-card, .hero-pick img { transition: none; } }

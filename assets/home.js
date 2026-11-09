@@ -1,116 +1,74 @@
-const grid = document.querySelector('#game-grid');
-const status = document.querySelector('#catalog-status');
-let games = [];
-const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
-const revealSelector = '.intro-line, .home-hero, .section-head, .video-card, .studio-section, .contact-band, .game-card';
-let revealObserver;
-function showReveal(element) {
-  element.classList.add('is-visible');
-  revealObserver?.unobserve(element);
-}
-function observeReveals(scope = document) {
-  if (!revealObserver || motionPreference.matches) return;
-  scope.querySelectorAll(revealSelector).forEach(element => {
-    if (element.classList.contains('is-visible')) return;
-    element.classList.add('reveal');
-    revealObserver.observe(element);
-  });
-}
-function configureReveals() {
-  revealObserver?.disconnect();
-  revealObserver = undefined;
-  document.documentElement.classList.remove('reveal-ready');
-  if (motionPreference.matches || !('IntersectionObserver' in window)) {
-    document.querySelectorAll('.reveal').forEach(showReveal);
-    return;
-  }
-  try {
-    revealObserver = new IntersectionObserver(entries => {
-      entries.forEach(entry => { if (entry.isIntersecting) showReveal(entry.target); });
-    }, { threshold: 0, rootMargin: '0px 0px -24px 0px' });
-    observeReveals();
-    document.documentElement.classList.add('reveal-ready');
-  } catch {
-    document.querySelectorAll('.reveal').forEach(showReveal);
-  }
-}
-configureReveals();
-if (motionPreference.addEventListener) motionPreference.addEventListener('change', configureReveals);
-else motionPreference.addListener?.(configureReveals);
-document.addEventListener('focusin', event => {
-  const element = event.target.closest('.reveal');
-  if (element) showReveal(element);
-});
-let refreshScrollProgress = () => {};
-const progress = document.querySelector('.scroll-progress, #scroll-progress');
-if (progress) {
-  let scheduled = false;
-  const updateProgress = () => {
-    const distance = document.documentElement.scrollHeight - window.innerHeight;
-    const fraction = distance > 0 ? Math.min(1, Math.max(0, window.scrollY / distance)) : 0;
-    document.documentElement.style.setProperty('--scroll-progress', fraction);
-    scheduled = false;
-  };
-  const scheduleProgress = () => {
-    if (!scheduled) { scheduled = true; requestAnimationFrame(updateProgress); }
-  };
-  refreshScrollProgress = scheduleProgress;
-  window.addEventListener('scroll', scheduleProgress, { passive: true });
-  window.addEventListener('resize', scheduleProgress);
-  window.addEventListener('load', scheduleProgress, { once: true });
-  updateProgress();
+// Trang chủ "vào là chơi": đọc /assets/games.json — game có trường `play` vào lưới "Play in your browser",
+// game chưa có bản web vào "Coming soon". Thêm game: sửa games.json, không sửa file này.
+const playGrid = document.querySelector('#play-grid');
+const soonGrid = document.querySelector('#soon-grid');
+
+function el(tag, cls, text) {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text) e.textContent = text;
+  return e;
 }
 
-function render(filter = 'all') {
-  grid.querySelectorAll('.reveal').forEach(element => revealObserver?.unobserve(element));
-  grid.replaceChildren();
-  const selected = games.filter(game => filter === 'all' || game.status === filter);
-  for (const game of selected) {
-    const card = document.createElement('article');
-    card.className = 'game-card';
-    card.style.setProperty('--accent', game.accent);
-    const art = document.createElement('a');
-    art.className = 'card-art'; art.href = `/${game.slug}/`; art.tabIndex = -1; art.setAttribute('aria-hidden', 'true');
-    const image = document.createElement('img');
-    image.src = game.image; image.alt = ''; image.loading = 'lazy'; image.width = 800; image.height = 450;
-    art.append(image);
-    const body = document.createElement('div'); body.className = 'card-body';
-    const top = document.createElement('div'); top.className = 'card-top';
-    const genre = document.createElement('span'); genre.className = 'eyebrow'; genre.textContent = game.genre;
-    const pill = document.createElement('span'); pill.className = `pill ${game.playUrl ? 'live' : 'soon'}`; pill.textContent = game.status;
-    top.append(genre, pill);
-    const title = document.createElement('h3'); title.textContent = game.name;
-    const desc = document.createElement('p'); desc.textContent = game.description;
-    const link = document.createElement('a'); link.className = 'card-link'; link.href = `/${game.slug}/`; link.textContent = 'Explore game →'; link.setAttribute('aria-label', `Explore ${game.name}`);
-    body.append(top, title, desc);
-    if (game.demoUrl) {
-      const demo = document.createElement('a'); demo.className = 'card-link card-demo'; demo.href = game.demoUrl; demo.textContent = 'Play the demo in your browser ▶'; demo.setAttribute('aria-label', `Play the ${game.name} demo`);
-      body.append(demo);
-    }
-    body.append(link); card.append(art, body); grid.append(card);
+function playCard(game) {
+  const p = game.play;
+  const card = el('article', 'play-card');
+  card.style.setProperty('--card-accent', game.accent);
+
+  const main = el('a', 'play-main');
+  main.href = p.url;
+  main.setAttribute('aria-label', `Play ${game.name}`);
+  const img = el('img');
+  img.src = game.image; img.alt = ''; img.loading = 'lazy'; img.width = 800; img.height = 450;
+  const badges = el('span', 'play-badges');
+  badges.append(el('span', p.demo ? 'badge instant' : 'badge', p.demo ? '⚡ Instant demo' : `⬇ ${p.size}`));
+  badges.append(el('span', 'badge', p.orientation === 'landscape' ? '↔ Landscape' : '↕ Portrait'));
+  main.append(img, badges, el('span', 'play-chip', '▶ PLAY'));
+
+  const body = el('div', 'play-body');
+  if (p.icon) {
+    const icon = el('img', 'play-icon');
+    icon.src = p.icon; icon.alt = ''; icon.loading = 'lazy'; icon.width = 52; icon.height = 52;
+    body.append(icon);
   }
-  const available = selected.filter(game => Boolean(game.playUrl)).length;
-  const upcoming = selected.length - available;
-  const counts = [];
-  if (available) counts.push(`${available} available now on Android`);
-  if (upcoming) counts.push(`${upcoming} in development`);
-  status.textContent = counts.length ? counts.join(' · ') : 'No games in this category yet.';
-  observeReveals(grid);
-  refreshScrollProgress();
+  const title = el('div', 'play-title');
+  title.append(el('h3', '', game.name), el('p', '', game.genre));
+  body.append(title);
+
+  const links = el('div', 'play-links');
+  if (game.playUrl) {
+    const a = el('a', '', 'Get the app ↗');
+    a.href = game.playUrl; a.rel = 'noopener';
+    links.append(a);
+  }
+  const about = el('a', '', 'About the game');
+  about.href = `/${game.slug}/`;
+  links.append(about);
+
+  card.append(main, body, links);
+  return card;
 }
-fetch('/assets/games.json?v=20261108').then(response => {
-  if (!response.ok) throw new Error('Catalog unavailable');
-  return response.json();
-}).then(data => { games = data; render(); }).catch(() => {
-  status.replaceChildren(document.createTextNode('Explore our games: '));
-  for (const [slug, name] of [['last-tower','Last Tower'],['stickman-archer-duel','Archer Duel'],['marble-rush','Marble Rush'],['find-numbers','Find Numbers'],['stickman-block-defense','Block Defense'],['rooftop-last-stand','Rooftop Last Stand'],['ring-sort','Ring Sort']]) {
-    const link = document.createElement('a'); link.href = `/${slug}/`; link.textContent = name;
-    status.append(link, document.createTextNode(' · '));
-  }
-});
-document.querySelectorAll('[data-filter]').forEach(button => {
-  button.addEventListener('click', () => {
-    document.querySelectorAll('[data-filter]').forEach(other => other.setAttribute('aria-pressed', String(other === button)));
-    render(button.dataset.filter);
+
+function soonCard(game) {
+  const a = el('a', 'soon-card');
+  a.href = `/${game.slug}/`;
+  const img = el('img');
+  img.src = game.image; img.alt = ''; img.loading = 'lazy'; img.width = 640; img.height = 400;
+  const d = el('div');
+  d.append(el('h3', '', game.name), el('p', '', game.genre));
+  a.append(img, d);
+  return a;
+}
+
+fetch('/assets/games.json?v=20261109')
+  .then((r) => {
+    if (!r.ok) throw new Error('catalog');
+    return r.json();
+  })
+  .then((games) => {
+    playGrid.replaceChildren(...games.filter((g) => g.play).map(playCard));
+    soonGrid.replaceChildren(...games.filter((g) => !g.play).map(soonCard));
+  })
+  .catch(() => {
+    playGrid.textContent = 'Could not load the game list. Please refresh the page.';
   });
-});
