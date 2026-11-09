@@ -1,0 +1,2 @@
+const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["assets/web-CBLmEEhP.js","assets/index-DkO8i9Cz.js","assets/index-eLDHxw00.css"])))=>i.map(i=>d[i]);
+import{i as e,t}from"./index-DkO8i9Cz.js";var n=e(`FirebaseCrashlytics`,{web:()=>t(()=>import(`./web-CBLmEEhP.js`).then(e=>new e.FirebaseCrashlyticsWeb),__vite__mapDeps([0,1,2]))});export{n as FirebaseCrashlytics};
