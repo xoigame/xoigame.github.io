@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "607455230221",
+    "project_id": "last-tower-monster-siege",
+    "storage_bucket": "last-tower-monster-siege.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:607455230221:android:0cd3e808eef553aba9d844",
+        "android_client_info": {
+          "package_name": "com.xoigame.lasttowermonster"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCx6W-pL2i-TmtR5nPzVfYEPRj3lZACmoU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "227191312916",
+    "project_id": "stickman-block-defense",
+    "storage_bucket": "stickman-block-defense.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:227191312916:android:cc05aeb5912cd6d69f0d01",
+        "android_client_info": {
+          "package_name": "com.xoigame.stickmanblockdefense"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBD-IIZnYzwUmAdtuFg94MBAkQCA5NheOM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

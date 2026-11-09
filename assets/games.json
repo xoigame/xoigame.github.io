@@ -1,23 +1,20 @@
 [
  {
-  "slug": "last-tower",
-  "name": "Last Tower: Monster Siege",
-  "genre": "Archery · Tower defense",
-  "status": "Available now",
-  "description": "One archer. One tower. A whole horde to stop. Aim your bow, discover powerful skills and hold the line.",
-  "image": "/last-tower/img/hero.jpg",
-  "accent": "#ffb351",
-  "playUrl": "https://play.google.com/store/apps/details?id=com.xoigame.lasttowermonster"
- },
- {
-  "slug": "stickman-archer-duel",
-  "name": "Stickman Archer Duel: Bow War",
-  "genre": "Turn-based archery",
-  "status": "Available now",
-  "description": "Read the wind, land the perfect headshot and challenge the champions of eight civilizations. Pull, aim and let the arrows fly.",
-  "image": "/assets/games/archer-hero.jpg",
-  "accent": "#e7ba73",
-  "playUrl": "https://play.google.com/store/apps/details?id=com.xoigame.stickmanarcherduel"
+  "slug": "ring-sort",
+  "name": "Ring Sort: Color Hoop Puzzle",
+  "genre": "Color sort puzzle · Casual",
+  "status": "In development",
+  "description": "Stack colored wooden rings, fill each peg with one color and watch it snap shut. Play the free demo right in your browser.",
+  "image": "/assets/games/ring-sort-hero.jpg",
+  "accent": "#f5a623",
+  "playUrl": null,
+  "play": {
+   "url": "/ring-sort/#demo",
+   "size": "Instant",
+   "orientation": "portrait",
+   "demo": true,
+   "icon": "/ring-sort/icon.png"
+  }
  },
  {
   "slug": "marble-rush",
@@ -27,7 +24,13 @@
   "description": "Biggest or smallest? Spot the right marble and tap its color before time runs out. One rule. One tap. One more try.",
   "image": "/assets/games/marble-hero.jpg",
   "accent": "#8edbff",
-  "playUrl": "https://play.google.com/store/apps/details?id=com.xoigame.marblerush"
+  "playUrl": "https://play.google.com/store/apps/details?id=com.xoigame.marblerush",
+  "play": {
+   "url": "/marble-rush/play/",
+   "size": "60 MB",
+   "orientation": "landscape",
+   "icon": "/marble-rush/play/icon.png"
+  }
  },
  {
   "slug": "find-numbers",
@@ -37,18 +40,45 @@
   "description": "A hundred numbers. One sharp eye. Find and tap them in order, challenge a friend or take on the AI.",
   "image": "/assets/games/find-numbers-hero.jpg",
   "accent": "#9fdbff",
-  "playUrl": "https://play.google.com/store/apps/details?id=com.xoigame.FindNumber"
+  "playUrl": "https://play.google.com/store/apps/details?id=com.xoigame.FindNumber",
+  "play": {
+   "url": "/find-numbers/play/",
+   "size": "58 MB",
+   "orientation": "landscape",
+   "icon": "/find-numbers/play/icon.png"
+  }
  },
  {
-  "slug": "ring-sort",
-  "name": "Ring Sort: Color Hoop Puzzle",
-  "genre": "Color sort puzzle · Casual",
-  "status": "In development",
-  "description": "Stack colored wooden rings, fill each peg with one color and watch it snap shut. Play the free demo right in your browser.",
-  "image": "/assets/games/ring-sort-hero.jpg",
-  "accent": "#f5a623",
-  "playUrl": null,
-  "demoUrl": "/ring-sort/#demo"
+  "slug": "last-tower",
+  "name": "Last Tower: Monster Siege",
+  "genre": "Archery · Tower defense",
+  "status": "Available now",
+  "description": "One archer. One tower. A whole horde to stop. Aim your bow, discover powerful skills and hold the line.",
+  "image": "/last-tower/img/hero.jpg",
+  "accent": "#ffb351",
+  "playUrl": "https://play.google.com/store/apps/details?id=com.xoigame.lasttowermonster",
+  "play": {
+   "url": "/last-tower/play/",
+   "size": "96 MB",
+   "orientation": "landscape",
+   "icon": "/last-tower/play/icon.png"
+  }
+ },
+ {
+  "slug": "stickman-archer-duel",
+  "name": "Stickman Archer Duel: Bow War",
+  "genre": "Turn-based archery",
+  "status": "Available now",
+  "description": "Read the wind, land the perfect headshot and challenge the champions of eight civilizations. Pull, aim and let the arrows fly.",
+  "image": "/assets/games/archer-hero.jpg",
+  "accent": "#e7ba73",
+  "playUrl": "https://play.google.com/store/apps/details?id=com.xoigame.stickmanarcherduel",
+  "play": {
+   "url": "/stickman-archer-duel/play/",
+   "size": "108 MB",
+   "orientation": "landscape",
+   "icon": "/stickman-archer-duel/play/icon.png"
+  }
  },
  {
   "slug": "stickman-block-defense",
@@ -58,7 +88,13 @@
   "description": "Stack your wall. Clear a line. Fire a volley. A new puzzle-defense adventure with mighty heroes and epic castle sieges.",
   "image": "/assets/games/block-defense-hero.jpg",
   "accent": "#ffbd6d",
-  "playUrl": null
+  "playUrl": null,
+  "play": {
+   "url": "/stickman-block-defense/play/",
+   "size": "139 MB",
+   "orientation": "portrait",
+   "icon": "/stickman-block-defense/play/icon.png"
+  }
  },
  {
   "slug": "rooftop-last-stand",
