@@ -84,11 +84,11 @@
   "slug": "bolt-pop",
   "name": "Bolt Pop: Unscrew Puzzle",
   "genre": "Screw puzzle · Casual",
-  "status": "In development",
+  "status": "Available now",
   "description": "Unscrew colorful screws, drop them into matching toolboxes and watch the plates fall. 300 levels, each proven solvable, and a Robot Garage to decorate.",
   "image": "/assets/games/bolt-pop-hero.jpg",
   "accent": "#f5b82e",
-  "playUrl": null,
+  "playUrl": "https://play.google.com/store/apps/details?id=com.xoigame.boltpop",
   "package": "com.xoigame.boltpop"
  }
 ]
