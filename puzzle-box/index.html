@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Puzzle Box: Daily Brain Mix — XOI GAME</title>
+<meta name="description" content="Puzzle Box is one cozy collection of brain games with a shared journey: one wallet, one daily streak, one player level and a cross-game Trophy Room.">
+<link rel="icon" href="icon.png">
+<meta property="og:title" content="Puzzle Box: Daily Brain Mix">
+<meta property="og:description" content="One box, many brain games. Play the Daily Mix, keep your streak and fill your Trophy Room.">
+<meta property="og:image" content="https://xoigame.com/puzzle-box/icon.png">
+<style>
+  :root{--ink:#2a1640;--muted:#5d4a72;--bg:#fbf6ff;--violet:#5b14b8;--magenta:#c91fbf;--card:#ffffff;--line:#e7dcf3;--gold:#ffcf4a}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 system-ui,-apple-system,"Segoe UI",sans-serif}
+  a{color:var(--violet)}
+  .top{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;background:linear-gradient(90deg,var(--violet),var(--magenta));color:#fff}
+  .top a{color:#fff;text-decoration:none;font-weight:700;letter-spacing:.06em}
+  .hero{max-width:960px;margin:auto;padding:48px 20px 24px;display:flex;gap:32px;align-items:center;flex-wrap:wrap}
+  .hero img{width:168px;height:168px;border-radius:38px;box-shadow:0 14px 34px rgba(91,20,184,.28)}
+  .hero h1{font-size:clamp(30px,6vw,46px);line-height:1.1;margin:0 0 10px}
+  .hero p{margin:0 0 16px;color:var(--muted);max-width:520px}
+  .badge{display:inline-block;background:var(--ink);color:#fff;padding:12px 20px;border-radius:12px;text-decoration:none;font-weight:700}
+  .wrap{max-width:960px;margin:auto;padding:12px 20px 64px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px;margin:18px 0 36px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px}
+  .card h3{margin:0 0 6px;font-size:18px}
+  .card p{margin:0;color:var(--muted);font-size:15px}
+  h2{font-size:24px;margin:28px 0 6px}
+  ul{padding-left:22px}
+  footer{border-top:1px solid var(--line);padding:22px 20px;color:var(--muted);font-size:14px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;max-width:960px;margin:auto}
+</style>
+</head>
+<body>
+<header class="top"><a href="/">XOI GAME</a><a href="privacy.html">Privacy</a></header>
+<section class="hero">
+  <img src="icon.png" alt="Puzzle Box app icon" width="168" height="168">
+  <div>
+    <h1>Puzzle Box: Daily Brain Mix</h1>
+    <p>One cozy box of brain games with one shared journey: one wallet, one daily streak, one player level and a Trophy Room that needs every game to fill.</p>
+    <span class="badge">Coming soon on the App Store</span>
+  </div>
+</section>
+<main class="wrap">
+  <h2>The Daily Mix</h2>
+  <p>Win one round in each game every day to open the Daily Mix chest. Keep your streak going for bigger rewards and level up your player rank with every win.</p>
+  <h2>Games in the box</h2>
+  <div class="grid">
+    <div class="card"><h3>Number Hunt</h3><p>Find the hidden numbers in calm, detailed scenes.</p></div>
+    <div class="card"><h3>Arrow Escape</h3><p>Tap the arrows out of the board in the right order.</p></div>
+    <div class="card"><h3>Ring Sort</h3><p>Stack colored wooden rings until every peg is one color.</p></div>
+    <div class="card"><h3>Bolt Pop</h3><p>Unscrew the bolts and free every plate.</p></div>
+  </div>
+  <h2>One progress for everything</h2>
+  <ul>
+    <li>Coins and hints work in every game.</li>
+    <li>12 trophies that need more than one game to earn.</li>
+    <li>Plays offline, no account needed. Big one-thumb controls.</li>
+  </ul>
+  <h2>Support</h2>
+  <p>Questions, bugs or purchase problems: <a href="mailto:xoistudio@gmail.com?subject=Puzzle%20Box%20support">xoistudio@gmail.com</a>. Read our <a href="privacy.html">Privacy Policy</a>.</p>
+</main>
+<footer><span>© <span id="year"></span> XOI GAME</span><a href="/">xoigame.com</a></footer>
+<script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>
