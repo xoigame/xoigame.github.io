@@ -20,3 +20,8 @@ Videos are H.264/AAC, 1280×720, CRF 26, with faststart; audio and edit preserve
 
 - `games/bolt-pop-01..03.jpg`: 720×1280 JPEG re-encodes of captures from the game itself (BoltPop `Logs/Shots`, level 1, menu, decorated garage).
 - `games/bolt-pop-hero.jpg`: 1280×720 composite of the studio-owned logo, app icon and two of those captures. `games/bolt-pop-icon.png`: 512×512 app icon.
+
+## Wool Bloom (2026-11-10)
+
+- `games/wool-bloom-01..03.jpg`: 720×1280 JPEG re-encodes of captures from the game itself (WoolBloom `Logs/Shots`: level 12, level 1 tutorial, decorated Cozy Nook).
+- `games/wool-bloom-hero.jpg`: 1280×720 composite of the studio-owned logo, Ollie mascot and spool art (WoolBloom `Tools/store_art.py`). `games/wool-bloom-icon.png`: 512×512 app icon.

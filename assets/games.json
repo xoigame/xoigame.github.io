@@ -126,5 +126,16 @@
   "accent": "#f5b82e",
   "playUrl": "https://play.google.com/store/apps/details?id=com.xoigame.boltpop",
   "package": "com.xoigame.boltpop"
+ },
+ {
+  "slug": "wool-bloom",
+  "name": "Wool Bloom: Unravel Yarn Art",
+  "genre": "Yarn puzzle · Cozy",
+  "status": "Coming soon",
+  "description": "Tap spools to pull loose stitches out of cozy wool pictures and unravel them row by row. 300 levels, each proven solvable, boosters and a Cozy Nook to decorate.",
+  "image": "/assets/games/wool-bloom-hero.jpg",
+  "accent": "#e8526a",
+  "playUrl": null,
+  "package": "com.xoigame.woolbloom"
  }
 ]
