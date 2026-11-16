@@ -128,6 +128,17 @@
   "package": "com.xoigame.boltpop"
  },
  {
+  "slug": "star-dial",
+  "name": "Star Dial: Rotate Ring Puzzle",
+  "genre": "Rotate puzzle · Relaxing",
+  "status": "Coming soon",
+  "description": "Tap or drag the rings to line up the gaps and free the shining star. 300 levels, each proven solvable, gears and locked rings, boosters and a Stargazer Loft to decorate.",
+  "image": "/assets/games/star-dial-hero.jpg",
+  "accent": "#e8b54a",
+  "playUrl": null,
+  "package": "com.xoigame.stardial"
+ },
+ {
   "slug": "wool-bloom",
   "name": "Wool Bloom: Unravel Yarn Art",
   "genre": "Yarn puzzle · Cozy",
