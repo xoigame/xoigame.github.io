@@ -14,7 +14,8 @@
    "orientation": "portrait",
    "demo": true,
    "icon": "/ring-sort/icon.png"
-  }
+  },
+  "audience": "puzzle"
  },
  {
   "slug": "marble-rush",
@@ -30,7 +31,8 @@
    "size": "60 MB",
    "orientation": "landscape",
    "icon": "/marble-rush/play/icon.png"
-  }
+  },
+  "audience": "puzzle"
  },
  {
   "slug": "find-numbers",
@@ -46,7 +48,9 @@
    "size": "58 MB",
    "orientation": "landscape",
    "icon": "/find-numbers/play/icon.png"
-  }
+  },
+  "audience": "puzzle",
+  "iosUrl": "https://apps.apple.com/app/find-number-1-100/id6818377827"
  },
  {
   "slug": "last-tower",
@@ -62,7 +66,8 @@
    "size": "96 MB",
    "orientation": "landscape",
    "icon": "/last-tower/play/icon.png"
-  }
+  },
+  "audience": "action"
  },
  {
   "slug": "stickman-archer-duel",
@@ -78,7 +83,8 @@
    "size": "108 MB",
    "orientation": "landscape",
    "icon": "/stickman-archer-duel/play/icon.png"
-  }
+  },
+  "audience": "action"
  },
  {
   "slug": "stickman-block-defense",
@@ -94,7 +100,8 @@
    "size": "139 MB",
    "orientation": "portrait",
    "icon": "/stickman-block-defense/play/icon.png"
-  }
+  },
+  "audience": "action"
  },
  {
   "slug": "rooftop-last-stand",
@@ -104,7 +111,8 @@
   "description": "Hold the roof. Survive the night. Aim, land headshots and crack open supply crates between waves to power up your arsenal.",
   "image": "/assets/games/rooftop-hero.jpg",
   "accent": "#8bd13f",
-  "playUrl": null
+  "playUrl": null,
+  "audience": "action"
  },
  {
   "slug": "arrow-escape",
@@ -114,7 +122,8 @@
   "description": "Tap a paper arrow and watch it fly off the board. Find the right order, unlock keys, melt ice and decorate Pip's cozy home.",
   "image": "/assets/games/arrow-escape-hero.jpg",
   "accent": "#e4572e",
-  "playUrl": null
+  "playUrl": null,
+  "audience": "puzzle"
  },
  {
   "slug": "bolt-pop",
@@ -125,7 +134,8 @@
   "image": "/assets/games/bolt-pop-hero.jpg",
   "accent": "#f5b82e",
   "playUrl": "https://play.google.com/store/apps/details?id=com.xoigame.boltpop",
-  "package": "com.xoigame.boltpop"
+  "package": "com.xoigame.boltpop",
+  "audience": "puzzle"
  },
  {
   "slug": "star-dial",
@@ -136,7 +146,8 @@
   "image": "/assets/games/star-dial-hero.jpg",
   "accent": "#e8b54a",
   "playUrl": null,
-  "package": "com.xoigame.stardial"
+  "package": "com.xoigame.stardial",
+  "audience": "puzzle"
  },
  {
   "slug": "wool-bloom",
@@ -147,6 +158,7 @@
   "image": "/assets/games/wool-bloom-hero.jpg",
   "accent": "#e8526a",
   "playUrl": null,
-  "package": "com.xoigame.woolbloom"
+  "package": "com.xoigame.woolbloom",
+  "audience": "puzzle"
  }
 ]

@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>More Games · XOI GAME</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0b1220">
+<link rel="icon" href="/assets/brand.png">
+<style>
+  :root { --bg:#0b1220; --card:#141d31; --line:#24304b; --text:#f3f6fb; --muted:#9aa7c0; --play:#ffb000; --get:#3d9bff; }
+  * { box-sizing:border-box; }
+  html,body { margin:0; background:var(--bg); color:var(--text);
+    font:16px/1.4 "Nunito","Segoe UI",system-ui,-apple-system,Roboto,sans-serif; -webkit-tap-highlight-color:transparent; }
+  header { position:sticky; top:0; z-index:2; display:flex; align-items:center; gap:12px;
+    padding:calc(12px + env(safe-area-inset-top)) 16px 12px; background:rgba(11,18,32,.94); backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line); }
+  header img { width:36px; height:36px; border-radius:10px; }
+  header h1 { margin:0; font-size:20px; font-weight:900; letter-spacing:.3px; }
+  header p { margin:0; font-size:13px; color:var(--muted); }
+  main { max-width:720px; margin:0 auto; padding:16px 16px calc(24px + env(safe-area-inset-bottom)); display:grid; gap:14px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:20px; overflow:hidden;
+    box-shadow:0 0 0 2px color-mix(in srgb, var(--accent,#ffb000) 0%, transparent); animation:rise .45s both; }
+  .card:nth-child(2){animation-delay:.06s}.card:nth-child(3){animation-delay:.12s}.card:nth-child(4){animation-delay:.18s}
+  @keyframes rise { from { opacity:0; transform:translateY(14px) scale(.98); } to { opacity:1; transform:none; } }
+  .hero { position:relative; display:block; aspect-ratio:16/9; background:#000; }
+  .hero img { width:100%; height:100%; object-fit:cover; display:block; }
+  .hero .tag { position:absolute; left:10px; top:10px; padding:4px 10px; border-radius:999px; font-size:12px; font-weight:800;
+    background:rgba(0,0,0,.6); }
+  .hero .tag.instant { background:var(--play); color:#1b1300; }
+  .body { display:flex; gap:12px; align-items:center; padding:12px 14px 14px; }
+  .icon { width:56px; height:56px; border-radius:14px; flex:none; background:#000; object-fit:cover; }
+  .info { flex:1; min-width:0; }
+  .info h2 { margin:0; font-size:16px; font-weight:900; line-height:1.2; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .info p { margin:2px 0 0; font-size:13px; color:var(--muted); display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden; }
+  .btns { display:flex; flex-direction:column; gap:8px; flex:none; }
+  .btn { min-width:104px; min-height:44px; display:flex; align-items:center; justify-content:center; padding:0 14px;
+    border-radius:14px; font-weight:900; font-size:15px; text-decoration:none; color:#fff; border:0; }
+  .btn.play { background:var(--play); color:#1b1300; animation:pulse 1.8s ease-in-out infinite; }
+  .btn.get { background:var(--get); }
+  .btn:active { transform:scale(.95); }
+  @keyframes pulse { 0%,100% { transform:scale(1); } 50% { transform:scale(1.05); } }
+  .empty { text-align:center; color:var(--muted); padding:48px 0; }
+  @media (prefers-reduced-motion:reduce) { .card,.btn.play { animation:none; } }
+</style>
+</head>
+<body>
+<header>
+  <img src="/assets/brand.png" alt="">
+  <div><h1>More Games</h1><p>Tap PLAY NOW to try instantly — free!</p></div>
+</header>
+<main id="list"><p class="empty">Loading…</p></main>
+<script>
+// Trang MORE GAMES mở từ nút trong mọi game XOI GAME (package hub com.xoi.moregames).
+// Tham số: from=<slug game đang chơi> · p=android|ios|web · aud=all|puzzle|kids · src=<chỗ bấm>.
+// Dữ liệu: /assets/games.json (thêm game mới chỉ sửa file đó). Trường dùng: play.url (chơi thử), playUrl (Google Play),
+// iosUrl (App Store), audience (kids|puzzle|casual|action), package.
+(function () {
+  const q = new URLSearchParams(location.search);
+  const from = q.get('from') || '';
+  const ua = navigator.userAgent;
+  const p = q.get('p') || (/Android/i.test(ua) ? 'android' : /iPhone|iPad|iPod/i.test(ua) ? 'ios' : 'web');
+  const aud = q.get('aud') || 'all';
+  const src = q.get('src') || 'menu';
+  const list = document.getElementById('list');
+
+  function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text) e.textContent = text; return e; }
+
+  function storeUrl(g) {
+    const ref = encodeURIComponent('utm_source=' + (from || 'web') + '&utm_medium=crosspromo&utm_campaign=moregames_' + src);
+    if (p === 'ios') return g.iosUrl ? g.iosUrl + (g.iosUrl.includes('?') ? '&' : '?') + 'ct=moregames_' + encodeURIComponent(from) : null;
+    if (g.playUrl) return g.playUrl + (g.playUrl.includes('?') ? '&' : '?') + 'referrer=' + ref;
+    return null;
+  }
+
+  function playUrl(g) {
+    if (!g.play || !g.play.url) return null;
+    const u = g.play.url;
+    const sep = u.includes('?') ? '&' : '?';
+    const hash = u.indexOf('#');
+    const base = hash >= 0 ? u.slice(0, hash) : u, tail = hash >= 0 ? u.slice(hash) : '';
+    return base + sep + 'from=' + encodeURIComponent(from) + '&via=moregames' + tail;
+  }
+
+  function audienceOf(g) { return g.audience || 'casual'; }
+
+  function keep(g) {
+    if (g.slug === from) return false;
+    const a = audienceOf(g);
+    if (aud === 'kids') { if (a !== 'kids') return false; }
+    else if (a === 'kids') return false;        // không đẩy game trẻ em vào game người lớn và ngược lại
+    return !!(playUrl(g) || storeUrl(g));
+  }
+
+  function score(g) {
+    let s = 0;
+    if (g.play && g.play.demo) s += 4;             // chơi tức thì xếp trên
+    else if (g.play) s += 2;
+    if (storeUrl(g)) s += 3;
+    if (aud === 'puzzle' && audienceOf(g) === 'puzzle') s += 5;
+    return s;
+  }
+
+  function card(g) {
+    const c = el('article', 'card'); c.style.setProperty('--accent', g.accent || '#ffb000');
+    const pu = playUrl(g), su = storeUrl(g);
+    const hero = el('a', 'hero'); hero.href = pu || su;
+    const img = el('img'); img.src = g.image; img.alt = ''; img.loading = 'lazy'; hero.append(img);
+    if (g.play) hero.append(el('span', 'tag' + (g.play.demo ? ' instant' : ''), g.play.demo ? '⚡ Instant play' : ('▶ Play in browser' + (g.play.size ? ' · ' + g.play.size : ''))));
+    const body = el('div', 'body');
+    const icon = el('img', 'icon'); icon.src = (g.play && g.play.icon) || g.icon || g.image; icon.alt = ''; icon.loading = 'lazy';
+    const info = el('div', 'info'); info.append(el('h2', '', g.name), el('p', '', g.description || g.genre || ''));
+    const btns = el('div', 'btns');
+    if (pu) { const a = el('a', 'btn play', 'PLAY NOW'); a.href = pu; btns.append(a); }
+    if (su) { const a = el('a', 'btn get', p === 'ios' ? 'GET' : 'GET ⬇'); a.href = su; a.rel = 'noopener'; btns.append(a); }
+    body.append(icon, info, btns);
+    c.append(hero, body);
+    return c;
+  }
+
+  fetch('/assets/games.json', { cache: 'no-cache' })
+    .then(r => r.json())
+    .then(games => {
+      const shown = games.filter(keep).sort((a, b) => score(b) - score(a));
+      list.textContent = '';
+      if (!shown.length) { list.append(el('p', 'empty', 'New games are coming soon!')); return; }
+      shown.forEach(g => list.append(card(g)));
+    })
+    .catch(() => { list.textContent = ''; list.append(el('p', 'empty', 'Please check your connection and try again.')); });
+})();
+</script>
+</body>
+</html>
