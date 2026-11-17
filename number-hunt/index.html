@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Number Hunt: Find the Number — XOI GAME</title>
+<meta name="description" content="Number Hunt is a cozy detective number puzzle: find the hidden numbers in order, crack each case and train your focus. Plays offline.">
+<link rel="icon" href="icon.png">
+<meta property="og:title" content="Number Hunt: Find the Number">
+<meta property="og:description" content="Find the numbers in order, crack each case and train your focus.">
+<meta property="og:image" content="https://xoigame.com/number-hunt/icon.png">
+<style>
+  :root{--ink:#2a1640;--muted:#5d4a72;--bg:#fff9ee;--violet:#b5651d;--magenta:#e8a33a;--card:#ffffff;--line:#efe2c8;--gold:#ffcf4a}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 system-ui,-apple-system,"Segoe UI",sans-serif}
+  a{color:var(--violet)}
+  .top{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;background:linear-gradient(90deg,var(--violet),var(--magenta));color:#fff}
+  .top a{color:#fff;text-decoration:none;font-weight:700;letter-spacing:.06em}
+  .hero{max-width:960px;margin:auto;padding:48px 20px 24px;display:flex;gap:32px;align-items:center;flex-wrap:wrap}
+  .hero img{width:168px;height:168px;border-radius:38px;box-shadow:0 14px 34px rgba(150,90,20,.28)}
+  .hero h1{font-size:clamp(30px,6vw,46px);line-height:1.1;margin:0 0 10px}
+  .hero p{margin:0 0 16px;color:var(--muted);max-width:520px}
+  .badge{display:inline-block;background:var(--ink);color:#fff;padding:12px 20px;border-radius:12px;text-decoration:none;font-weight:700}
+  .wrap{max-width:960px;margin:auto;padding:12px 20px 64px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px;margin:18px 0 36px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px}
+  .card h3{margin:0 0 6px;font-size:18px}
+  .card p{margin:0;color:var(--muted);font-size:15px}
+  h2{font-size:24px;margin:28px 0 6px}
+  ul{padding-left:22px}
+  footer{border-top:1px solid var(--line);padding:22px 20px;color:var(--muted);font-size:14px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;max-width:960px;margin:auto}
+</style>
+</head>
+<body>
+<header class="top"><a href="/">XOI GAME</a><a href="privacy.html">Privacy</a></header>
+<section class="hero">
+  <img src="icon.png" alt="Number Hunt app icon" width="168" height="168">
+  <div>
+    <h1>Number Hunt: Find the Number</h1>
+    <p>Someone hid the numbers all over town. Join the little detective, find them in order and crack each case. A calm brain puzzle that trains your focus.</p>
+    <a class="badge" href="https://play.google.com/store/apps/details?id=com.xoigame.numberhunt" rel="noopener">Get it on Google Play</a>
+  </div>
+</section>
+<main class="wrap">
+  <h2>How to play</h2>
+  <p>Tap the numbers in order, starting from 1. Every case hides a new board, and the clock gets a little tighter as you go.</p>
+  <h2>Modes</h2>
+  <div class="grid">
+    <div class="card"><h3>Cases</h3><p>Story chapters with a new mystery and harder boards.</p></div>
+    <div class="card"><h3>Daily</h3><p>One fresh puzzle every day to keep your streak.</p></div>
+    <div class="card"><h3>Album</h3><p>Collect stickers and fill the detective's album.</p></div>
+  </div>
+  <h2>Why players like it</h2>
+  <ul>
+    <li>Big, clear numbers and one-thumb controls.</li>
+    <li>Hints when you get stuck.</li>
+    <li>Plays offline, no account needed.</li>
+  </ul>
+  <h2>Support</h2>
+  <p>Questions, bugs or purchase problems: <a href="mailto:xoistudio@gmail.com?subject=Number%20Hunt%20support">xoistudio@gmail.com</a>. Read our <a href="privacy.html">Privacy Policy</a>.</p>
+</main>
+<footer><span>© <span id="year"></span> XOI GAME</span><a href="/">xoigame.com</a></footer>
+<script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

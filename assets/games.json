@@ -3,11 +3,11 @@
   "slug": "ring-sort",
   "name": "Ring Sort: Color Hoop Puzzle",
   "genre": "Color sort puzzle · Casual",
-  "status": "In development",
+  "status": "Available now",
   "description": "Stack colored wooden rings, fill each peg with one color and watch it snap shut. Play the free demo right in your browser.",
   "image": "/assets/games/ring-sort-hero.jpg",
   "accent": "#f5a623",
-  "playUrl": null,
+  "playUrl": "https://play.google.com/store/apps/details?id=com.xoigame.ringsort",
   "play": {
    "url": "/ring-sort/#demo",
    "size": "Instant",
@@ -15,7 +15,8 @@
    "demo": true,
    "icon": "/ring-sort/icon.png"
   },
-  "audience": "puzzle"
+  "audience": "puzzle",
+  "package": "com.xoigame.ringsort"
  },
  {
   "slug": "marble-rush",
@@ -32,7 +33,9 @@
    "orientation": "landscape",
    "icon": "/marble-rush/play/icon.png"
   },
-  "audience": "puzzle"
+  "audience": "puzzle",
+  "iosUrl": "https://apps.apple.com/app/marble-rush-marble-puzzle/id6819539848",
+  "package": "com.xoigame.marblerush"
  },
  {
   "slug": "find-numbers",
@@ -123,7 +126,8 @@
   "image": "/assets/games/arrow-escape-hero.jpg",
   "accent": "#e4572e",
   "playUrl": null,
-  "audience": "puzzle"
+  "audience": "puzzle",
+  "package": "com.xoigame.arrowescape"
  },
  {
   "slug": "bolt-pop",
@@ -141,11 +145,11 @@
   "slug": "star-dial",
   "name": "Star Dial: Rotate Ring Puzzle",
   "genre": "Rotate puzzle · Relaxing",
-  "status": "Coming soon",
+  "status": "Available now",
   "description": "Tap or drag the rings to line up the gaps and free the shining star. 300 levels, each proven solvable, gears and locked rings, boosters and a Stargazer Loft to decorate.",
   "image": "/assets/games/star-dial-hero.jpg",
   "accent": "#e8b54a",
-  "playUrl": null,
+  "playUrl": "https://play.google.com/store/apps/details?id=com.xoigame.stardial",
   "package": "com.xoigame.stardial",
   "audience": "puzzle"
  },
@@ -153,12 +157,40 @@
   "slug": "wool-bloom",
   "name": "Wool Bloom: Unravel Yarn Art",
   "genre": "Yarn puzzle · Cozy",
-  "status": "Coming soon",
+  "status": "Available now",
   "description": "Tap spools to pull loose stitches out of cozy wool pictures and unravel them row by row. 300 levels, each proven solvable, boosters and a Cozy Nook to decorate.",
   "image": "/assets/games/wool-bloom-hero.jpg",
   "accent": "#e8526a",
-  "playUrl": null,
+  "playUrl": "https://play.google.com/store/apps/details?id=com.xoigame.woolbloom",
   "package": "com.xoigame.woolbloom",
   "audience": "puzzle"
+ },
+ {
+  "slug": "number-hunt",
+  "name": "Number Hunt: Find the Number",
+  "genre": "Number puzzle · Brain training",
+  "status": "Available now",
+  "description": "Find the hidden numbers in order, crack each case with the little detective and train your focus. A cozy number puzzle that plays offline.",
+  "image": "/assets/games/number-hunt-hero.jpg",
+  "icon": "/assets/games/number-hunt-icon.png",
+  "accent": "#f6c744",
+  "playUrl": "https://play.google.com/store/apps/details?id=com.xoigame.numberhunt",
+  "package": "com.xoigame.numberhunt",
+  "audience": "puzzle",
+  "iosUrl": null
+ },
+ {
+  "slug": "puzzle-box",
+  "name": "Puzzle Box: Daily Brain Mix",
+  "genre": "Puzzle collection · Daily",
+  "status": "Coming soon",
+  "description": "One box, many brain games: Number Hunt, Arrow Escape, Ring Sort, Bolt Pop and Wool Bloom. Play the Daily Mix, keep your streak and fill your Trophy Room.",
+  "image": "/assets/games/puzzle-box-hero.jpg",
+  "icon": "/puzzle-box/icon.png",
+  "accent": "#7b3fd1",
+  "playUrl": null,
+  "package": "com.xoigame.puzzlebox",
+  "audience": "puzzle",
+  "iosUrl": null
  }
 ]

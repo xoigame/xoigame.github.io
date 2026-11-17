@@ -55,6 +55,8 @@
 // Tham số: from=<slug game đang chơi> · p=android|ios|web · aud=all|puzzle|kids · src=<chỗ bấm>.
 // Dữ liệu: /assets/games.json (thêm game mới chỉ sửa file đó). Trường dùng: play.url (chơi thử), playUrl (Google Play),
 // iosUrl (App Store), audience (kids|puzzle|casual|action), package.
+// Hiện tại (tác giả chốt 2026-11-17): CHỈ game puzzle ĐÃ PHÁT HÀNH (có playUrl hoặc iosUrl); game chưa lên store không hiện.
+// Nút: PLAY NOW nếu chơi được trên web + nút tải đúng store của máy (máy tính: cả Google Play lẫn App Store).
 (function () {
   const q = new URLSearchParams(location.search);
   const from = q.get('from') || '';
@@ -66,12 +68,30 @@
 
   function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text) e.textContent = text; return e; }
 
-  function storeUrl(g) {
+  function androidUrl(g) {
+    if (!g.playUrl) return null;
     const ref = encodeURIComponent('utm_source=' + (from || 'web') + '&utm_medium=crosspromo&utm_campaign=moregames_' + src);
-    if (p === 'ios') return g.iosUrl ? g.iosUrl + (g.iosUrl.includes('?') ? '&' : '?') + 'ct=moregames_' + encodeURIComponent(from) : null;
-    if (g.playUrl) return g.playUrl + (g.playUrl.includes('?') ? '&' : '?') + 'referrer=' + ref;
-    return null;
+    return g.playUrl + (g.playUrl.includes('?') ? '&' : '?') + 'referrer=' + ref;
   }
+
+  function iosUrl(g) {
+    return g.iosUrl ? g.iosUrl + (g.iosUrl.includes('?') ? '&' : '?') + 'ct=moregames_' + encodeURIComponent(from || 'web') : null;
+  }
+
+  // Nút tải theo nền: android -> Google Play · ios -> App Store · web -> cả hai (cái nào có).
+  function storeLinks(g) {
+    const out = [];
+    const a = androidUrl(g), i = iosUrl(g);
+    if (p === 'android') { if (a) out.push({ url: a, label: 'GET ⬇' }); }
+    else if (p === 'ios') { if (i) out.push({ url: i, label: 'GET' }); }
+    else {
+      if (a) out.push({ url: a, label: 'Google Play' });
+      if (i) out.push({ url: i, label: 'App Store' });
+    }
+    return out;
+  }
+
+  function released(g) { return !!(g.playUrl || g.iosUrl); }
 
   function playUrl(g) {
     if (!g.play || !g.play.url) return null;
@@ -87,24 +107,24 @@
   function keep(g) {
     if (g.slug === from) return false;
     const a = audienceOf(g);
-    if (aud === 'kids') { if (a !== 'kids') return false; }
-    else if (a === 'kids') return false;        // không đẩy game trẻ em vào game người lớn và ngược lại
-    return !!(playUrl(g) || storeUrl(g));
+    if (aud === 'kids') { if (a !== 'kids') return false; }   // game trẻ em chỉ thấy game trẻ em
+    else if (a !== 'puzzle') return false;                     // còn lại: chỉ game puzzle
+    if (!released(g)) return false;                            // chưa lên store => không hiện
+    return !!(playUrl(g) || storeLinks(g).length);
   }
 
   function score(g) {
     let s = 0;
     if (g.play && g.play.demo) s += 4;             // chơi tức thì xếp trên
     else if (g.play) s += 2;
-    if (storeUrl(g)) s += 3;
-    if (aud === 'puzzle' && audienceOf(g) === 'puzzle') s += 5;
+    if (storeLinks(g).length) s += 3;
     return s;
   }
 
   function card(g) {
     const c = el('article', 'card'); c.style.setProperty('--accent', g.accent || '#ffb000');
-    const pu = playUrl(g), su = storeUrl(g);
-    const hero = el('a', 'hero'); hero.href = pu || su;
+    const pu = playUrl(g), links = storeLinks(g);
+    const hero = el('a', 'hero'); hero.href = pu || links[0].url;
     const img = el('img'); img.src = g.image; img.alt = ''; img.loading = 'lazy'; hero.append(img);
     if (g.play) hero.append(el('span', 'tag' + (g.play.demo ? ' instant' : ''), g.play.demo ? '⚡ Instant play' : ('▶ Play in browser' + (g.play.size ? ' · ' + g.play.size : ''))));
     const body = el('div', 'body');
@@ -112,7 +132,7 @@
     const info = el('div', 'info'); info.append(el('h2', '', g.name), el('p', '', g.description || g.genre || ''));
     const btns = el('div', 'btns');
     if (pu) { const a = el('a', 'btn play', 'PLAY NOW'); a.href = pu; btns.append(a); }
-    if (su) { const a = el('a', 'btn get', p === 'ios' ? 'GET' : 'GET ⬇'); a.href = su; a.rel = 'noopener'; btns.append(a); }
+    links.forEach(l => { const a = el('a', 'btn get', l.label); a.href = l.url; a.rel = 'noopener'; btns.append(a); });
     body.append(icon, info, btns);
     c.append(hero, body);
     return c;
