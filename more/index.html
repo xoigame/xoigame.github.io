@@ -40,6 +40,8 @@
   .btn.get { background:var(--get); }
   .btn:active { transform:scale(.95); }
   @keyframes pulse { 0%,100% { transform:scale(1); } 50% { transform:scale(1.05); } }
+  body.dragging, body.dragging * { cursor:grabbing !important; user-select:none; }
+  img { -webkit-user-drag:none; user-select:none; }
   .empty { text-align:center; color:var(--muted); padding:48px 0; }
   @media (prefers-reduced-motion:reduce) { .card,.btn.play { animation:none; } }
 </style>
@@ -113,13 +115,8 @@
     return !!(playUrl(g) || storeLinks(g).length);
   }
 
-  function score(g) {
-    let s = 0;
-    if (g.play && g.play.demo) s += 4;             // chơi tức thì xếp trên
-    else if (g.play) s += 2;
-    if (storeLinks(g).length) s += 3;
-    return s;
-  }
+  // Game mới phát hành xếp trước (trường released = ngày lên store, YYYY-MM-DD; thiếu thì xuống cuối).
+  function newestFirst(a, b) { return (b.released || '').localeCompare(a.released || ''); }
 
   function card(g) {
     const c = el('article', 'card'); c.style.setProperty('--accent', g.accent || '#ffb000');
@@ -141,12 +138,32 @@
   fetch('/assets/games.json', { cache: 'no-cache' })
     .then(r => r.json())
     .then(games => {
-      const shown = games.filter(keep).sort((a, b) => score(b) - score(a));
+      const shown = games.filter(keep).sort(newestFirst);
       list.textContent = '';
       if (!shown.length) { list.append(el('p', 'empty', 'New games are coming soon!')); return; }
       shown.forEach(g => list.append(card(g)));
+      list.querySelectorAll('img, a').forEach(n => n.setAttribute('draggable', 'false'));
     })
     .catch(() => { list.textContent = ''; list.append(el('p', 'empty', 'Please check your connection and try again.')); });
+
+  // PC: kéo chuột để cuộn như vuốt trên điện thoại. Kéo quá 6px thì không tính là bấm vào game.
+  (function dragScroll() {
+    let down = false, moved = false, y0 = 0, s0 = 0;
+    addEventListener('pointerdown', e => {
+      if (e.pointerType !== 'mouse' || e.button !== 0) return;
+      down = true; moved = false; y0 = e.clientY; s0 = scrollY;
+    });
+    addEventListener('pointermove', e => {
+      if (!down) return;
+      const dy = e.clientY - y0;
+      if (!moved && Math.abs(dy) > 6) { moved = true; document.body.classList.add('dragging'); }
+      if (moved) { scrollTo(0, s0 - dy); e.preventDefault(); }
+    });
+    const up = () => { down = false; document.body.classList.remove('dragging'); };
+    addEventListener('pointerup', up);
+    addEventListener('pointercancel', up);
+    addEventListener('click', e => { if (moved) { e.preventDefault(); e.stopPropagation(); moved = false; } }, true);
+  })();
 })();
 </script>
 </body>
