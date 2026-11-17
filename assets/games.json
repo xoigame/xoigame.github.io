@@ -16,7 +16,8 @@
    "icon": "/ring-sort/icon.png"
   },
   "audience": "puzzle",
-  "package": "com.xoigame.ringsort"
+  "package": "com.xoigame.ringsort",
+  "released": "2026-11-07"
  },
  {
   "slug": "marble-rush",
@@ -35,7 +36,8 @@
   },
   "audience": "puzzle",
   "iosUrl": "https://apps.apple.com/app/marble-rush-marble-puzzle/id6819539848",
-  "package": "com.xoigame.marblerush"
+  "package": "com.xoigame.marblerush",
+  "released": "2026-08-18"
  },
  {
   "slug": "find-numbers",
@@ -53,7 +55,8 @@
    "icon": "/find-numbers/play/icon.png"
   },
   "audience": "puzzle",
-  "iosUrl": "https://apps.apple.com/app/find-number-1-100/id6818377827"
+  "iosUrl": "https://apps.apple.com/app/find-number-1-100/id6818377827",
+  "released": "2023-04-24"
  },
  {
   "slug": "last-tower",
@@ -139,7 +142,8 @@
   "accent": "#f5b82e",
   "playUrl": "https://play.google.com/store/apps/details?id=com.xoigame.boltpop",
   "package": "com.xoigame.boltpop",
-  "audience": "puzzle"
+  "audience": "puzzle",
+  "released": "2026-11-08"
  },
  {
   "slug": "star-dial",
@@ -151,7 +155,8 @@
   "accent": "#e8b54a",
   "playUrl": "https://play.google.com/store/apps/details?id=com.xoigame.stardial",
   "package": "com.xoigame.stardial",
-  "audience": "puzzle"
+  "audience": "puzzle",
+  "released": "2026-11-16"
  },
  {
   "slug": "wool-bloom",
@@ -163,7 +168,8 @@
   "accent": "#e8526a",
   "playUrl": "https://play.google.com/store/apps/details?id=com.xoigame.woolbloom",
   "package": "com.xoigame.woolbloom",
-  "audience": "puzzle"
+  "audience": "puzzle",
+  "released": "2026-11-10"
  },
  {
   "slug": "number-hunt",
@@ -177,7 +183,8 @@
   "playUrl": "https://play.google.com/store/apps/details?id=com.xoigame.numberhunt",
   "package": "com.xoigame.numberhunt",
   "audience": "puzzle",
-  "iosUrl": null
+  "iosUrl": null,
+  "released": "2026-11-05"
  },
  {
   "slug": "puzzle-box",
