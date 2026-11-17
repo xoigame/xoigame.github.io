@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Play · XOI GAME</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0b1220">
+<link rel="icon" href="/assets/brand.png">
+<style>
+  :root { --bg:#0b1220; --bar:#101a2e; --line:#24304b; --text:#f3f6fb; --muted:#9aa7c0; --get:#2fbf71; }
+  * { box-sizing:border-box; }
+  html,body { margin:0; height:100%; background:var(--bg); color:var(--text); overflow:hidden;
+    font:16px/1.3 "Nunito","Segoe UI",system-ui,-apple-system,Roboto,sans-serif; -webkit-tap-highlight-color:transparent; }
+  .app { position:fixed; inset:0; display:flex; flex-direction:column; }
+  .bar { flex:none; display:flex; align-items:center; gap:10px; padding:calc(8px + env(safe-area-inset-top)) 12px 8px;
+    background:var(--bar); border-bottom:1px solid var(--line); }
+  .back { min-width:44px; min-height:44px; display:flex; align-items:center; justify-content:center; border-radius:12px;
+    color:var(--text); text-decoration:none; font-size:26px; font-weight:900; }
+  .back:active { background:#ffffff14; }
+  .icon { width:36px; height:36px; border-radius:9px; object-fit:cover; background:#000; }
+  .name { flex:1; min-width:0; font-weight:900; font-size:15px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .get { min-height:40px; padding:0 16px; display:flex; align-items:center; border-radius:12px; background:var(--get); color:#fff;
+    font-weight:900; text-decoration:none; font-size:15px; animation:pulse 1.8s ease-in-out infinite; }
+  .get[hidden] { display:none; }
+  @keyframes pulse { 0%,100% { transform:scale(1); } 50% { transform:scale(1.06); } }
+  .stage { position:relative; flex:1; min-height:0; }
+  iframe { position:absolute; inset:0; width:100%; height:100%; border:0; background:#000; }
+  .msg { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px;
+    padding:24px; text-align:center; color:var(--muted); }
+  .again { position:absolute; left:50%; bottom:calc(18px + env(safe-area-inset-bottom)); transform:translateX(-50%);
+    min-height:44px; padding:0 20px; border-radius:999px; border:0; background:#ffffffe6; color:#11161f; font:inherit;
+    font-weight:900; cursor:pointer; box-shadow:0 6px 18px #0006; }
+  .again[hidden], .toast[hidden], .msg[hidden] { display:none; }
+  .toast { position:absolute; left:14px; right:14px; bottom:calc(74px + env(safe-area-inset-bottom)); padding:14px 16px;
+    border-radius:16px; background:#11120ff2; color:var(--text); font-size:14px; }
+  @media (prefers-reduced-motion:reduce) { .get { animation:none; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="bar">
+    <a class="back" id="back" href="/more/" aria-label="Back to more games">‹</a>
+    <img class="icon" id="icon" alt="" hidden>
+    <div class="name" id="name">Loading…</div>
+    <a class="get" id="get" hidden rel="noopener">GET</a>
+  </div>
+  <div class="stage" id="stage">
+    <div class="msg" id="msg">Loading…</div>
+    <button class="again" id="again" type="button" hidden>↻ Play again</button>
+    <div class="toast" id="toast" role="status" hidden>Coming soon to your store. Follow XOI GAME for launch news!</div>
+  </div>
+</div>
+<script>
+// Trình chơi thử dùng chung: /play/?g=<slug>[&v=quick][&from=<slug game nguồn>][&p=android|ios].
+// Nhúng /<slug>/play/<v>.html (playable bản mạng "web" của packages/playable-ads). Nút Install trong playable gửi
+// postMessage {xoi:'install'} → mở store đúng nền (games.json: playUrl / iosUrl) kèm mã crosspromo; {xoi:'end'} → hiện "Chơi lại".
+(function () {
+  const q = new URLSearchParams(location.search);
+  const slug = (q.get('g') || '').replace(/[^a-z0-9-]/g, '');
+  const variant = (q.get('v') || 'quick').replace(/[^a-z0-9-]/g, '');
+  const from = q.get('from') || '';
+  const ua = navigator.userAgent;
+  const p = q.get('p') || (/Android/i.test(ua) ? 'android' : /iPhone|iPad|iPod/i.test(ua) ? 'ios' : 'web');
+  const $ = (id) => document.getElementById(id);
+  const stage = $('stage'), msg = $('msg'), again = $('again'), toast = $('toast'), get = $('get');
+  let frame = null, store = null;
+
+  // Quay lại: từ trang More Games thì về đúng trang đó (giữ from/p/aud), không thì về /more/
+  try {
+    const ref = document.referrer ? new URL(document.referrer) : null;
+    if (ref && ref.origin === location.origin && ref.pathname.startsWith('/more')) $('back').href = ref.pathname + ref.search;
+    else if (from) $('back').href = '/more/?from=' + encodeURIComponent(from) + '&p=' + p;
+  } catch (e) { /* giữ /more/ */ }
+
+  function storeUrl(g) {
+    const camp = 'demo_' + slug;
+    if (p === 'ios') return g.iosUrl ? g.iosUrl + (g.iosUrl.includes('?') ? '&' : '?') + 'ct=' + camp : null;
+    if (!g.playUrl) return null;
+    const ref = encodeURIComponent('utm_source=' + (from || 'xoigame_web') + '&utm_medium=crosspromo&utm_campaign=' + camp);
+    return g.playUrl + (g.playUrl.includes('?') ? '&' : '?') + 'referrer=' + ref;
+  }
+
+  function load() {
+    again.hidden = true; toast.hidden = true;
+    if (frame) frame.remove();
+    frame = document.createElement('iframe');
+    frame.title = 'Playable demo';
+    frame.allow = 'autoplay';
+    frame.src = '/' + slug + '/play/' + variant + '.html';
+    frame.addEventListener('load', () => { msg.hidden = true; });
+    stage.prepend(frame);
+    frame.focus();
+  }
+
+  function install() {
+    if (store) location.href = store;   // trong Custom Tabs / SFSafariViewController: link Play/App Store mở thẳng app store
+    else toast.hidden = false;
+  }
+
+  window.addEventListener('message', (e) => {
+    if (!frame || e.source !== frame.contentWindow || !e.data) return;
+    if (e.data.xoi === 'install') install();
+    if (e.data.xoi === 'end') again.hidden = false;
+  });
+  again.addEventListener('click', load);
+
+  if (!slug) { msg.textContent = 'Game not found.'; return; }
+  fetch('/assets/games.json', { cache: 'no-cache' })
+    .then((r) => r.json())
+    .then((games) => {
+      const g = games.find((x) => x.slug === slug);
+      if (!g) { msg.textContent = 'Game not found.'; return; }
+      document.title = g.name + ' · Play free demo · XOI GAME';
+      $('name').textContent = g.name;
+      const icon = (g.play && g.play.icon) || g.icon;
+      if (icon) { $('icon').src = icon; $('icon').hidden = false; }
+      store = storeUrl(g);
+      if (store) { get.href = store; get.hidden = false; }
+      load();
+    })
+    .catch(() => { msg.textContent = 'Please check your connection and try again.'; });
+})();
+</script>
+</body>
+</html>
