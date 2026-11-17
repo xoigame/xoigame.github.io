@@ -33,7 +33,9 @@
    "orientation": "landscape",
    "icon": "/marble-rush/play/icon.png"
   },
-  "audience": "puzzle"
+  "audience": "puzzle",
+  "iosUrl": "https://apps.apple.com/app/marble-rush-marble-puzzle/id6819539848",
+  "package": "com.xoigame.marblerush"
  },
  {
   "slug": "find-numbers",
@@ -143,11 +145,11 @@
   "slug": "star-dial",
   "name": "Star Dial: Rotate Ring Puzzle",
   "genre": "Rotate puzzle · Relaxing",
-  "status": "Coming soon",
+  "status": "Available now",
   "description": "Tap or drag the rings to line up the gaps and free the shining star. 300 levels, each proven solvable, gears and locked rings, boosters and a Stargazer Loft to decorate.",
   "image": "/assets/games/star-dial-hero.jpg",
   "accent": "#e8b54a",
-  "playUrl": null,
+  "playUrl": "https://play.google.com/store/apps/details?id=com.xoigame.stardial",
   "package": "com.xoigame.stardial",
   "audience": "puzzle"
  },
