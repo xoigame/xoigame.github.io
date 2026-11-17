@@ -1,0 +1,2 @@
+const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["assets/web-Bgz4Sx-R.js","assets/index-BN96X5-F.js","assets/index-C9RgMUxz.css"])))=>i.map(i=>d[i]);
+import{i as e,t}from"./index-BN96X5-F.js";var n=e(`TextToSpeech`,{web:()=>t(()=>import(`./web-Bgz4Sx-R.js`).then(e=>new e.TextToSpeechWeb),__vite__mapDeps([0,1,2]))});`speechSynthesis`in window&&window.speechSynthesis;export{n as TextToSpeech};
