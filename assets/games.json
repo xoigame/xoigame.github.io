@@ -9,7 +9,7 @@
   "accent": "#f5a623",
   "playUrl": "https://play.google.com/store/apps/details?id=com.xoigame.ringsort",
   "play": {
-   "url": "/ring-sort/#demo",
+   "url": "/play/?g=ring-sort",
    "size": "Instant",
    "orientation": "portrait",
    "demo": true,
@@ -130,7 +130,14 @@
   "accent": "#e4572e",
   "playUrl": null,
   "audience": "puzzle",
-  "package": "com.xoigame.arrowescape"
+  "package": "com.xoigame.arrowescape",
+  "play": {
+   "url": "/play/?g=arrow-escape",
+   "size": "Instant",
+   "orientation": "portrait",
+   "demo": true,
+   "icon": "/arrow-escape/icon.png"
+  }
  },
  {
   "slug": "bolt-pop",
@@ -143,7 +150,14 @@
   "playUrl": "https://play.google.com/store/apps/details?id=com.xoigame.boltpop",
   "package": "com.xoigame.boltpop",
   "audience": "puzzle",
-  "released": "2026-11-08"
+  "released": "2026-11-08",
+  "play": {
+   "url": "/play/?g=bolt-pop",
+   "size": "Instant",
+   "orientation": "portrait",
+   "demo": true,
+   "icon": "/bolt-pop/icon.png"
+  }
  },
  {
   "slug": "star-dial",
@@ -156,7 +170,14 @@
   "playUrl": "https://play.google.com/store/apps/details?id=com.xoigame.stardial",
   "package": "com.xoigame.stardial",
   "audience": "puzzle",
-  "released": "2026-11-16"
+  "released": "2026-11-16",
+  "play": {
+   "url": "/play/?g=star-dial",
+   "size": "Instant",
+   "orientation": "portrait",
+   "demo": true,
+   "icon": "/star-dial/icon.png"
+  }
  },
  {
   "slug": "wool-bloom",
@@ -169,7 +190,14 @@
   "playUrl": "https://play.google.com/store/apps/details?id=com.xoigame.woolbloom",
   "package": "com.xoigame.woolbloom",
   "audience": "puzzle",
-  "released": "2026-11-10"
+  "released": "2026-11-10",
+  "play": {
+   "url": "/play/?g=wool-bloom",
+   "size": "Instant",
+   "orientation": "portrait",
+   "demo": true,
+   "icon": "/wool-bloom/icon.png"
+  }
  },
  {
   "slug": "number-hunt",
@@ -184,7 +212,14 @@
   "package": "com.xoigame.numberhunt",
   "audience": "puzzle",
   "iosUrl": null,
-  "released": "2026-11-05"
+  "released": "2026-11-05",
+  "play": {
+   "url": "/play/?g=number-hunt",
+   "size": "Instant",
+   "orientation": "portrait",
+   "demo": true,
+   "icon": "/number-hunt/icon.png"
+  }
  },
  {
   "slug": "puzzle-box",
