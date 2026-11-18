@@ -1,0 +1,833 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>BulletHell — phân tích code một game bullet hell trên Cocos Creator | XOI GAME Devlog</title>
+<meta name="description" content="Phân tích code BulletHell, demo bullet hell đánh boss làm bằng Cocos Creator 3.7.4: kiến trúc tách mô phỏng khỏi hiển thị, đạn lưu trong typed array, AI boss theo phase HP, va chạm tự viết, hiệu năng và quản lý bộ nhớ.">
+<link rel="canonical" href="https://xoigame.com/devlog/bullethell/">
+<meta property="og:type" content="article"><meta property="og:title" content="BulletHell — phân tích code một game bullet hell trên Cocos Creator"><meta property="og:description" content="Kiến trúc, AI boss theo phase HP, đạn dạng dữ liệu, va chạm tự viết và tối ưu hiệu năng trong Cocos Creator 3.7.4."><meta property="og:url" content="https://xoigame.com/devlog/bullethell/"><meta property="og:image" content="https://xoigame.com/assets/brand.png">
+<meta name="theme-color" content="#11120f"><link rel="icon" href="/assets/brand.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+/* Layout: arena metaphor - a dark "arena" hero with a live fan-pattern demo, then a sidebar TOC + long-form study column. */
+:root {
+  --bg: #f2f4f8;
+  --panel: #ffffff;
+  --panel-2: #f7f8fb;
+  --ink: #141b26;
+  --muted: #5b6676;
+  --line: #d9dee6;
+  --accent: #2f6fd8;          /* player blue, slightly deeper for text contrast */
+  --accent-soft: #e3ecfb;
+  --boss: #d93636;            /* boss red */
+  --boss-soft: #fbe6e6;
+  --bullet: #e2700f;          /* boss bullet orange */
+  --good: #1f8a4c;            /* player bullet green */
+  --good-soft: #e2f3e8;
+  --warn: #a8670a;
+  --warn-soft: #fbf0db;
+  --code-bg: #f4f6f9;
+  --code-ink: #1b2f4d;
+  --arena: #1e293b;
+  --arena-wall: #64748b;
+  --f-text: "Be Vietnam Pro", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f141b; --panel: #171e28; --panel-2: #1d2532; --ink: #e6ebf2; --muted: #95a1b3; --line: #2a3442;
+    --accent: #6ea2f5; --accent-soft: #1b2d4a; --boss: #f07373; --boss-soft: #3a1c1f; --bullet: #f59a4b;
+    --good: #5cc98a; --good-soft: #163325; --warn: #e2b155; --warn-soft: #382b12; --code-bg: #121820; --code-ink: #c3d8f5;
+    --arena: #1e293b; --arena-wall: #64748b;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f141b; --panel: #171e28; --panel-2: #1d2532; --ink: #e6ebf2; --muted: #95a1b3; --line: #2a3442;
+  --accent: #6ea2f5; --accent-soft: #1b2d4a; --boss: #f07373; --boss-soft: #3a1c1f; --bullet: #f59a4b;
+  --good: #5cc98a; --good-soft: #163325; --warn: #e2b155; --warn-soft: #382b12; --code-bg: #121820; --code-ink: #c3d8f5;
+  --arena: #1e293b; --arena-wall: #64748b;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-text); font-size: 15.5px; line-height: 1.65; }
+.wrap { max-width: 1160px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 28px 72px; }
+
+/* Hero */
+.hero { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 28px; align-items: center; margin-bottom: 36px; }
+.eyebrow { font-family: var(--f-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+h1 { font-size: clamp(28px, 4.2vw, 42px); line-height: 1.12; margin: 6px 0 12px; font-weight: 800; letter-spacing: -.015em; text-wrap: balance; }
+.lede { color: var(--muted); margin: 0 0 16px; max-width: 62ch; }
+.facts { display: flex; flex-wrap: wrap; gap: 8px; }
+.fact { font-family: var(--f-mono); font-size: 12.5px; padding: 4px 10px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel); white-space: nowrap; }
+.fact b { color: var(--ink); }
+.arena-card { background: var(--arena); border: 6px solid var(--arena-wall); border-radius: 6px; overflow: hidden; }
+.arena-card canvas { display: block; width: 100%; height: auto; aspect-ratio: 16 / 10; }
+.arena-ctrl { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; padding: 10px 12px; background: #0f172a; color: #cbd5e1; font-size: 13px; }
+.arena-ctrl button { font: inherit; font-size: 12.5px; font-weight: 600; border: 1px solid #334155; background: #1e293b; color: #e2e8f0; border-radius: 6px; padding: 5px 10px; cursor: pointer; }
+.arena-ctrl button[aria-pressed="true"] { background: #f97316; border-color: #f97316; color: #111827; }
+.arena-ctrl .formula { font-family: var(--f-mono); font-size: 11.5px; color: #94a3b8; margin-left: auto; }
+
+/* Layout */
+.layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 32px; align-items: start; }
+nav.toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 14px); font-size: 14px; }
+nav.toc .h { font-family: var(--f-mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+nav.toc a { display: block; padding: 4px 10px; border-left: 2px solid var(--line); color: var(--muted); text-decoration: none; }
+nav.toc a:hover, nav.toc a.on { color: var(--ink); border-left-color: var(--accent); background: var(--accent-soft); }
+.progress { margin-top: 14px; font-size: 13px; color: var(--muted); }
+.progress b { color: var(--ink); font-variant-numeric: tabular-nums; }
+.bar { height: 5px; border-radius: 3px; background: var(--line); overflow: hidden; margin-top: 6px; }
+.bar i { display: block; height: 100%; width: 0; background: var(--good); transition: width .3s; }
+
+main { min-width: 0; }
+section.block { padding-bottom: 34px; margin-bottom: 34px; border-bottom: 1px solid var(--line); scroll-margin-top: 16px; }
+section.block:last-child { border-bottom: 0; }
+h2 { font-size: 24px; margin: 0 0 6px; font-weight: 800; letter-spacing: -.01em; text-wrap: balance; }
+h3 { font-size: 17px; margin: 22px 0 8px; font-weight: 700; text-wrap: balance; }
+p { margin: 0 0 10px; max-width: 72ch; }
+.sub { color: var(--muted); margin-bottom: 16px; }
+ul, ol { padding-left: 20px; margin: 0 0 10px; max-width: 72ch; }
+li { margin-bottom: 4px; }
+code { font-family: var(--f-mono); font-size: .86em; background: var(--code-bg); color: var(--code-ink); padding: 1px 5px; border-radius: 4px; }
+pre { margin: 10px 0 12px; background: var(--code-bg); border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px; overflow-x: auto; font-family: var(--f-mono); font-size: 12.5px; line-height: 1.55; color: var(--code-ink); }
+pre code { background: none; padding: 0; font-size: inherit; }
+.file { font-family: var(--f-mono); font-size: 12px; color: var(--muted); }
+.tbl { overflow-x: auto; margin: 8px 0 14px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); background: var(--panel-2); font-weight: 600; }
+tr:last-child td { border-bottom: 0; }
+td.num { font-variant-numeric: tabular-nums; font-family: var(--f-mono); font-size: 13px; }
+
+/* Module cards */
+.mod { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; margin-bottom: 14px; }
+.mod > summary { list-style: none; cursor: pointer; padding: 14px 16px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: center; }
+.mod > summary::-webkit-details-marker { display: none; }
+.mod > summary .t { font-weight: 700; }
+.mod > summary .p { display: block; font-family: var(--f-mono); font-size: 12px; color: var(--muted); font-weight: 400; }
+.layer { font-family: var(--f-mono); font-size: 11px; padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+.layer.model { background: var(--good-soft); color: var(--good); }
+.layer.ctrl { background: var(--accent-soft); color: var(--accent); }
+.layer.view { background: var(--warn-soft); color: var(--warn); }
+.layer.cfg { background: var(--boss-soft); color: var(--boss); }
+.mod[open] > summary { border-bottom: 1px solid var(--line); }
+.mod .body { padding: 6px 16px 14px; }
+.why { border-left: 3px solid var(--accent); padding: 2px 0 2px 12px; margin: 10px 0; }
+.why b { color: var(--accent); }
+.ask { background: var(--panel-2); border-radius: 6px; padding: 10px 12px; margin-top: 10px; font-size: 14.5px; }
+.ask .q { font-weight: 600; }
+.ask .a { color: var(--muted); margin-top: 4px; }
+
+/* Review */
+.review { display: grid; gap: 10px; }
+.rv { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 12px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; }
+.sev { font-family: var(--f-mono); font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 4px; height: fit-content; white-space: nowrap; }
+.sev.ok { background: var(--good-soft); color: var(--good); }
+.sev.mid { background: var(--warn-soft); color: var(--warn); }
+.sev.low { background: var(--accent-soft); color: var(--accent); }
+.rv h4 { margin: 0 0 4px; font-size: 15px; }
+.rv p { margin: 0 0 4px; font-size: 14.5px; }
+.rv .say { font-size: 13.5px; color: var(--muted); }
+
+/* Quiz */
+.quiz { display: grid; gap: 8px; }
+.qz { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; }
+.qz > summary { list-style: none; cursor: pointer; padding: 11px 14px; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 10px; align-items: start; font-weight: 600; }
+.qz > summary::-webkit-details-marker { display: none; }
+.qz .n { font-family: var(--f-mono); font-size: 12px; color: var(--muted); padding-top: 2px; font-variant-numeric: tabular-nums; }
+.qz input { width: 17px; height: 17px; accent-color: var(--good); margin-top: 3px; cursor: pointer; }
+.qz.done .qt { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--line); }
+.qz .ans { padding: 0 14px 12px 44px; color: var(--ink); font-size: 14.5px; }
+.callout { background: var(--warn-soft); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; margin: 12px 0; }
+.callout b { color: var(--warn); }
+.toolbar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+.btn { font: inherit; font-size: 13px; font-weight: 600; border: 1px solid var(--line); background: var(--panel); color: var(--ink); border-radius: 6px; padding: 7px 12px; cursor: pointer; }
+.btn:hover { border-color: var(--accent); color: var(--accent); }
+button:focus-visible, summary:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.mermaid { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px; overflow-x: auto; }
+footer { color: var(--muted); font-size: 13px; margin-top: 24px; }
+
+/* Site chrome (kept self-contained so the article styles never fight the arcade home CSS) */
+.site-top { border-bottom: 1px solid var(--line); background: var(--panel); }
+.site-top .in, .site-bottom .in { max-width: 1160px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 10px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.site-brand { display: inline-flex; align-items: center; gap: 10px; font-weight: 800; letter-spacing: .02em; color: var(--ink); text-decoration: none; }
+.site-brand img { width: 34px; height: 34px; }
+.site-nav { display: flex; gap: 14px; font-size: 14px; }
+.site-nav a { color: var(--muted); text-decoration: none; }
+.site-nav a:hover { color: var(--accent); }
+.site-bottom { border-top: 1px solid var(--line); margin-top: 24px; }
+.site-bottom p { margin: 0; color: var(--muted); font-size: 13px; }
+/* Architecture flow (plain HTML instead of a diagram library) */
+.archflow { display: flex; flex-wrap: wrap; align-items: stretch; gap: 8px; margin: 10px 0 14px; }
+.archflow .box { flex: 1 1 150px; min-width: 0; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; font-size: 13.5px; }
+.archflow .box b { display: block; font-family: var(--f-mono); font-size: 12.5px; color: var(--accent); margin-bottom: 2px; }
+.archflow .arrow { align-self: center; color: var(--muted); font-family: var(--f-mono); }
+@media (max-width: 900px) {
+  .hero { grid-template-columns: minmax(0, 1fr); }
+  .layout { grid-template-columns: minmax(0, 1fr); }
+  nav.toc { position: static; }
+  nav.toc ol { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 520px) {
+  nav.toc ol { grid-template-columns: minmax(0, 1fr); }
+  .qz .ans { padding-left: 14px; }
+  .arena-ctrl .formula { margin-left: 0; width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<header class="site-top"><div class="in"><a class="site-brand" href="/" aria-label="XOI GAME home"><img src="/assets/brand.png" width="34" height="34" alt="">XOI GAME</a><nav class="site-nav" aria-label="Main navigation"><a href="/#play">Games</a><a href="/devlog/bullethell/" aria-current="page">Devlog</a><a href="https://www.youtube.com/@xoigame">YouTube ↗</a></nav></div></header>
+
+<div class="wrap">
+  <header class="hero">
+    <div>
+      <div class="eyebrow">XOI GAME Devlog · Cocos Creator 3.7.4 · TypeScript</div>
+      <h1>BulletHell: phân tích code một game bullet hell đánh boss</h1>
+      <p class="lede">Một demo bullet hell góc nhìn từ trên xuống: player né đạn và tự bắn, boss đổi chiến thuật theo lượng máu. Bài này đi từ từng yêu cầu của game, tới file xử lý nó, tới đoạn code thật và lý do viết như vậy. Cuối bài có phần tự đánh giá code và bộ câu hỏi để tự kiểm tra.</p>
+      <div class="facts">
+        <span class="fact"><b>44</b> file TypeScript</span>
+        <span class="fact">~<b>2.900</b> dòng</span>
+        <span class="fact">arena <b>2400×1600</b> px</span>
+        <span class="fact"><b>1</b> gameplay update</span>
+        <span class="fact">sub-step ≤ <b>50</b> ms</span>
+      </div>
+    </div>
+    <figure class="arena-card" style="margin:0">
+      <canvas id="arena" width="640" height="400" aria-label="Mô phỏng boss bắn quạt đạn về phía player"></canvas>
+      <div class="arena-ctrl">
+        <button type="button" id="fanNormal" aria-pressed="true">Normal · 6 viên / 50°</button>
+        <button type="button" id="fanCrazy" aria-pressed="false">Crazy · 18 viên / 140°</button>
+        <span class="formula">angle<sub>i</sub> = base − spread/2 + spread·i/(count−1)</span>
+      </div>
+    </figure>
+  </header>
+
+  <div class="layout">
+    <nav class="toc" aria-label="Mục lục">
+      <div class="h">Mục lục</div>
+      <ol id="toc">
+        <li><a href="#de-bai">Đề bài → code</a></li>
+        <li><a href="#kien-truc">Kiến trúc</a></li>
+        <li><a href="#mot-frame">Một frame chạy thế nào</a></li>
+        <li><a href="#module">Từng module</a></li>
+        <li><a href="#hieu-nang">Hiệu năng</a></li>
+        <li><a href="#bo-nho">Bộ nhớ và lỗi</a></li>
+        <li><a href="#quyet-dinh">Quyết định, đánh đổi</a></li>
+        <li><a href="#review">Review code</a></li>
+        <li><a href="#luyen-tap">Câu hỏi luyện tập</a></li>
+      </ol>
+      <div class="progress">Đã nắm <b id="doneN">0</b>/<b id="totalN">0</b> câu
+        <div class="bar"><i id="barFill"></i></div>
+      </div>
+    </nav>
+
+    <main>
+      <!-- ============ 1. De bai ============ -->
+      <section class="block" id="de-bai">
+        <h2>Đề bài → nơi xử lý trong code</h2>
+        <p class="sub">Mỗi yêu cầu của game và nơi xử lý nó trong code.</p>
+        <div class="tbl"><table>
+          <thead><tr><th>Yêu cầu trong đề</th><th>Nơi xử lý</th><th>Ghi chú</th></tr></thead>
+          <tbody>
+            <tr><td>Player tròn xanh, đạn tròn xanh lá, boss vuông đỏ, đạn boss tròn cam</td><td><code>GameConfig.COLORS</code>, <code>BulletLayerView</code>, <code>PlayerView</code>, <code>BossView</code></td><td>2 texture trắng (tròn, vuông) tô màu bằng <code>Sprite.color</code></td></tr>
+            <tr><td>Arena lớn kín 4 tường</td><td><code>ArenaBounds</code> (va chạm), <code>ArenaView</code> (vẽ)</td><td>2400×1600 px, tường dày 40 px chỉ để nhìn</td></tr>
+            <tr><td>Camera top-down</td><td><code>CameraFollow</code></td><td>Bám mượt <code>1 − e<sup>−k·dt</sup></code>, kẹp trong arena, rung khi trúng đạn</td></tr>
+            <tr><td>Player di chuyển tự do trong map</td><td><code>PlayerModel.move</code>, <code>KeyboardInput</code>, <code>VirtualJoystick</code></td><td>Chuẩn hoá chéo, kẹp theo bán kính</td></tr>
+            <tr><td>Tự bắn khi boss trong tầm</td><td><code>PlayerWeapon</code></td><td>Tầm 750 px, so bình phương khoảng cách</td></tr>
+            <tr><td>Máu cố định</td><td><code>Health</code>, <code>PlayerModel.takeHit</code></td><td>100 HP, bất tử 1 s sau khi trúng</td></tr>
+            <tr><td>(Tuỳ chọn) Dash cho player</td><td><code>PlayerModel.tryStartDash</code>, <code>DashButton</code></td><td>165 px, hồi 1 s, bất tử khi dash</td></tr>
+            <tr><td>Boss Normal Move: đuổi theo player</td><td><code>ChaseMove</code></td><td>150 px/s, dừng cách 60 px</td></tr>
+            <tr><td>Boss Dash Move: lao về vị trí lúc kích hoạt, khoá hướng</td><td><code>DashMove</code></td><td>Windup 0.5 s → Dash 1200 px/s → Recover 0.6 s</td></tr>
+            <tr><td>Normal Shoot 6 viên, Crazy Shoot 18 viên quạt rộng hơn</td><td><code>FanShot</code> + <code>BossConfig.SHOTS</code></td><td>Một class cho mọi kiểu quạt</td></tr>
+            <tr><td>Hành vi theo HP: High / Medium (random) / Low</td><td><code>BossBrain</code> + <code>BossConfig.PHASES</code></td><td>Ngưỡng 60% / 30%, đổi ngẫu nhiên mỗi 2–4 s</td></tr>
+            <tr><td>Code dễ mở rộng</td><td><code>IBossMove</code>, <code>IBossShot</code>, <code>BossActionFactory</code></td><td>Thêm kiểu mới = 1 class + 1 enum + 1 dòng factory</td></tr>
+            <tr><td>Boss chết → xoá hết đạn ngay lập tức</td><td><code>GameManager.handleOutcome</code> → <code>BattleWorld.clearAllBullets</code></td><td>Đặt <code>count = 0</code>, cùng frame</td></tr>
+            <tr><td>Game Over + Restart</td><td><code>GameOverPanel</code>, <code>GameManager.startGame</code></td><td>Chơi lại không load lại scene</td></tr>
+            <tr><td>Config tách khỏi logic</td><td><code>config/GameConfig.ts</code>, <code>config/BossConfig.ts</code></td><td>TS <code>as const</code>, thiếu entry là lỗi biên dịch</td></tr>
+            <tr><td>(Tuỳ chọn) VFX theo stage, (bonus) audio</td><td><code>BossView</code>, <code>AudioPlayer</code></td><td>Boss đổi màu theo phase, nháy khi windup; âm thanh sinh bằng code</td></tr>
+          </tbody>
+        </table></div>
+      </section>
+
+      <!-- ============ 2. Kien truc ============ -->
+      <section class="block" id="kien-truc">
+        <h2>Kiến trúc: mô phỏng tách khỏi hiển thị</h2>
+        <p class="sub">Ý tưởng cốt lõi của cả project.</p>
+        <p>Toàn bộ luật chơi nằm trong <code>model/</code> dưới dạng TypeScript thuần, <b>không import <code>'cc'</code></b>. Component của Cocos chỉ làm hai việc: nhận input và vẽ lại trạng thái của model. Phụ thuộc đi một chiều:</p>
+        <div class="archflow" role="img" aria-label="Phụ thuộc một chiều: ui, view, input phụ thuộc controller; controller phụ thuộc model; model phụ thuộc config, core, utils">
+          <div class="box"><b>ui/ · view/ · input/</b>Vẽ lại model trong lateUpdate, nghe EventBus</div>
+          <span class="arrow" aria-hidden="true">→</span>
+          <div class="box"><b>controller/</b>GameManager: update duy nhất, state machine</div>
+          <span class="arrow" aria-hidden="true">→</span>
+          <div class="box"><b>model/</b>BattleWorld, BossBrain, BulletStore: TypeScript thuần</div>
+          <span class="arrow" aria-hidden="true">→</span>
+          <div class="box"><b>config/ · core/ · utils/</b>Số liệu, EventBus, va chạm</div>
+        </div>
+        <div class="tbl"><table>
+          <thead><tr><th>Thư mục</th><th>Vai trò</th><th>Ví dụ</th></tr></thead>
+          <tbody>
+            <tr><td><code>config/</code></td><td>Mọi con số chỉnh gameplay, bảng phase</td><td><code>GameConfig</code>, <code>BossConfig</code>, các enum id</td></tr>
+            <tr><td><code>core/</code></td><td>Kênh sự kiện toàn cục</td><td><code>EventBus</code>, <code>GameEvents</code></td></tr>
+            <tr><td><code>model/</code></td><td>Mô phỏng thuần, test được không cần editor</td><td><code>BattleWorld</code>, <code>BulletStore</code>, <code>PlayerModel</code>, <code>boss/*</code></td></tr>
+            <tr><td><code>controller/</code></td><td>Update duy nhất của gameplay, state machine</td><td><code>GameManager</code></td></tr>
+            <tr><td><code>view/</code></td><td>Chép trạng thái model lên node mỗi frame</td><td><code>BulletLayerView</code>, <code>BossView</code>, <code>CameraFollow</code></td></tr>
+            <tr><td><code>input/</code>, <code>ui/</code></td><td>Ghi input; HUD và popup chỉ phản ứng theo sự kiện</td><td><code>VirtualJoystick</code>, <code>HealthBarView</code>, <code>GameOverPanel</code></td></tr>
+          </tbody>
+        </table></div>
+        <div class="why"><b>Vì sao tách như vậy:</b> luật chơi đọc và kiểm tra được mà không cần mở editor; đổi giao diện không đụng luật; số lượng đạn tăng không làm tăng số component phải update. Cái giá: mỗi frame view phải chép dữ liệu sang node.</div>
+      </section>
+
+      <!-- ============ 3. Mot frame ============ -->
+      <section class="block" id="mot-frame">
+        <h2>Một frame chạy thế nào</h2>
+        <p class="sub">Thứ tự dưới đây đúng như trong code.</p>
+        <ol>
+          <li><b>Input đến theo sự kiện.</b> <code>KeyboardInput</code>, <code>VirtualJoystick</code> ghi vào <code>InputState</code> khi có phím hoặc chạm, không ai phải hỏi vòng mỗi frame.</li>
+          <li><b><code>GameManager.update(dt)</code></b> chỉ chạy khi state là <code>Playing</code>. Nó cắt frame thành các bước tối đa <b>50 ms</b>, frame dài hơn <b>250 ms</b> thì bỏ phần thừa.</li>
+          <li>Mỗi bước gọi <code>BattleWorld.step</code>: player di chuyển → súng player → <code>BossBrain</code> (phase, chọn move/shot, chạy chúng) → đạn hai bên bay và bị xoá khi chạm tường → xét va chạm → trả về <code>BattleOutcome</code>.</li>
+          <li><code>GameManager</code> phát sự kiện HP, phase, trúng đạn <b>chỉ khi giá trị đổi</b>; boss chết thì xoá hết đạn rồi phát <code>GAME_OVER</code>.</li>
+          <li>Trong <code>lateUpdate</code>, các view chép model lên node: <code>PlayerView</code>, <code>BossView</code>, hai <code>BulletLayerView</code>, <code>CameraFollow</code>.</li>
+          <li>UI (thanh máu, nhãn phase, bảng Game Over) chỉ chạy khi nhận sự kiện.</li>
+        </ol>
+        <pre><code><span class="file">// controller/GameManager.ts</span>
+private simulateFrame(dt: number, world: BattleWorld): BattleOutcome {
+    // NOTE: frames longer than MAX_FRAME_TIME (tab switch, debugger) are cut, not fast-forwarded.
+    let remaining = Math.min(dt, GameConfig.FRAME.MAX_FRAME_TIME);
+    let outcome = BattleOutcome.None;
+    while (remaining &gt; 0 &amp;&amp; outcome === BattleOutcome.None) {
+        const step = Math.min(remaining, GameConfig.FRAME.MAX_DT);
+        outcome = world.step(step, this._input);
+        remaining -= step;
+    }
+    return outcome;
+}</code></pre>
+        <div class="why"><b>Vì sao sub-step:</b> máy yếu chạy 15 fps thì <code>dt</code> ≈ 0.066 s. Nếu bước một lần, đạn player (900 px/s) nhảy 60 px mỗi bước và có thể "xuyên" qua mục tiêu. Cắt thành bước ≤ 50 ms vừa giữ đúng tốc độ thật, vừa giữ va chạm chính xác.</div>
+      </section>
+
+      <!-- ============ 4. Module ============ -->
+      <section class="block" id="module">
+        <h2>Từng module</h2>
+        <p class="sub">Bấm để mở. Mỗi module có: làm gì, đoạn code chính, vì sao viết vậy, và câu hỏi dễ gặp.</p>
+
+        <details class="mod" open>
+          <summary><span><span class="t">BulletStore</span><span class="p">model/BulletStore.ts · 121 dòng</span></span><span class="layer model">model</span></summary>
+          <div class="body">
+            <p>Lưu toàn bộ đạn của một phe trong 4 mảng <code>Float32Array</code> cố định (x, y, vx, vy). Đạn đang sống nằm ở chỉ số <code>[0, count)</code>. Không có object nào cho từng viên đạn.</p>
+            <pre><code>/** Swap-remove: the last bullet takes the freed slot. */
+private removeAt(index: number): void {
+    // PERF: O(1) instead of shifting every later bullet (order does not matter for bullets).
+    const last = this._count - 1;
+    if (index !== last) {
+        this.x[index] = this.x[last];
+        this.y[index] = this.y[last];
+        this.vx[index] = this.vx[last];
+        this.vy[index] = this.vy[last];
+    }
+    this._count = last;
+}</code></pre>
+            <pre><code>step(dt: number, bounds: ArenaBounds): void {
+    // NOTE: loop backwards: removeAt moves the last bullet into slot i, and that bullet was
+    // already processed, so nothing is skipped or moved twice.
+    for (let i = this._count - 1; i &gt;= 0; i--) {
+        this.x[i] += this.vx[i] * dt;
+        this.y[i] += this.vy[i] * dt;
+        if (bounds.touchesWall(this.x[i], this.y[i], this.radius)) {
+            this.removeAt(i);
+        }
+    }
+}</code></pre>
+            <div class="why"><b>Vì sao:</b> không tạo object khi bắn, không rác cho GC, dữ liệu nằm liền nhau trong bộ nhớ nên duyệt nhanh. <code>clear()</code> chỉ đặt <code>count = 0</code>, đó là cách "xoá hết đạn ngay lập tức" khi boss chết.</div>
+            <div class="ask"><div class="q">Hỏi: vì sao duyệt ngược từ cuối mảng?</div><div class="a">Vì <code>removeAt(i)</code> lấy viên cuối mảng đặt vào chỗ <code>i</code>. Viên cuối đó đã được xử lý rồi (đi ngược), nên không viên nào bị bỏ sót hay xử lý hai lần.</div></div>
+          </div>
+        </details>
+
+        <details class="mod">
+          <summary><span><span class="t">BattleWorld</span><span class="p">model/BattleWorld.ts · 101 dòng</span></span><span class="layer model">model</span></summary>
+          <div class="body">
+            <p>Chứa toàn bộ trận đấu dưới dạng dữ liệu: arena, player, boss, súng, hai kho đạn, bộ não boss. <code>step()</code> chạy mọi thứ theo thứ tự cố định rồi trả về kết quả.</p>
+            <pre><code>step(dt: number, input: InputState): BattleOutcome {
+    this.player.step(dt, input, this.bounds);
+    this.weapon.step(dt, this.player, this.boss, this.playerBullets);
+    this.brain.step(dt, this.boss, this.player, this.bounds, this.bossBullets);
+    this.playerBullets.step(dt, this.bounds);
+    this.bossBullets.step(dt, this.bounds);
+    this.hitBoss();
+    this.hitPlayer();
+    const outcome = this.outcome();
+    ...
+}</code></pre>
+            <pre><code>private outcome(): BattleOutcome {
+    // NOTE: boss checked first, so a same-frame double kill counts as a victory.
+    if (this.boss.health.isDead) { return BattleOutcome.BossDefeated; }
+    if (this.player.health.isDead) { return BattleOutcome.PlayerDefeated; }
+    return BattleOutcome.None;
+}</code></pre>
+            <div class="why"><b>Vì sao thứ tự này:</b> mọi thứ di chuyển và bắn trước, đạn bay sau, va chạm xét cuối cùng trên vị trí đã chốt của frame. Hai bên cùng chết trong một frame thì tính là thắng.</div>
+            <div class="ask"><div class="q">Hỏi: khi player đang bất tử, đạn boss xử lý thế nào?</div><div class="a"><code>hitPlayer()</code> thoát sớm: đạn bay xuyên qua player chứ không bị "ăn" mất. Đây là lựa chọn thiết kế, ghi trong README.</div></div>
+          </div>
+        </details>
+
+        <details class="mod">
+          <summary><span><span class="t">GameManager</span><span class="p">controller/GameManager.ts · 174 dòng</span></span><span class="layer ctrl">controller</span></summary>
+          <div class="body">
+            <p>Update gameplay duy nhất của cả game. Giữ <code>BattleWorld</code>, <code>InputState</code> và state machine <code>Ready → Playing → GameOver</code>.</p>
+            <pre><code>startGame(): void {
+    if (!this._world) { return; }
+    // NOTE: passing through Ready lets every view clear the previous round (panel, camera snap).
+    this.setState(GameState.Ready);
+    this._world.reset();
+    this._input.isDashRequested = false;
+    this.emitInitialValues(this._world);
+    this.setState(GameState.Playing);
+}</code></pre>
+            <pre><code>private emitHealthChange(health: Health, lastHp: number, hpEvent: string, hitEvent: string): number {
+    const hp = health.current;
+    if (hp === lastHp) { return lastHp; }       // PERF: no event when nothing changed
+    if (hp &lt; lastHp) { EventBus.emit(hitEvent); }
+    EventBus.emit(hpEvent, hp, health.max);
+    return hp;
+}</code></pre>
+            <div class="why"><b>Vì sao:</b> chơi lại không cần load lại scene, chỉ đi qua <code>Ready</code> để mọi view tự dọn. HUD không bị cập nhật mỗi frame vì sự kiện chỉ bắn khi HP thực sự đổi. World tạo trong <code>onLoad</code> (không trong field initializer) vì editor cũng khởi tạo component khi mở scene.</div>
+            <div class="ask"><div class="q">Hỏi: vì sao <code>startGame()</code> gọi trong <code>start()</code> chứ không trong <code>onLoad()</code>?</div><div class="a">Mọi <code>onEnable</code> (nơi view đăng ký nghe sự kiện) chạy trước mọi <code>start</code>. Gọi trong <code>start</code> thì sự kiện HP và phase ban đầu chắc chắn có người nghe.</div></div>
+          </div>
+        </details>
+
+        <details class="mod">
+          <summary><span><span class="t">BossBrain</span><span class="p">model/boss/BossBrain.ts · 146 dòng</span></span><span class="layer model">model</span></summary>
+          <div class="body">
+            <p>Quyết định boss làm gì: tính phase từ tỉ lệ HP, chọn move và shot từ bảng <code>BossConfig.PHASES</code>, đổi ngẫu nhiên trong phase có nhiều lựa chọn.</p>
+            <pre><code>private static phaseFromRatio(ratio: number): BossPhase {
+    if (ratio &gt;= BOSS.PHASE_HIGH_MIN_RATIO) { return BossPhase.High; }     // &gt;= 60%
+    if (ratio &gt;= BOSS.PHASE_MEDIUM_MIN_RATIO) { return BossPhase.Medium; } // &gt;= 30%
+    return BossPhase.Low;
+}</code></pre>
+            <pre><code>private updateMoveChoice(dt: number, boss: BossModel, target: Point, bounds: ArenaBounds): void {
+    this.moveSwitchTimer -= dt;
+    if (this.moveSwitchTimer &gt; 0) { return; }
+    // NOTE: a dash in windup or charge is never cut: the timer stays expired, so this retries
+    // every frame and switches as soon as the move becomes interruptible.
+    if (this.move !== null &amp;&amp; !this.move.isInterruptible) { return; }
+    const next = this.getMove(randomItem(this.phaseConfig.MOVES));
+    ...
+    this.moveSwitchTimer = BossBrain.nextSwitchDelay(this.phaseConfig.MOVES.length);
+}</code></pre>
+            <ul>
+              <li><b>Phase chỉ đi tiến</b> trong một round (High → Medium → Low), vì enum có thứ tự tăng dần.</li>
+              <li><b>Move và shot đổi độc lập</b>, mỗi cái một timer ngẫu nhiên 2–4 s.</li>
+              <li>Phase chỉ có một lựa chọn thì timer là <code>Infinity</code>: không bao giờ đổi, không cần cờ riêng.</li>
+              <li>Mỗi move/shot tạo một lần rồi dùng lại (<code>Map</code> theo id).</li>
+            </ul>
+            <div class="ask"><div class="q">Hỏi: nếu muốn thêm phase thứ tư (ví dụ "Enraged" dưới 10% HP)?</div><div class="a">Thêm giá trị vào enum <code>BossPhase</code>, thêm entry trong <code>BossConfig.PHASES</code> (thiếu là lỗi biên dịch), thêm ngưỡng trong <code>GameConfig.BOSS</code> và một nhánh trong <code>phaseFromRatio</code>.</div></div>
+          </div>
+        </details>
+
+        <details class="mod">
+          <summary><span><span class="t">DashMove</span><span class="p">model/boss/DashMove.ts · 118 dòng</span></span><span class="layer model">model</span></summary>
+          <div class="body">
+            <p>Vòng lặp ba giai đoạn: <b>Windup</b> (đứng yên, nháy trắng) → <b>Dash</b> (lao theo hướng đã khoá) → <b>Recover</b> (nghỉ) → Windup lại. Chỉ Recover mới được ngắt.</p>
+            <pre><code>private startWindup(boss: BossModel, target: Point, bounds: ArenaBounds): void {
+    // Aim point = target clamped into the rectangle the boss centre can reach.
+    const dx = bounds.clampX(target.x, boss.halfSize) - boss.x;
+    const dy = bounds.clampY(target.y, boss.halfSize) - boss.y;
+    const distanceSqr = dx * dx + dy * dy;
+    const minDistance = this.config.MIN_AIM_DISTANCE;
+    if (distanceSqr &lt; minDistance * minDistance) {   // already on the aim point: no direction
+        this.startRecover(boss);
+        return;
+    }
+    const scale = 1 / Math.sqrt(distanceSqr);
+    this.directionX = dx * scale;                      // direction locked here
+    this.directionY = dy * scale;
+    ...
+}</code></pre>
+            <div class="why"><b>Cách hiểu "thời điểm kích hoạt":</b> hướng được khoá ngay khi bắt đầu windup, nên ánh nháy trắng báo trước một hướng cố định và player có thể né sang ngang. Nếu ngắm lúc hết windup thì boss gần như luôn trúng, không công bằng.</div>
+            <div class="why"><b>Vì sao kẹp điểm ngắm:</b> player nhỏ hơn boss nên đứng sát tường được hơn. Ngắm thẳng vào player thì mọi cú dash đâm vào tường và boss bị kẹt. Kẹp điểm ngắm vào vùng tâm boss tới được thì boss lướt dọc tường.</div>
+            <div class="ask"><div class="q">Hỏi: dash kết thúc khi nào?</div><div class="a">Hết <code>DURATION</code> (0.45 s) hoặc khi bị tường chặn. Tường chặn được phát hiện bằng cách so vị trí sau khi kẹp với vị trí chưa kẹp; nhờ vậy boss đang đứng sát tường vẫn dash ra xa tường được.</div></div>
+          </div>
+        </details>
+
+        <details class="mod">
+          <summary><span><span class="t">FanShot</span><span class="p">model/boss/FanShot.ts · 58 dòng</span></span><span class="layer model">model</span></summary>
+          <div class="body">
+            <p>Một class phục vụ mọi kiểu quạt; Normal và Crazy chỉ khác số liệu trong config.</p>
+            <pre><code>constructor(config: FanShotConfig) {
+    this.config = config;
+    const spread = degToRad(config.SPREAD_DEG);
+    // angle_i = base - spread/2 + spread * i / (count - 1); one bullet would divide by zero.
+    const hasSpread = config.COUNT &gt; 1;
+    this.firstOffset = hasSpread ? -spread / 2 : 0;
+    this.angleStep = hasSpread ? spread / (config.COUNT - 1) : 0;
+}
+
+private fireVolley(origin: Point, target: Point, emitter: IBulletEmitter): void {
+    // PERF: atan2 once per volley, not per frame.
+    const baseAngle = Math.atan2(target.y - origin.y, target.x - origin.x);
+    const speed = this.config.SPEED;
+    for (let i = 0; i &lt; this.config.COUNT; i++) {
+        const angle = baseAngle + this.firstOffset + this.angleStep * i;
+        emitter.spawn(origin.x, origin.y, Math.cos(angle) * speed, Math.sin(angle) * speed);
+    }
+}</code></pre>
+            <div class="tbl"><table>
+              <thead><tr><th>Kiểu</th><th>Số viên</th><th>Độ mở</th><th>Tốc độ</th><th>Chu kỳ</th></tr></thead>
+              <tbody>
+                <tr><td>NormalFan</td><td class="num">6</td><td class="num">50°</td><td class="num">300 px/s</td><td class="num">0.9 s</td></tr>
+                <tr><td>CrazyFan</td><td class="num">18</td><td class="num">140°</td><td class="num">260 px/s</td><td class="num">1.2 s</td></tr>
+              </tbody>
+            </table></div>
+            <div class="ask"><div class="q">Hỏi: vì sao <code>enter()</code> đặt cooldown bằng một chu kỳ chứ không bằng 0?</div><div class="a">Để khi đổi shot không bắn hai loạt sát nhau, và đầu round player có một nhịp để chuẩn bị.</div></div>
+          </div>
+        </details>
+
+        <details class="mod">
+          <summary><span><span class="t">Collision</span><span class="p">utils/Collision.ts · 30 dòng</span></span><span class="layer model">utils</span></summary>
+          <div class="body">
+            <pre><code>export function circleOverlapsBox(cx: number, cy: number, r: number, boxX: number, boxY: number, halfSize: number): boolean {
+    // The point of the square closest to the circle centre; overlap if that point is inside the circle.
+    const nearestX = clamp(cx, boxX - halfSize, boxX + halfSize);
+    const nearestY = clamp(cy, boxY - halfSize, boxY + halfSize);
+    const dx = cx - nearestX;
+    const dy = cy - nearestY;
+    return dx * dx + dy * dy &lt; r * r;   // PERF: squared distance, no Math.sqrt
+}</code></pre>
+            <div class="why"><b>Vì sao không dùng physics engine:</b> chỉ có hai loại hình (tròn, vuông) và mỗi phe một mục tiêu. Tự tính trên khoảng cách bình phương là O(n), nhẹ hơn nhiều so với một rigid body cho mỗi viên đạn. Module physics cũng đã tắt trong Feature Cropping để build nhỏ hơn.</div>
+            <div class="ask"><div class="q">Hỏi: có cần spatial grid không?</div><div class="a">Không: dưới 200 viên và chỉ một mục tiêu mỗi phe, mỗi frame vài trăm phép so sánh. Grid chỉ có lợi khi nhiều mục tiêu × nhiều đạn (nhiều địch, đạn va đạn), và nếu cần thì thêm vào trong <code>BulletStore.consumeHits*</code> mà không đổi chỗ gọi.</div></div>
+          </div>
+        </details>
+
+        <details class="mod">
+          <summary><span><span class="t">PlayerModel và PlayerWeapon</span><span class="p">model/PlayerModel.ts · model/PlayerWeapon.ts</span></span><span class="layer model">model</span></summary>
+          <div class="body">
+            <pre><code>private move(dt: number, dirX: number, dirY: number, bounds: ArenaBounds): void {
+    const lengthSqr = dirX * dirX + dirY * dirY;
+    if (lengthSqr === 0) { return; }
+    // only shrink, never grow: a diagonal key press is scaled to 1, a half-tilted stick keeps its slower speed.
+    if (lengthSqr &gt; 1) {
+        const scale = 1 / Math.sqrt(lengthSqr);
+        dirX *= scale;
+        dirY *= scale;
+    }
+    const distance = PLAYER.SPEED * dt;
+    this.moveClamped(dirX * distance, dirY * distance, bounds);
+}</code></pre>
+            <ul>
+              <li><b>Bất tử</b> = sau khi trúng (1 s, nhấp nháy) hoặc đang dash. Trúng đòn chí mạng thì không bật bất tử, để player chết không nhấp nháy sau màn DEFEAT.</li>
+              <li><b>Dash</b>: hướng là hướng di chuyển gần nhất, luôn chuẩn hoá; bước cuối chỉ dùng phần thời gian còn lại nên quãng đường đúng 1100 × 0.15 = 165 px.</li>
+              <li><b>Súng</b>: tầm so bằng bình phương (<code>AUTO_AIM_RANGE_SQR</code> tính sẵn một lần), một <code>sqrt</code> mỗi phát bắn, không phải mỗi frame; khoảng cách 0 thì bỏ qua để không chia cho 0.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="mod">
+          <summary><span><span class="t">BulletLayerView</span><span class="p">view/BulletLayerView.ts · 124 dòng</span></span><span class="layer view">view</span></summary>
+          <div class="body">
+            <p>Vẽ đạn của một phe. Giữ danh sách node "slot" tạo sẵn; mỗi frame bật <code>count</code> slot đầu, đặt vị trí theo mảng, tắt phần còn lại. Đây chính là pool: node tạo một lần, chỉ bật tắt, không bao giờ huỷ khi đang chơi.</p>
+            <pre><code>protected lateUpdate(): void {
+    const store = this.store;
+    if (!store) { return; }
+    const count = store.count;
+    this.ensureSlots(count);
+    const xs = store.x;
+    const ys = store.y;
+    for (let i = 0; i &lt; count; i++) {
+        this.slots[i].setPosition(xs[i], ys[i], 0);
+    }
+    this.updateVisibleCount(count);
+}
+
+private updateVisibleCount(count: number): void {
+    // PERF: changing node.active walks the node's components, so never set it when unchanged.
+    for (let i = this.shownCount; i &lt; count; i++) { this.slots[i].active = true; }
+    for (let i = count; i &lt; this.shownCount; i++) { this.slots[i].active = false; }
+    this.shownCount = count;
+}</code></pre>
+            <div class="why"><b>Vì sao không dùng NodePool get/put:</b> mỗi lần put/get là gỡ node khỏi cha và gắn lại (tốn duyệt mảng con). Bật tắt <code>active</code> trên slot cố định rẻ hơn, và vì mọi viên đạn trông giống nhau nên không cần biết node nào là viên nào.</div>
+            <div class="ask"><div class="q">Hỏi: có tạo node giữa trận không?</div><div class="a">Gần như không: tạo sẵn 32 slot đạn player và 200 slot đạn boss lúc load. Chỉ khi số đạn vượt mức đó mới tạo thêm, tối đa bằng sức chứa của store (400), và chỉ một lần.</div></div>
+          </div>
+        </details>
+
+        <details class="mod">
+          <summary><span><span class="t">Config và mở rộng boss</span><span class="p">config/BossConfig.ts · model/boss/BossActionFactory.ts</span></span><span class="layer cfg">config</span></summary>
+          <div class="body">
+            <pre><code>const PHASES: Readonly&lt;Record&lt;BossPhase, PhaseConfig&gt;&gt; = {
+    [BossPhase.High]:   { MOVES: [BossMoveId.Chase], SHOTS: [BossShotId.NormalFan] },
+    [BossPhase.Medium]: { MOVES: [BossMoveId.Chase, BossMoveId.Dash],
+                          SHOTS: [BossShotId.NormalFan, BossShotId.CrazyFan] },
+    [BossPhase.Low]:    { MOVES: [BossMoveId.Dash], SHOTS: [BossShotId.CrazyFan] },
+};
+
+const SHOTS: Readonly&lt;Record&lt;BossShotId, () =&gt; IBossShot&gt;&gt; = {
+    [BossShotId.NormalFan]: () =&gt; new FanShot(BossConfig.SHOTS[BossShotId.NormalFan]),
+    [BossShotId.CrazyFan]:  () =&gt; new FanShot(BossConfig.SHOTS[BossShotId.CrazyFan]),
+};</code></pre>
+            <div class="tbl"><table>
+              <thead><tr><th>Muốn thêm</th><th>Cần làm</th></tr></thead>
+              <tbody>
+                <tr><td>Quạt mới (ví dụ 30 viên)</td><td>1 giá trị <code>BossShotId</code> + 1 entry <code>BossConfig.SHOTS</code> + 1 dòng factory + thêm id vào phase. Không cần class mới.</td></tr>
+                <tr><td>Kiểu bắn mới (vòng tròn, xoắn ốc)</td><td>Class mới <code>implements IBossShot</code> + enum + 1 dòng factory + config.</td></tr>
+                <tr><td>Kiểu di chuyển mới</td><td>Tương tự qua <code>IBossMove</code>.</td></tr>
+                <tr><td>Đổi hành vi từng phase</td><td>Chỉ sửa bảng <code>PHASES</code>, không đụng logic.</td></tr>
+              </tbody>
+            </table></div>
+            <div class="why"><b>Điểm đáng chú ý:</b> kiểu <code>Record&lt;Enum, ...&gt;</code> làm cho việc quên khai báo một entry thành lỗi biên dịch, không phải lỗi lúc chạy.</div>
+          </div>
+        </details>
+      </section>
+
+      <!-- ============ 5. Hieu nang ============ -->
+      <section class="block" id="hieu-nang">
+        <h2>Hiệu năng</h2>
+        <div class="tbl"><table>
+          <thead><tr><th>Kỹ thuật</th><th>Ở đâu</th><th>Tránh được chi phí gì</th></tr></thead>
+          <tbody>
+            <tr><td>Đạn là dữ liệu trong <code>Float32Array</code></td><td><code>BulletStore</code></td><td>Không object mỗi viên, không rác cho GC</td></tr>
+            <tr><td>Swap-remove O(1)</td><td><code>BulletStore.removeAt</code></td><td>Không dịch mảng như <code>splice</code></td></tr>
+            <tr><td>Một gameplay <code>update</code> cho cả game</td><td><code>GameManager</code></td><td>Khoảng 6 lời gọi update/lateUpdate mỗi frame dù có bao nhiêu đạn</td></tr>
+            <tr><td>Slot node tạo sẵn, chỉ bật tắt khi đổi</td><td><code>BulletLayerView</code></td><td>Không instantiate/destroy giữa trận</td></tr>
+            <tr><td>So khoảng cách bình phương</td><td><code>Collision</code>, <code>PlayerWeapon</code>, <code>ChaseMove</code></td><td>Không <code>Math.sqrt</code> trong vòng lặp nóng</td></tr>
+            <tr><td><code>atan2</code> một lần mỗi loạt</td><td><code>FanShot</code></td><td>Lượng giác chỉ chạy khi bắn, khoảng 1 lần/giây</td></tr>
+            <tr><td>Sự kiện chỉ khi giá trị đổi</td><td><code>GameManager.emitChanges</code></td><td>HUD không cập nhật mỗi frame</td></tr>
+            <tr><td>2 texture trắng tô màu</td><td>sprite tròn/vuông</td><td>Thế giới gom vào vài draw call</td></tr>
+            <tr><td>Cắt module engine không dùng</td><td>Feature Cropping</td><td>Build nhỏ hơn (physics, spine, particle... tắt)</td></tr>
+          </tbody>
+        </table></div>
+        <p><b>Con số để nói:</b> đỉnh dưới 100 đạn boss trong một trận dài (theo README); sức chứa 400. Đạn player 900 px/s × 50 ms = 45 px mỗi bước, nhỏ hơn nhiều so với 136 px bề ngang boss cộng đạn, nên không xuyên qua được.</p>
+      </section>
+
+      <!-- ============ 6. Bo nho ============ -->
+      <section class="block" id="bo-nho">
+        <h2>Bộ nhớ và xử lý lỗi</h2>
+        <div class="tbl"><table>
+          <thead><tr><th>Mở</th><th>Đóng</th><th>Ở đâu</th></tr></thead>
+          <tbody>
+            <tr><td><code>EventBus.on</code> (HealthBarView, PhaseLabelView, GameOverPanel, CameraFollow, BossView)</td><td><code>EventBus.off</code> cùng handler và target</td><td><code>onEnable</code> ↔ <code>onDisable</code></td></tr>
+            <tr><td><code>input.on</code> KEY_DOWN / KEY_UP, <code>game.on(EVENT_HIDE)</code></td><td><code>input.off</code>, <code>game.off</code>, nhả phím đang giữ</td><td><code>onEnable</code> ↔ <code>onDisable</code></td></tr>
+            <tr><td><code>node.on</code> chạm (VirtualJoystick, DashButton), nút Restart</td><td><code>node.off</code></td><td><code>onEnable</code> ↔ <code>onDisable</code></td></tr>
+            <tr><td><code>view.on('canvas-resize')</code> (CameraFollow)</td><td><code>view.off</code></td><td><code>onEnable</code> ↔ <code>onDisable</code></td></tr>
+            <tr><td>Nhạc nền <code>AudioSource.play()</code> loop</td><td><code>stop()</code></td><td><code>onEnable</code> ↔ <code>onDisable</code></td></tr>
+            <tr><td>Slot đạn <code>instantiate(prefab)</code></td><td>Huỷ cùng layer; mảng slot được làm rỗng</td><td><code>onDestroy</code></td></tr>
+          </tbody>
+        </table></div>
+        <ul>
+          <li>Không tween, không schedule, không load asset động, không tham chiếu <code>static</code> tới node.</li>
+          <li>Đo thực tế: 20 lần Game Over → Restart liên tiếp, số node giữ nguyên 266, heap JS phẳng (16.0 MB → 15.7 MB).</li>
+          <li>Thiếu tham chiếu <code>@property</code>: <code>console.error</code> nêu tên node, <code>this.enabled = false</code>, không crash về sau.</li>
+          <li>Chia cho 0 được chặn ở mọi chỗ chuẩn hoá vector (súng, dash boss, dash player, quạt 1 viên).</li>
+        </ul>
+      </section>
+
+      <!-- ============ 7. Quyet dinh ============ -->
+      <section class="block" id="quyet-dinh">
+        <h2>Quyết định và đánh đổi</h2>
+        <div class="tbl"><table>
+          <thead><tr><th>Quyết định</th><th>Được gì</th><th>Mất gì</th></tr></thead>
+          <tbody>
+            <tr><td>Config bằng TS <code>as const</code>, không JSON</td><td>Kiểm tra kiểu lúc biên dịch, không có đường lỗi khi load</td><td>Đổi số phải build lại; muốn chỉnh trực tiếp thì chuyển sang JsonAsset có validate</td></tr>
+            <tr><td>Chơi lại không load lại scene</td><td>Nhanh, giữ nguyên node đạn đã tạo</td><td>Mọi model phải có <code>reset()</code> đúng</td></tr>
+            <tr><td>Không có trạng thái Pause</td><td>Đề không yêu cầu; tránh tác dụng phụ của <code>director.pause()</code></td><td>Không tạm dừng được</td></tr>
+            <tr><td>Ngưỡng phase 60% / 30%</td><td>Chia ba gần đều</td><td>Đề không nói, tự chọn và ghi README</td></tr>
+            <tr><td>Boss dừng cách player 60 px</td><td>Vẫn chạm gây sát thương nhưng không đè lên tâm player (mất hướng ngắm)</td><td>Boss không bao giờ chồng khít lên player</td></tr>
+            <tr><td>Joystick hiện theo khả năng cảm ứng</td><td>iPad, laptop cảm ứng cũng có</td><td>Màn cảm ứng có bàn phím vẫn thấy joystick</td></tr>
+          </tbody>
+        </table></div>
+      </section>
+
+      <!-- ============ 8. Review ============ -->
+      <section class="block" id="review">
+        <h2>Tự đánh giá code: điểm mạnh và chỗ cần cải thiện</h2>
+        <p class="sub">Biết điểm yếu của chính code mình là cách tốt nhất để biết bước tiếp theo nên làm gì.</p>
+        <div class="review">
+          <div class="rv"><span class="sev ok">MẠNH</span><div><h4>Mô phỏng tách khỏi engine</h4><p><code>model/</code> không import <code>cc</code>, một update duy nhất, view chỉ chép dữ liệu. Luật chơi chạy và test được ngoài Cocos.</p></div></div>
+          <div class="rv"><span class="sev ok">MẠNH</span><div><h4>Đạn dạng dữ liệu, không rác</h4><p>Typed array cố định, swap-remove, slot node tạo sẵn: không cấp phát trong vòng lặp nóng.</p></div></div>
+          <div class="rv"><span class="sev ok">MẠNH</span><div><h4>Mở rộng boss bằng dữ liệu</h4><p>Interface + factory + bảng phase; thiếu entry là lỗi biên dịch.</p></div></div>
+          <div class="rv"><span class="sev mid">CẦN BIẾT</span><div><h4>Chưa có unit test</h4><p>Model thuần TS rất dễ test nhưng repo chưa có test nào.</p><p class="say">Hướng cải thiện: viết test cho <code>Collision</code>, góc của <code>FanShot</code> và chuyển phase của <code>BossBrain</code>, vì chúng không phụ thuộc engine.</p></div></div>
+          <div class="rv"><span class="sev mid">CẦN BIẾT</span><div><h4>Ngẫu nhiên không có seed</h4><p><code>Math.random</code> được dùng trực tiếp, nên không tái hiện được đúng một trận để debug hay replay.</p><p class="say">Cách sửa: truyền một bộ sinh số ngẫu nhiên có seed vào <code>BossBrain</code>.</p></div></div>
+          <div class="rv"><span class="sev mid">CẦN BIẾT</span><div><h4>Va chạm rời rạc, an toàn nhờ sub-step</h4><p>Không dùng va chạm quét (swept). Hiện an toàn vì bước tối đa 50 ms; nếu đạn player nhanh hơn khoảng 2700 px/s thì có thể xuyên qua boss.</p></div></div>
+          <div class="rv"><span class="sev mid">CẦN BIẾT</span><div><h4>Scene được sinh bằng script</h4><p><code>Main.scene</code> do <code>tools/gen-bullethell-scene.js</code> tạo, chưa từng được editor lưu lại.</p><p class="say">Hướng cải thiện: mở scene trong editor 3.7.4 và lưu lại một lần để scene có định dạng chuẩn của editor.</p></div></div>
+          <div class="rv"><span class="sev low">NHỎ</span><div><h4>Tên sự kiện kiểu <code>string</code></h4><p><code>emitHealthChange(..., hpEvent: string, hitEvent: string)</code> không ràng buộc payload theo từng sự kiện; sai tham số chỉ lộ ra lúc chạy.</p></div></div>
+          <div class="rv"><span class="sev low">NHỎ</span><div><h4>Kho đạn đầy thì bỏ viên mới</h4><p>Vượt 400 viên thì viên mới bị bỏ và có một <code>console.warn</code>. Với nhịp bắn hiện tại không xảy ra (đỉnh dưới 100), nhưng nên biết khi tăng độ khó.</p></div></div>
+          <div class="rv"><span class="sev low">NHỎ</span><div><h4>Phase chỉ đi tiến</h4><p>Đúng với đề vì boss không hồi máu; nếu thêm hồi máu thì phải bỏ điều kiện này trong <code>updatePhase</code>.</p></div></div>
+          <div class="rv"><span class="sev low">NHỎ</span><div><h4>Chưa có bản build Windows</h4><p>Máy không có Visual Studio; nộp bản Android APK và web-mobile.</p></div></div>
+        </div>
+      </section>
+
+      <!-- ============ 9. Luyen tap ============ -->
+      <section class="block" id="luyen-tap">
+        <h2>Câu hỏi tự kiểm tra</h2>
+        <p class="sub">Thử tự trả lời trước, rồi mới mở đáp án. Đánh dấu câu đã nắm; trạng thái chỉ lưu trên trình duyệt của bạn.</p>
+        <div class="toolbar">
+          <button type="button" class="btn" id="openAll">Mở hết đáp án</button>
+          <button type="button" class="btn" id="randomQ">Hỏi ngẫu nhiên</button>
+        </div>
+        <div class="quiz" id="quiz"></div>
+      </section>
+
+      <footer>Bài viết dựng từ code thật của project BulletHell (Cocos Creator 3.7.4, TypeScript).</footer>
+    </main>
+  </div>
+</div>
+
+<script>
+/* ---------- Quiz data ---------- */
+var QUIZ = [
+  ["Tóm tắt kiến trúc trong 30 giây.", "Luật chơi là TypeScript thuần trong model/, không phụ thuộc Cocos. GameManager là update gameplay duy nhất, mỗi frame gọi BattleWorld.step theo các bước tối đa 50 ms. View chỉ chép trạng thái model lên node trong lateUpdate; UI phản ứng theo sự kiện qua EventBus. Config tách riêng trong config/."],
+  ["Vì sao đạn không phải là node/component riêng?", "Hàng trăm component có update riêng tốn chi phí gọi hàm và cấp phát. Đạn lưu trong Float32Array theo phe, cập nhật trong một vòng lặp; view có một tập node slot tạo sẵn và chỉ bật tắt, đặt vị trí."],
+  ["Swap-remove là gì và vì sao vòng lặp đi ngược?", "Xoá phần tử i bằng cách chép phần tử cuối vào i rồi giảm count: O(1). Đi ngược vì phần tử cuối được chép vào đã xử lý rồi, nên không bỏ sót hay xử lý hai lần."],
+  ["Boss chết thì xoá hết đạn 'ngay lập tức' bằng cách nào?", "GameManager.handleOutcome gọi BattleWorld.clearAllBullets(), đặt count của cả hai kho về 0 ngay trong tick đó; lateUpdate cùng frame tắt mọi slot đạn."],
+  ["Sub-stepping giải quyết vấn đề gì?", "Frame dài (máy yếu) được chia thành các bước tối đa 50 ms nên tốc độ game vẫn đúng thời gian thực và đạn nhanh không nhảy qua mục tiêu. Frame dài quá 250 ms (chuyển tab, debugger) bị cắt bớt để game không tua nhanh."],
+  ["Boss chọn hành động theo HP thế nào?", "BossBrain tính tỉ lệ HP: >= 60% High, >= 30% Medium, còn lại Low. Bảng BossConfig.PHASES cho biết phase đó dùng move và shot nào. Ở Medium, move và shot được chọn ngẫu nhiên độc lập mỗi 2–4 giây."],
+  ["Dash của boss có bị ngắt giữa chừng không?", "Không. DashMove chỉ cho ngắt ở giai đoạn Recover. Khi timer đổi move hết hạn mà dash đang windup hay đang lao, BossBrain giữ timer ở trạng thái hết hạn và thử lại mỗi frame, đổi ngay khi dash vào Recover."],
+  ["'Hướng khoá tại thời điểm kích hoạt' được hiểu thế nào?", "Kích hoạt là lúc bắt đầu windup. Hướng được tính và khoá ở đó, nên ánh nháy trắng báo trước một hướng cố định và player có thể né sang ngang."],
+  ["Thêm một kiểu bắn vòng tròn 24 viên cần sửa những gì?", "Viết class RingShot implements IBossShot, thêm giá trị BossShotId, thêm config, thêm một dòng trong BossActionFactory.SHOTS và thêm id vào phase muốn dùng. Quên dòng factory là lỗi biên dịch nhờ Record<BossShotId, ...>."],
+  ["Va chạm tròn với vuông tính thế nào?", "Kẹp tâm hình tròn vào hình vuông để được điểm gần nhất, rồi so bình phương khoảng cách từ tâm tới điểm đó với r²."],
+  ["Vì sao không dùng physics engine của Cocos?", "Chỉ có hình tròn và hình vuông, mỗi phe một mục tiêu; tự tính O(n) trên bình phương khoảng cách rẻ hơn nhiều so với rigid body cho từng viên đạn, và module physics được tắt để build nhỏ hơn."],
+  ["Nếu số đạn tăng 10 lần thì sao?", "Dữ liệu vẫn ổn (typed array, O(n)). Nút thắt sẽ là số node: setPosition cho mỗi slot mỗi frame. Khi đó có thể vẽ bằng một mesh chung (instancing hoặc custom assembler), và thêm spatial grid nếu có nhiều mục tiêu."],
+  ["Làm sao chắc chắn chơi lại không rò rỉ bộ nhớ?", "Mọi on có off cùng tham số trong onEnable/onDisable, không tween hay schedule, không load động, node đạn tạo một lần. Đã đo 20 lần Game Over → Restart: số node giữ 266, heap JS phẳng."],
+  ["Vì sao startGame() đi qua trạng thái Ready?", "Để mọi view nghe STATE_CHANGED(Ready) và tự dọn round cũ (ẩn bảng kết quả, camera nhảy về player) trước khi world reset và chuyển sang Playing."],
+  ["Player bất tử thì đạn boss thế nào?", "hitPlayer() thoát sớm khi player bất tử, nên đạn bay xuyên qua chứ không bị tiêu hao. Bất tử có sau khi trúng (1 giây) và trong lúc dash."],
+  ["Điểm yếu của code này là gì?", "Chưa có unit test dù model rất dễ test; random không có seed nên khó tái hiện; va chạm rời rạc nên phụ thuộc giới hạn bước 50 ms; scene sinh bằng script; tên sự kiện kiểu string chưa ràng buộc payload."],
+  ["Config tách khỏi logic thế nào, vì sao không dùng JSON?", "Mọi số nằm trong GameConfig và BossConfig dạng TS as const. Được kiểm tra kiểu lúc biên dịch và không có đường lỗi khi load; đánh đổi là đổi số phải build lại. Muốn chỉnh trực tiếp thì chuyển sang JsonAsset kèm validate."],
+  ["Điều khiển trên điện thoại hoạt động thế nào?", "VirtualJoystick nhận chạm ở nửa trái màn hình (joystick nổi), ghi stickX/stickY vào InputState; nút DASH ở góc phải. Joystick hiện khi thiết bị hỗ trợ cảm ứng; bàn phím luôn dùng được."]
+];
+
+var KEY = "bullethell-study-done-v1";
+var done = {};
+try { done = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e) { done = {}; }
+function save() { try { localStorage.setItem(KEY, JSON.stringify(done)); } catch (e) {} }
+function esc(s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+
+var quiz = document.getElementById("quiz");
+quiz.innerHTML = QUIZ.map(function (q, i) {
+  var id = "q" + (i + 1);
+  var isDone = !!done[id];
+  return '<details class="qz' + (isDone ? " done" : "") + '" id="' + id + '">' +
+    '<summary><span class="n">' + String(i + 1).padStart(2, "0") + '</span><span class="qt">' + esc(q[0]) + '</span>' +
+    '<input type="checkbox" id="chk-' + id + '" data-id="' + id + '"' + (isDone ? " checked" : "") + ' aria-label="Đánh dấu đã nắm"></summary>' +
+    '<div class="ans">' + esc(q[1]) + '</div></details>';
+}).join("");
+
+function stats() {
+  var n = 0; for (var k in done) { if (done[k]) n++; }
+  document.getElementById("doneN").textContent = n;
+  document.getElementById("totalN").textContent = QUIZ.length;
+  document.getElementById("barFill").style.width = (n / QUIZ.length * 100) + "%";
+}
+stats();
+quiz.addEventListener("click", function (e) { if (e.target.tagName === "INPUT") { e.stopPropagation(); } });
+quiz.addEventListener("change", function (e) {
+  var c = e.target; if (!c.dataset || !c.dataset.id) { return; }
+  done[c.dataset.id] = c.checked;
+  c.closest("details").classList.toggle("done", c.checked);
+  save(); stats();
+});
+var allOpen = false;
+document.getElementById("openAll").addEventListener("click", function (e) {
+  allOpen = !allOpen;
+  e.currentTarget.textContent = allOpen ? "Đóng hết đáp án" : "Mở hết đáp án";
+  quiz.querySelectorAll("details").forEach(function (d) { d.open = allOpen; });
+});
+document.getElementById("randomQ").addEventListener("click", function () {
+  var items = Array.prototype.slice.call(quiz.querySelectorAll("details"));
+  var pool = items.filter(function (d) { return !done[d.id]; });
+  var list = pool.length ? pool : items;
+  var pick = list[Math.floor(Math.random() * list.length)];
+  pick.open = false;
+  pick.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "center" });
+  pick.querySelector("summary").focus({ preventScroll: true });
+});
+
+/* ---------- TOC highlight ---------- */
+var links = Array.prototype.slice.call(document.querySelectorAll("#toc a"));
+if ("IntersectionObserver" in window) {
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (en) {
+      if (en.isIntersecting) {
+        links.forEach(function (a) { a.classList.toggle("on", a.getAttribute("href") === "#" + en.target.id); });
+      }
+    });
+  }, { rootMargin: "-20% 0px -70% 0px" });
+  document.querySelectorAll("section.block").forEach(function (s) { io.observe(s); });
+}
+
+/* ---------- Fan-shot demo (same formula as FanShot.ts) ---------- */
+(function () {
+  var cv = document.getElementById("arena");
+  var ctx = cv.getContext("2d");
+  var W = cv.width, H = cv.height;
+  var FANS = { normal: { count: 6, spread: 50, speed: 300, interval: 0.9 }, crazy: { count: 18, spread: 140, speed: 260, interval: 1.2 } };
+  var fan = FANS.normal;
+  var SCALE = 0.32;                       // world px -> canvas px
+  var MAX = 400;
+  var bx = new Float32Array(MAX), by = new Float32Array(MAX), bvx = new Float32Array(MAX), bvy = new Float32Array(MAX);
+  var count = 0, cooldown = 0.2, t = 0;
+  var boss = { x: W * 0.28, y: H * 0.5, half: 60 * SCALE };
+  var player = { x: W * 0.78, y: H * 0.5, r: 20 * SCALE };
+  var reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function spawn(x, y, vx, vy) { if (count >= MAX) { return; } bx[count] = x; by[count] = y; bvx[count] = vx; bvy[count] = vy; count++; }
+  function volley() {
+    var spread = fan.spread * Math.PI / 180;
+    var first = fan.count > 1 ? -spread / 2 : 0;
+    var step = fan.count > 1 ? spread / (fan.count - 1) : 0;
+    var base = Math.atan2(player.y - boss.y, player.x - boss.x);
+    var sp = fan.speed * SCALE;
+    for (var i = 0; i < fan.count; i++) {
+      var a = base + first + step * i;
+      spawn(boss.x, boss.y, Math.cos(a) * sp, Math.sin(a) * sp);
+    }
+  }
+  function update(dt) {
+    t += dt;
+    player.y = H * 0.5 + Math.sin(t * 0.9) * H * 0.28;
+    cooldown -= dt;
+    if (cooldown <= 0) { cooldown = fan.interval; volley(); }
+    for (var i = count - 1; i >= 0; i--) {
+      bx[i] += bvx[i] * dt; by[i] += bvy[i] * dt;
+      if (bx[i] < -10 || bx[i] > W + 10 || by[i] < -10 || by[i] > H + 10) {
+        var last = count - 1;
+        bx[i] = bx[last]; by[i] = by[last]; bvx[i] = bvx[last]; bvy[i] = bvy[last]; count = last;
+      }
+    }
+  }
+  function draw() {
+    ctx.fillStyle = "#1E293B"; ctx.fillRect(0, 0, W, H);
+    ctx.strokeStyle = "rgba(148,163,184,0.08)"; ctx.lineWidth = 1;
+    for (var gx = 0; gx < W; gx += 40) { ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, H); ctx.stroke(); }
+    for (var gy = 0; gy < H; gy += 40) { ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(W, gy); ctx.stroke(); }
+    ctx.fillStyle = "#F97316";
+    var r = 10 * SCALE + 1;
+    for (var i = 0; i < count; i++) { ctx.beginPath(); ctx.arc(bx[i], by[i], r, 0, Math.PI * 2); ctx.fill(); }
+    ctx.fillStyle = "#EF4444"; ctx.fillRect(boss.x - boss.half, boss.y - boss.half, boss.half * 2, boss.half * 2);
+    ctx.fillStyle = "#3B82F6"; ctx.beginPath(); ctx.arc(player.x, player.y, player.r + 1, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = "rgba(226,232,240,0.75)"; ctx.font = "12px 'JetBrains Mono', monospace";
+    ctx.fillText(fan.count + " bullets · " + fan.spread + "° · " + count + " live", 12, H - 12);
+  }
+  if (reduce) {
+    for (var k = 0; k < 3; k++) { volley(); update(0.35); }
+    draw();
+  } else {
+    var prev = performance.now();
+    (function loop(now) {
+      var dt = Math.min(0.05, (now - prev) / 1000); prev = now;
+      update(dt); draw();
+      requestAnimationFrame(loop);
+    })(prev);
+  }
+  function setFan(name) {
+    fan = FANS[name]; cooldown = 0.15;
+    document.getElementById("fanNormal").setAttribute("aria-pressed", name === "normal");
+    document.getElementById("fanCrazy").setAttribute("aria-pressed", name === "crazy");
+    if (reduce) { count = 0; for (var k = 0; k < 3; k++) { volley(); update(0.35); } draw(); }
+  }
+  document.getElementById("fanNormal").addEventListener("click", function () { setFan("normal"); });
+  document.getElementById("fanCrazy").addEventListener("click", function () { setFan("crazy"); });
+})();
+</script>
+<footer class="site-bottom"><div class="in"><a class="site-brand" href="/">XOI GAME</a><p>© 2026 XOI GAME · Made with care in Vietnam</p><nav class="site-nav" aria-label="Footer"><a href="https://www.youtube.com/@xoigame">YouTube ↗</a><a href="https://www.facebook.com/xoigame">Facebook ↗</a><a href="/privacy-common.html">Privacy</a></nav></div></footer>
+</body>
+</html>
