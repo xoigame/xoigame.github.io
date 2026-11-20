@@ -245,5 +245,17 @@
   "accent": "#1fa8f0",
   "audience": "kids",
   "package": "com.xoistudio.tracebuddy"
+ },
+ {
+  "slug": "tile-express",
+  "name": "Tile Express: Mosaic Train",
+  "genre": "Mosaic puzzle · Relaxing",
+  "status": "Coming soon",
+  "description": "Send toy trains around the track to collect matching tiles and reveal mosaic pictures. 200+ calm levels, free undo, hints and a little station to decorate.",
+  "image": "/assets/games/tile-express-hero.jpg",
+  "accent": "#e2452f",
+  "playUrl": null,
+  "package": "com.xoigame.tileexpress",
+  "audience": "puzzle"
  }
 ]
