@@ -257,5 +257,17 @@
   "playUrl": null,
   "package": "com.xoigame.tileexpress",
   "audience": "puzzle"
+ },
+ {
+  "slug": "slide-home",
+  "name": "Slide Home: Color Block Puzzle",
+  "genre": "Block puzzle · Relaxing",
+  "status": "Coming soon",
+  "description": "Slide wooden toy blocks out through the door of the same color. 300 calm levels, no timer, free undo, hints and a bunny home to decorate.",
+  "image": "/assets/games/slide-home-hero.jpg",
+  "accent": "#e8862a",
+  "playUrl": null,
+  "package": "com.xoigame.slidehome",
+  "audience": "puzzle"
  }
 ]
