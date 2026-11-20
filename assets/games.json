@@ -257,5 +257,17 @@
   "playUrl": null,
   "package": "com.xoigame.tileexpress",
   "audience": "puzzle"
+ },
+ {
+  "slug": "sandy-pop",
+  "name": "Sandy Pop: Color Sand Puzzle",
+  "genre": "Sand puzzle · Relaxing",
+  "status": "Coming soon",
+  "description": "Drop colorful blocks that melt into flowing sand, link one color wall to wall and pop giant chain reactions. 300 calm levels, free undo and hints.",
+  "image": "/assets/games/sandy-pop-hero.jpg",
+  "accent": "#f0803c",
+  "playUrl": null,
+  "package": "com.xoigame.sandypop",
+  "audience": "puzzle"
  }
 ]
