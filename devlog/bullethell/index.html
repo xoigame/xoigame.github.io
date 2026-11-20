@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>BulletHell — phân tích code một game bullet hell trên Cocos Creator | XOI GAME Devlog</title>
-<meta name="description" content="Phân tích code BulletHell, demo bullet hell đánh boss làm bằng Cocos Creator 3.7.4: kiến trúc tách mô phỏng khỏi hiển thị, đạn lưu trong typed array, AI boss theo phase HP, va chạm tự viết, hiệu năng và quản lý bộ nhớ.">
+<meta name="description" content="Phân tích code BulletHell, demo bullet hell đánh boss làm bằng Cocos Creator 3.7.4: kiến trúc tách mô phỏng khỏi hiển thị, đạn lưu trong typed array, AI boss theo phase HP, pause, khiên, hiệu ứng không tween, hiệu năng và quản lý bộ nhớ.">
 <link rel="canonical" href="https://xoigame.com/devlog/bullethell/">
-<meta property="og:type" content="article"><meta property="og:title" content="BulletHell — phân tích code một game bullet hell trên Cocos Creator"><meta property="og:description" content="Kiến trúc, AI boss theo phase HP, đạn dạng dữ liệu, va chạm tự viết và tối ưu hiệu năng trong Cocos Creator 3.7.4."><meta property="og:url" content="https://xoigame.com/devlog/bullethell/"><meta property="og:image" content="https://xoigame.com/assets/brand.png">
+<meta property="og:type" content="article"><meta property="og:title" content="BulletHell — phân tích code một game bullet hell trên Cocos Creator"><meta property="og:description" content="Kiến trúc, AI boss theo phase HP, đạn dạng dữ liệu, pause, va chạm tự viết và tối ưu hiệu năng trong Cocos Creator 3.7.4."><meta property="og:url" content="https://xoigame.com/devlog/bullethell/"><meta property="og:image" content="https://xoigame.com/assets/brand.png">
 <meta name="theme-color" content="#11120f"><link rel="icon" href="/assets/brand.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -188,10 +188,11 @@ footer { color: var(--muted); font-size: 13px; margin-top: 24px; }
     <div>
       <div class="eyebrow">XOI GAME Devlog · Cocos Creator 3.7.4 · TypeScript</div>
       <h1>BulletHell: phân tích code một game bullet hell đánh boss</h1>
-      <p class="lede">Một demo bullet hell góc nhìn từ trên xuống: player né đạn và tự bắn, boss đổi chiến thuật theo lượng máu. Bài này đi từ từng yêu cầu của game, tới file xử lý nó, tới đoạn code thật và lý do viết như vậy. Cuối bài có phần tự đánh giá code và bộ câu hỏi để tự kiểm tra.</p>
+      <p class="lede">Một demo bullet hell góc nhìn từ trên xuống: player né đạn và tự bắn, boss đổi chiến thuật theo lượng máu, có pause, khiên và hiệu ứng. Bài này đi từ từng yêu cầu của game, tới file xử lý nó, tới đoạn code thật và lý do viết như vậy. Cuối bài có phần tự đánh giá code và bộ câu hỏi để tự kiểm tra.</p>
       <div class="facts">
-        <span class="fact"><b>44</b> file TypeScript</span>
-        <span class="fact">~<b>2.900</b> dòng</span>
+        <span class="fact"><b>61</b> file TypeScript</span>
+        <span class="fact">~<b>4.500</b> dòng</span>
+        <span class="fact"><b>44</b> commit</span>
         <span class="fact">arena <b>2400×1600</b> px</span>
         <span class="fact"><b>1</b> gameplay update</span>
         <span class="fact">sub-step ≤ <b>50</b> ms</span>
@@ -218,8 +219,8 @@ footer { color: var(--muted); font-size: 13px; margin-top: 24px; }
         <li><a href="#hieu-nang">Hiệu năng</a></li>
         <li><a href="#bo-nho">Bộ nhớ và lỗi</a></li>
         <li><a href="#quyet-dinh">Quyết định, đánh đổi</a></li>
-        <li><a href="#review">Review code</a></li>
-        <li><a href="#luyen-tap">Câu hỏi luyện tập</a></li>
+        <li><a href="#review">Tự đánh giá</a></li>
+        <li><a href="#luyen-tap">Câu hỏi tự kiểm tra</a></li>
       </ol>
       <div class="progress">Đã nắm <b id="doneN">0</b>/<b id="totalN">0</b> câu
         <div class="bar"><i id="barFill"></i></div>
@@ -230,26 +231,34 @@ footer { color: var(--muted); font-size: 13px; margin-top: 24px; }
       <!-- ============ 1. De bai ============ -->
       <section class="block" id="de-bai">
         <h2>Đề bài → nơi xử lý trong code</h2>
-        <p class="sub">Mỗi yêu cầu của game và nơi xử lý nó trong code.</p>
+        <p class="sub">Mỗi yêu cầu của game và nơi xử lý nó trong code. Dòng "(Thêm)" là phần làm thêm ngoài yêu cầu gốc.</p>
         <div class="tbl"><table>
           <thead><tr><th>Yêu cầu trong đề</th><th>Nơi xử lý</th><th>Ghi chú</th></tr></thead>
           <tbody>
-            <tr><td>Player tròn xanh, đạn tròn xanh lá, boss vuông đỏ, đạn boss tròn cam</td><td><code>GameConfig.COLORS</code>, <code>BulletLayerView</code>, <code>PlayerView</code>, <code>BossView</code></td><td>2 texture trắng (tròn, vuông) tô màu bằng <code>Sprite.color</code></td></tr>
-            <tr><td>Arena lớn kín 4 tường</td><td><code>ArenaBounds</code> (va chạm), <code>ArenaView</code> (vẽ)</td><td>2400×1600 px, tường dày 40 px chỉ để nhìn</td></tr>
-            <tr><td>Camera top-down</td><td><code>CameraFollow</code></td><td>Bám mượt <code>1 − e<sup>−k·dt</sup></code>, kẹp trong arena, rung khi trúng đạn</td></tr>
+            <tr><td>Player tròn xanh, đạn tròn xanh lá, boss vuông đỏ, đạn boss tròn cam</td><td><code>GameConfig.COLORS</code>, <code>PlayerView</code>, <code>BossView</code>, <code>BulletLayerView</code></td><td>2 texture trắng (tròn, vuông) gom vào một Auto Atlas, tô màu bằng <code>Sprite.color</code></td></tr>
+            <tr><td>Arena lớn kín 4 tường</td><td><code>GameConfig.ARENA</code>, <code>ArenaBounds</code> (va chạm), <code>ArenaView</code> (vẽ)</td><td>2400×1600 px, tường dày 40 px chỉ để nhìn</td></tr>
+            <tr><td>Camera top-down</td><td><code>CameraFollow</code></td><td>Bám mượt <code>1 − e<sup>−k·dt</sup></code>, kẹp trong arena, rung khi trúng đạn; zoom theo tỉ lệ màn hình để luôn thấy ít nhất 1280×720 px</td></tr>
             <tr><td>Player di chuyển tự do trong map</td><td><code>PlayerModel.move</code>, <code>KeyboardInput</code>, <code>VirtualJoystick</code></td><td>Chuẩn hoá chéo, kẹp theo bán kính</td></tr>
-            <tr><td>Tự bắn khi boss trong tầm</td><td><code>PlayerWeapon</code></td><td>Tầm 750 px, so bình phương khoảng cách</td></tr>
-            <tr><td>Máu cố định</td><td><code>Health</code>, <code>PlayerModel.takeHit</code></td><td>100 HP, bất tử 1 s sau khi trúng</td></tr>
-            <tr><td>(Tuỳ chọn) Dash cho player</td><td><code>PlayerModel.tryStartDash</code>, <code>DashButton</code></td><td>165 px, hồi 1 s, bất tử khi dash</td></tr>
+            <tr><td>Tự bắn khi boss trong tầm</td><td><code>PlayerWeapon</code></td><td>Tầm 750 px, 0.15 s một phát, so bình phương khoảng cách</td></tr>
+            <tr><td>Máu cố định</td><td><code>Health</code>, <code>PlayerModel.takeHit</code></td><td>100 HP, bất tử 1 s sau khi trúng; không có gì hồi máu trong round</td></tr>
+            <tr><td>(Tuỳ chọn) Dash cho player</td><td><code>PlayerModel.tryStartDash</code>, <code>GameManager.requestDash</code>, <code>DashButton</code>, <code>KeyboardInput</code></td><td>165 px, hồi 1 s, bất tử khi dash; Space/Shift hoặc nút DASH</td></tr>
             <tr><td>Boss Normal Move: đuổi theo player</td><td><code>ChaseMove</code></td><td>150 px/s, dừng cách 60 px</td></tr>
-            <tr><td>Boss Dash Move: lao về vị trí lúc kích hoạt, khoá hướng</td><td><code>DashMove</code></td><td>Windup 0.5 s → Dash 1200 px/s → Recover 0.6 s</td></tr>
+            <tr><td>Boss Dash Move: lao về vị trí lúc kích hoạt, khoá hướng</td><td><code>DashMove</code></td><td>Windup 0.5 s → Dash 1200 px/s trong 0.45 s → Recover 0.6 s</td></tr>
             <tr><td>Normal Shoot 6 viên, Crazy Shoot 18 viên quạt rộng hơn</td><td><code>FanShot</code> + <code>BossConfig.SHOTS</code></td><td>Một class cho mọi kiểu quạt</td></tr>
             <tr><td>Hành vi theo HP: High / Medium (random) / Low</td><td><code>BossBrain</code> + <code>BossConfig.PHASES</code></td><td>Ngưỡng 60% / 30%, đổi ngẫu nhiên mỗi 2–4 s</td></tr>
             <tr><td>Code dễ mở rộng</td><td><code>IBossMove</code>, <code>IBossShot</code>, <code>BossActionFactory</code></td><td>Thêm kiểu mới = 1 class + 1 enum + 1 dòng factory</td></tr>
             <tr><td>Boss chết → xoá hết đạn ngay lập tức</td><td><code>GameManager.handleOutcome</code> → <code>BattleWorld.clearAllBullets</code></td><td>Đặt <code>count = 0</code>, cùng frame</td></tr>
-            <tr><td>Game Over + Restart</td><td><code>GameOverPanel</code>, <code>GameManager.startGame</code></td><td>Chơi lại không load lại scene</td></tr>
-            <tr><td>Config tách khỏi logic</td><td><code>config/GameConfig.ts</code>, <code>config/BossConfig.ts</code></td><td>TS <code>as const</code>, thiếu entry là lỗi biên dịch</td></tr>
-            <tr><td>(Tuỳ chọn) VFX theo stage, (bonus) audio</td><td><code>BossView</code>, <code>AudioPlayer</code></td><td>Boss đổi màu theo phase, nháy khi windup; âm thanh sinh bằng code</td></tr>
+            <tr><td>Game Over + Restart</td><td><code>GameOverPanel</code>, <code>GameManager.startGame</code></td><td>Tiêu đề VICTORY (vàng) hoặc GAME OVER (đỏ), kèm thời gian round; chơi lại không load lại scene</td></tr>
+            <tr><td>Config tách khỏi logic</td><td><code>config/</code>: <code>GameConfig</code>, <code>BossConfig</code>, <code>AudioConfig</code>, <code>FeedbackConfig</code></td><td>TS <code>as const</code>, thiếu entry là lỗi biên dịch</td></tr>
+            <tr><td>(Tuỳ chọn) VFX theo stage, (bonus) audio</td><td><code>BossView</code>, <code>DashTelegraphView</code>, <code>ImpactEffects</code>, <code>AudioPlayer</code></td><td>Boss đổi màu theo phase, nháy khi windup, vạch báo hướng dash; nhạc nền và 13 hiệu ứng âm thanh sinh bằng code</td></tr>
+            <tr><td>(Thêm) Menu tạm dừng</td><td><code>PausePanel</code>, <code>GameManager.pause</code> / <code>resume</code></td><td>Nút II, Esc / P, phím back Android; Resume, Restart, Home; tự dừng khi app xuống nền</td></tr>
+            <tr><td>(Thêm) Màn hình bắt đầu</td><td><code>StartScreen</code></td><td>Round đầu chờ ở <code>Ready</code> tới khi chạm hoặc bấm phím; cũng là cử chỉ mở khoá audio trên trình duyệt</td></tr>
+            <tr><td>(Thêm) Quả cầu khiên</td><td><code>PickupModel</code>, <code>BattleWorld.spawnPickupOnPhaseUp</code> / <code>collectPickup</code>, <code>PickupView</code></td><td>Mỗi lần boss lên phase rơi 1 quả, cách boss ít nhất 500 px; nhặt được thì chặn đúng 1 đòn, không hồi máu</td></tr>
+            <tr><td>(Thêm) Đồng hồ round</td><td><code>RoundTimer</code>, <code>RoundTimerView</code>, <code>TimeFormat</code></td><td>Đếm thời gian mô phỏng; HUD chỉ đổi chữ mỗi giây</td></tr>
+            <tr><td>(Thêm) Lưu thời gian thắng nhanh nhất</td><td><code>SaveStore</code>, <code>GameManager.saveIfBestTime</code>, <code>GameOverPanel</code></td><td>Có <code>version</code>, kiểm từng trường, không bao giờ throw; hiện "NEW BEST!"</td></tr>
+            <tr><td>(Thêm) Banner đổi phase</td><td><code>PhaseBanner</code>, <code>ImpactEffects</code>, <code>CameraFollow</code></td><td>"BOSS ENRAGED!", "FINAL PHASE!", vòng sóng và rung camera</td></tr>
+            <tr><td>(Thêm) Tia lửa trúng đòn, boss nổ</td><td><code>ImpactEffects</code>, <code>BurstPool</code></td><td>24 node tạo sẵn lúc load, hoạt ảnh theo thời gian, không tween</td></tr>
+            <tr><td>(Thêm) Nhiều loại màn hình</td><td><code>ScreenAdapter</code>, <code>CameraFollow.fitViewToScreen</code>, node <code>SafeArea</code></td><td>Fit Height cho màn rộng, Fit Width cho 4:3 và màn dọc; HUD tránh tai thỏ</td></tr>
           </tbody>
         </table></div>
       </section>
@@ -262,23 +271,27 @@ footer { color: var(--muted); font-size: 13px; margin-top: 24px; }
         <div class="archflow" role="img" aria-label="Phụ thuộc một chiều: ui, view, input phụ thuộc controller; controller phụ thuộc model; model phụ thuộc config, core, utils">
           <div class="box"><b>ui/ · view/ · input/</b>Vẽ lại model trong lateUpdate, nghe EventBus</div>
           <span class="arrow" aria-hidden="true">→</span>
-          <div class="box"><b>controller/</b>GameManager: update duy nhất, state machine</div>
+          <div class="box"><b>controller/</b>GameManager (state machine, pause) + BattleBroadcaster (sự kiện)</div>
           <span class="arrow" aria-hidden="true">→</span>
-          <div class="box"><b>model/</b>BattleWorld, BossBrain, BulletStore: TypeScript thuần</div>
+          <div class="box"><b>model/</b>BattleWorld, BossBrain, BulletStore, PickupModel, RoundTimer: TypeScript thuần</div>
           <span class="arrow" aria-hidden="true">→</span>
-          <div class="box"><b>config/ · core/ · utils/</b>Số liệu, EventBus, va chạm</div>
+          <div class="box"><b>config/ · core/ · utils/</b>Số liệu, EventBus, SaveStore, va chạm</div>
         </div>
         <div class="tbl"><table>
           <thead><tr><th>Thư mục</th><th>Vai trò</th><th>Ví dụ</th></tr></thead>
           <tbody>
-            <tr><td><code>config/</code></td><td>Mọi con số chỉnh gameplay, bảng phase</td><td><code>GameConfig</code>, <code>BossConfig</code>, các enum id</td></tr>
-            <tr><td><code>core/</code></td><td>Kênh sự kiện toàn cục</td><td><code>EventBus</code>, <code>GameEvents</code></td></tr>
-            <tr><td><code>model/</code></td><td>Mô phỏng thuần, test được không cần editor</td><td><code>BattleWorld</code>, <code>BulletStore</code>, <code>PlayerModel</code>, <code>boss/*</code></td></tr>
-            <tr><td><code>controller/</code></td><td>Update duy nhất của gameplay, state machine</td><td><code>GameManager</code></td></tr>
-            <tr><td><code>view/</code></td><td>Chép trạng thái model lên node mỗi frame</td><td><code>BulletLayerView</code>, <code>BossView</code>, <code>CameraFollow</code></td></tr>
-            <tr><td><code>input/</code>, <code>ui/</code></td><td>Ghi input; HUD và popup chỉ phản ứng theo sự kiện</td><td><code>VirtualJoystick</code>, <code>HealthBarView</code>, <code>GameOverPanel</code></td></tr>
+            <tr><td><code>config/</code></td><td>Mọi con số chỉnh gameplay, bảng phase, âm lượng, số liệu hiệu ứng</td><td><code>GameConfig</code>, <code>BossConfig</code>, <code>AudioConfig</code>, <code>FeedbackConfig</code>, các enum id</td></tr>
+            <tr><td><code>core/</code></td><td>Kênh sự kiện toàn cục, tên sự kiện, lưu game</td><td><code>EventBus</code>, <code>GameEvents</code>, <code>ViewEvents</code>, <code>SaveStore</code></td></tr>
+            <tr><td><code>model/</code></td><td>Mô phỏng thuần, test được không cần editor</td><td><code>BattleWorld</code>, <code>BulletStore</code>, <code>PlayerModel</code>, <code>PickupModel</code>, <code>RoundTimer</code>, <code>boss/*</code></td></tr>
+            <tr><td><code>controller/</code></td><td>Update duy nhất của gameplay, state machine, tạm dừng engine; biến thay đổi của world thành sự kiện</td><td><code>GameManager</code>, <code>BattleBroadcaster</code></td></tr>
+            <tr><td><code>view/</code></td><td>Chép trạng thái model lên node mỗi frame, hiệu ứng, âm thanh</td><td><code>BulletLayerView</code>, <code>BossView</code>, <code>CameraFollow</code>, <code>PickupView</code>, <code>DashTelegraphView</code>, <code>ImpactEffects</code>, <code>AudioPlayer</code></td></tr>
+            <tr><td><code>input/</code></td><td>Ghi input vào <code>InputState</code>, gửi yêu cầu dash</td><td><code>KeyboardInput</code>, <code>VirtualJoystick</code>, <code>DashButton</code></td></tr>
+            <tr><td><code>ui/</code></td><td>HUD, popup và màn hình; phản ứng theo sự kiện</td><td><code>HealthBarView</code>, <code>PhaseBanner</code>, <code>RoundTimerView</code>, <code>GameOverPanel</code>, <code>PausePanel</code>, <code>StartScreen</code>, <code>ScreenAdapter</code></td></tr>
+            <tr><td><code>utils/</code></td><td>Hàm thuần nhỏ</td><td><code>Collision</code>, <code>MathUtil</code>, <code>RateLimiter</code>, <code>TimeFormat</code></td></tr>
           </tbody>
         </table></div>
+        <p><b>Ai phát sự kiện:</b> <code>GameManager</code> phát <code>STATE_CHANGED</code> và <code>GAME_OVER</code>. Mọi sự kiện "trong trận" (HP, trúng đòn, khiên vỡ, phase, bắn, loạt đạn, orb) do <code>BattleBroadcaster</code> phát. Đây là class thuần do <code>GameManager</code> sở hữu và gọi mỗi frame, nên vẫn nằm ở tầng controller. View và UI chỉ nghe, không bao giờ hỏi vòng model để biết HP đổi chưa.</p>
+        <p><b><code>ViewEvents</code></b> chỉ có một hằng <code>CANVAS_RESIZE: 'canvas-resize'</code>. Đó là tên sự kiện của <code>view</code> trong engine, được <code>CameraFollow</code>, <code>ScreenAdapter</code> và <code>PausePanel</code> dùng. Gom vào một chỗ giống <code>GameEvents</code> để không có chuỗi tên sự kiện viết rời rạc trong code.</p>
         <div class="why"><b>Vì sao tách như vậy:</b> luật chơi đọc và kiểm tra được mà không cần mở editor; đổi giao diện không đụng luật; số lượng đạn tăng không làm tăng số component phải update. Cái giá: mỗi frame view phải chép dữ liệu sang node.</div>
       </section>
 
@@ -287,14 +300,24 @@ footer { color: var(--muted); font-size: 13px; margin-top: 24px; }
         <h2>Một frame chạy thế nào</h2>
         <p class="sub">Thứ tự dưới đây đúng như trong code.</p>
         <ol>
-          <li><b>Input đến theo sự kiện.</b> <code>KeyboardInput</code>, <code>VirtualJoystick</code> ghi vào <code>InputState</code> khi có phím hoặc chạm, không ai phải hỏi vòng mỗi frame.</li>
-          <li><b><code>GameManager.update(dt)</code></b> chỉ chạy khi state là <code>Playing</code>. Nó cắt frame thành các bước tối đa <b>50 ms</b>, frame dài hơn <b>250 ms</b> thì bỏ phần thừa.</li>
-          <li>Mỗi bước gọi <code>BattleWorld.step</code>: player di chuyển → súng player → <code>BossBrain</code> (phase, chọn move/shot, chạy chúng) → đạn hai bên bay và bị xoá khi chạm tường → xét va chạm → trả về <code>BattleOutcome</code>.</li>
-          <li><code>GameManager</code> phát sự kiện HP, phase, trúng đạn <b>chỉ khi giá trị đổi</b>; boss chết thì xoá hết đạn rồi phát <code>GAME_OVER</code>.</li>
-          <li>Trong <code>lateUpdate</code>, các view chép model lên node: <code>PlayerView</code>, <code>BossView</code>, hai <code>BulletLayerView</code>, <code>CameraFollow</code>.</li>
-          <li>UI (thanh máu, nhãn phase, bảng Game Over) chỉ chạy khi nhận sự kiện.</li>
+          <li><b>Input đến theo sự kiện.</b> <code>KeyboardInput</code>, <code>VirtualJoystick</code> ghi trục di chuyển vào <code>InputState</code> khi có phím hoặc chạm. Phím dash hoặc nút DASH gọi <code>GameManager.requestDash()</code>, hàm này chỉ nhận khi đang <code>Playing</code>.</li>
+          <li><b><code>GameManager.update(dt)</code></b> chỉ chạy khi state là <code>Playing</code> (khi <code>Paused</code> thì <code>director.pause()</code> đã dừng hẳn mọi update). Nó cắt frame thành các bước tối đa <b>50 ms</b>, frame dài hơn <b>250 ms</b> thì bỏ phần thừa. Mỗi bước cũng cộng vào <code>RoundTimer</code>.</li>
+          <li>Mỗi bước gọi <code>BattleWorld.step</code>: player di chuyển → súng player (đếm phát bắn) → <code>BossBrain</code> (phase, chọn move/shot, chạy chúng; đếm loạt đạn) → rơi orb nếu boss vừa lên phase → đạn hai bên bay và bị xoá khi chạm tường → đạn player trúng boss → đạn boss và thân boss trúng player (khiên chặn trước) → player nhặt orb → trả về <code>BattleOutcome</code>.</li>
+          <li><code>BattleBroadcaster.emitFrameChanges</code> phát sự kiện HP, trúng đòn, khiên vỡ, phase <b>chỉ khi giá trị đổi</b>, và sự kiện bắn, loạt đạn, orb <b>tối đa một lần mỗi frame</b> nhờ so bộ đếm. Sau đó <code>handleOutcome</code>: boss chết thì xoá hết đạn, ghi kỷ lục thời gian rồi phát <code>GAME_OVER</code>.</li>
+          <li>Trong <code>lateUpdate</code>, các view chép model lên node: <code>PlayerView</code>, <code>BossView</code>, hai <code>BulletLayerView</code>, <code>CameraFollow</code>, <code>PickupView</code>, <code>DashTelegraphView</code>, <code>DashButton</code>. Hiệu ứng (<code>ImpactEffects</code>, <code>PhaseBanner</code>) tự chạy theo thời gian; <code>RoundTimerView</code> chỉ đổi chữ khi sang giây mới.</li>
+          <li>UI và hiệu ứng phản ứng theo sự kiện: thanh máu, nhãn phase, banner, bảng Game Over, menu pause, tia lửa, âm thanh, rung camera.</li>
         </ol>
         <pre><code><span class="file">// controller/GameManager.ts</span>
+protected update(dt: number): void {
+    if (this._state !== GameState.Playing || !this._world) {
+        return;
+    }
+    const outcome = this.simulateFrame(dt, this._world);
+    // NOTE: HP is broadcast before the outcome, so the HUD already shows 0 when GAME_OVER arrives.
+    this.broadcaster.emitFrameChanges(this._world);
+    this.handleOutcome(outcome, this._world);
+}
+
 private simulateFrame(dt: number, world: BattleWorld): BattleOutcome {
     // NOTE: frames longer than MAX_FRAME_TIME (tab switch, debugger) are cut, not fast-forwarded.
     let remaining = Math.min(dt, GameConfig.FRAME.MAX_FRAME_TIME);
@@ -302,11 +325,15 @@ private simulateFrame(dt: number, world: BattleWorld): BattleOutcome {
     while (remaining &gt; 0 &amp;&amp; outcome === BattleOutcome.None) {
         const step = Math.min(remaining, GameConfig.FRAME.MAX_DT);
         outcome = world.step(step, this._input);
+        // NOTE: simulated time, not wall time: a cut long frame is not counted, so the clear time
+        // matches what was actually played.
+        this.roundTimer.advance(step);
         remaining -= step;
     }
     return outcome;
 }</code></pre>
         <div class="why"><b>Vì sao sub-step:</b> máy yếu chạy 15 fps thì <code>dt</code> ≈ 0.066 s. Nếu bước một lần, đạn player (900 px/s) nhảy 60 px mỗi bước và có thể "xuyên" qua mục tiêu. Cắt thành bước ≤ 50 ms vừa giữ đúng tốc độ thật, vừa giữ va chạm chính xác.</div>
+        <div class="why"><b>Vì sao sự kiện phát sau vòng lặp:</b> một frame có thể chạy nhiều bước. Nếu phát sự kiện trong từng bước thì âm thanh bắn có thể kêu hai lần trong một frame. Phát một lần sau vòng lặp, dựa trên bộ đếm, thì mỗi frame tối đa một sự kiện mỗi loại.</div>
       </section>
 
       <!-- ============ 4. Module ============ -->
@@ -341,131 +368,231 @@ private removeAt(index: number): void {
         }
     }
 }</code></pre>
-            <div class="why"><b>Vì sao:</b> không tạo object khi bắn, không rác cho GC, dữ liệu nằm liền nhau trong bộ nhớ nên duyệt nhanh. <code>clear()</code> chỉ đặt <code>count = 0</code>, đó là cách "xoá hết đạn ngay lập tức" khi boss chết.</div>
+            <div class="why"><b>Vì sao:</b> không tạo object khi bắn, không rác cho GC, dữ liệu nằm liền nhau trong bộ nhớ nên duyệt nhanh. <code>clear()</code> chỉ đặt <code>count = 0</code>, đó là cách "xoá hết đạn ngay lập tức" khi boss chết. Sức chứa: đạn player 64, đạn boss 400.</div>
             <div class="ask"><div class="q">Hỏi: vì sao duyệt ngược từ cuối mảng?</div><div class="a">Vì <code>removeAt(i)</code> lấy viên cuối mảng đặt vào chỗ <code>i</code>. Viên cuối đó đã được xử lý rồi (đi ngược), nên không viên nào bị bỏ sót hay xử lý hai lần.</div></div>
           </div>
         </details>
 
         <details class="mod">
-          <summary><span><span class="t">BattleWorld</span><span class="p">model/BattleWorld.ts · 101 dòng</span></span><span class="layer model">model</span></summary>
+          <summary><span><span class="t">BattleWorld</span><span class="p">model/BattleWorld.ts · 188 dòng</span></span><span class="layer model">model</span></summary>
           <div class="body">
-            <p>Chứa toàn bộ trận đấu dưới dạng dữ liệu: arena, player, boss, súng, hai kho đạn, bộ não boss. <code>step()</code> chạy mọi thứ theo thứ tự cố định rồi trả về kết quả.</p>
+            <p>Chứa toàn bộ trận đấu dưới dạng dữ liệu: arena, player, boss, súng, hai kho đạn, bộ não boss và quả cầu khiên. <code>step()</code> chạy mọi thứ theo thứ tự cố định rồi trả về kết quả. Nó cũng giữ các bộ đếm chỉ tăng trong một round (phát bắn, loạt đạn, orb xuất hiện, orb được nhặt, khiên vỡ) để <code>BattleBroadcaster</code> so sánh.</p>
             <pre><code>step(dt: number, input: InputState): BattleOutcome {
+    // NOTE: order matters: everyone moves and shoots first, then bullets fly, then hits are
+    // resolved on the final positions of this frame.
     this.player.step(dt, input, this.bounds);
-    this.weapon.step(dt, this.player, this.boss, this.playerBullets);
-    this.brain.step(dt, this.boss, this.player, this.bounds, this.bossBullets);
+    if (this.weapon.step(dt, this.player, this.boss, this.playerBullets)) {
+        this._playerShotCount++;
+    }
+    if (this.brain.step(dt, this.boss, this.player, this.bounds, this.bossBullets)) {
+        this._bossVolleyCount++;
+    }
+    this.spawnPickupOnPhaseUp();
     this.playerBullets.step(dt, this.bounds);
     this.bossBullets.step(dt, this.bounds);
     this.hitBoss();
     this.hitPlayer();
+    this.collectPickup();
     const outcome = this.outcome();
     ...
 }</code></pre>
             <pre><code>private outcome(): BattleOutcome {
     // NOTE: boss checked first, so a same-frame double kill counts as a victory.
-    if (this.boss.health.isDead) { return BattleOutcome.BossDefeated; }
-    if (this.player.health.isDead) { return BattleOutcome.PlayerDefeated; }
+    if (this.boss.health.isDead) {
+        return BattleOutcome.BossDefeated;
+    }
+    if (this.player.health.isDead) {
+        return BattleOutcome.PlayerDefeated;
+    }
     return BattleOutcome.None;
 }</code></pre>
-            <div class="why"><b>Vì sao thứ tự này:</b> mọi thứ di chuyển và bắn trước, đạn bay sau, va chạm xét cuối cùng trên vị trí đã chốt của frame. Hai bên cùng chết trong một frame thì tính là thắng.</div>
-            <div class="ask"><div class="q">Hỏi: khi player đang bất tử, đạn boss xử lý thế nào?</div><div class="a"><code>hitPlayer()</code> thoát sớm: đạn bay xuyên qua player chứ không bị "ăn" mất. Đây là lựa chọn thiết kế, ghi trong README.</div></div>
+            <div class="why"><b>Vì sao thứ tự này:</b> mọi thứ di chuyển và bắn trước, đạn bay sau, va chạm xét cuối cùng trên vị trí đã chốt của frame. Hai bên cùng chết trong một frame thì tính là thắng. Khi round vừa kết thúc, world xoá cờ windup/dash của boss, nhấp nháy và dash của player, và orb đang nằm trên map, vì sau đó world không được step nữa và các hiệu ứng đó sẽ bị đóng băng sau bảng kết quả.</div>
+            <div class="ask"><div class="q">Hỏi: khi player đang bất tử, đạn boss xử lý thế nào?</div><div class="a"><code>hitPlayer()</code> thoát sớm: đạn bay xuyên qua player chứ không bị "ăn" mất. Đây là lựa chọn thiết kế, ghi trong README. Nếu chưa bất tử, đạn trúng trước rồi mới tới va chạm thân boss; đòn đầu tiên bật bất tử nên đòn sau trong cùng bước bị <code>takeHit()</code> từ chối.</div></div>
           </div>
         </details>
 
         <details class="mod">
-          <summary><span><span class="t">GameManager</span><span class="p">controller/GameManager.ts · 174 dòng</span></span><span class="layer ctrl">controller</span></summary>
+          <summary><span><span class="t">GameManager</span><span class="p">controller/GameManager.ts · 225 dòng</span></span><span class="layer ctrl">controller</span></summary>
           <div class="body">
-            <p>Update gameplay duy nhất của cả game. Giữ <code>BattleWorld</code>, <code>InputState</code> và state machine <code>Ready → Playing → GameOver</code>.</p>
-            <pre><code>startGame(): void {
-    if (!this._world) { return; }
-    // NOTE: passing through Ready lets every view clear the previous round (panel, camera snap).
-    this.setState(GameState.Ready);
-    this._world.reset();
-    this._input.isDashRequested = false;
-    this.emitInitialValues(this._world);
+            <p>Update gameplay duy nhất của cả game. Giữ <code>BattleWorld</code>, <code>InputState</code>, <code>RoundTimer</code>, <code>BattleBroadcaster</code> và state machine <code>Ready → Playing ⇄ Paused</code>, <code>Playing → GameOver</code>. Là nơi duy nhất đổi <code>GameState</code> và nơi duy nhất gọi <code>director.pause()</code> / <code>resume()</code>.</p>
+            <pre><code>/** Starts a new round without reloading the scene. Used by the start screen and both Restart buttons. */
+startGame(): void {
+    if (!this._world) {
+        return;
+    }
+    this.resumeDirectorIfPaused();
+    this.prepareRound();
     this.setState(GameState.Playing);
 }</code></pre>
+            <pre><code>/**
+ * Resets the world and the HUD, and leaves the game in Ready (nothing moves until Playing).
+ * NOTE: passing through Ready lets every view clear the previous round (panel, camera snap).
+ */
+private prepareRound(): void {
+    if (!this._world) {
+        return;
+    }
+    this.setState(GameState.Ready);
+    this._world.reset();
+    this.roundTimer.startRound();
+    this._input.isDashRequested = false;
+    this.broadcaster.emitRoundStart(this._world);
+}</code></pre>
+            <div class="why"><b>Vì sao:</b> chơi lại không cần load lại scene, chỉ đi qua <code>Ready</code> để mọi view tự dọn. <code>prepareRound()</code> dùng chung cho lần mở game đầu, Restart, và Home trong menu pause. World tạo trong <code>onLoad</code> (không trong field initializer) vì editor cũng khởi tạo component khi mở scene. Kỷ lục thời gian đọc từ <code>SaveStore</code> một lần trong <code>onLoad</code>.</div>
+            <div class="ask"><div class="q">Hỏi: vì sao round đầu được chuẩn bị trong <code>start()</code> chứ không trong <code>onLoad()</code>?</div><div class="a">Mọi <code>onEnable</code> (nơi view đăng ký nghe sự kiện) chạy trước mọi <code>start</code>. Gọi <code>prepareRound()</code> trong <code>start</code> thì sự kiện HP và phase ban đầu chắc chắn có người nghe. Round đó dừng ở <code>Ready</code> sau màn hình bắt đầu, tới khi <code>StartScreen</code> gọi <code>startGame()</code>. Trên web, chạm có thể tới trước <code>start()</code>, nên <code>start()</code> chỉ chuẩn bị khi state vẫn là <code>Ready</code>.</div></div>
+          </div>
+        </details>
+
+        <details class="mod">
+          <summary><span><span class="t">BattleBroadcaster</span><span class="p">controller/BattleBroadcaster.ts · 107 dòng</span></span><span class="layer ctrl">controller</span></summary>
+          <div class="body">
+            <p>Biến thay đổi của <code>BattleWorld</code> thành sự kiện <code>EventBus</code>, tối đa một lần mỗi frame. Nhớ giá trị đã phát lần trước (HP hai bên, phase) và bộ đếm của world lần trước. Class thuần, không phải component; <code>GameManager</code> tạo và gọi nó. Tách ra từ <code>GameManager</code> để state machine và phần "frame này cái gì đổi" đọc riêng được.</p>
             <pre><code>private emitHealthChange(health: Health, lastHp: number, hpEvent: string, hitEvent: string): number {
     const hp = health.current;
-    if (hp === lastHp) { return lastHp; }       // PERF: no event when nothing changed
-    if (hp &lt; lastHp) { EventBus.emit(hitEvent); }
+    if (hp === lastHp) {
+        return lastHp;
+    }
+    if (hp &lt; lastHp) {
+        EventBus.emit(hitEvent);
+    }
     EventBus.emit(hpEvent, hp, health.max);
     return hp;
 }</code></pre>
-            <div class="why"><b>Vì sao:</b> chơi lại không cần load lại scene, chỉ đi qua <code>Ready</code> để mọi view tự dọn. HUD không bị cập nhật mỗi frame vì sự kiện chỉ bắn khi HP thực sự đổi. World tạo trong <code>onLoad</code> (không trong field initializer) vì editor cũng khởi tạo component khi mở scene.</div>
-            <div class="ask"><div class="q">Hỏi: vì sao <code>startGame()</code> gọi trong <code>start()</code> chứ không trong <code>onLoad()</code>?</div><div class="a">Mọi <code>onEnable</code> (nơi view đăng ký nghe sự kiện) chạy trước mọi <code>start</code>. Gọi trong <code>start</code> thì sự kiện HP và phase ban đầu chắc chắn có người nghe.</div></div>
+            <pre><code>private emitActionEvents(world: BattleWorld): void {
+    if (world.playerShotCount !== this.lastPlayerShotCount) {
+        this.lastPlayerShotCount = world.playerShotCount;
+        EventBus.emit(GameEvents.PLAYER_SHOT);
+    }
+    if (world.bossVolleyCount !== this.lastBossVolleyCount) {
+        this.lastBossVolleyCount = world.bossVolleyCount;
+        EventBus.emit(GameEvents.BOSS_VOLLEY_FIRED);
+    }
+    ...
+}</code></pre>
+            <div class="why"><b>Vì sao dùng bộ đếm:</b> world có thể chạy tới 5 bước trong một frame, mỗi bước có thể bắn. Model chỉ tăng một số nguyên, không biết gì về sự kiện. Broadcaster so số đó với lần trước, khác thì phát một sự kiện. Âm thanh và hiệu ứng chỉ cần biết "frame này có bắn", nên không bị kêu chồng. HUD cũng không bị cập nhật mỗi frame vì HP chỉ phát khi thực sự đổi. Khiên chặn đòn không làm mất HP, nên có bộ đếm riêng để phát <code>SHIELD_BROKEN</code>.</div>
+            <div class="ask"><div class="q">Hỏi: đầu round mới, làm sao broadcaster không phát nhầm sự kiện bắn của round cũ?</div><div class="a"><code>emitRoundStart()</code> chạy ngay sau <code>world.reset()</code>: chép lại mọi bộ đếm (đã về 0) làm "lần trước", rồi phát HP và phase ban đầu. Nhờ vậy HUD không bao giờ hiện số của round trước và không có sự kiện hành động nào đang chờ.</div></div>
           </div>
         </details>
 
         <details class="mod">
-          <summary><span><span class="t">BossBrain</span><span class="p">model/boss/BossBrain.ts · 146 dòng</span></span><span class="layer model">model</span></summary>
+          <summary><span><span class="t">PausePanel và StartScreen</span><span class="p">ui/PausePanel.ts · 139 dòng · ui/StartScreen.ts · 68 dòng</span></span><span class="layer view">ui</span></summary>
           <div class="body">
-            <p>Quyết định boss làm gì: tính phase từ tỉ lệ HP, chọn move và shot từ bảng <code>BossConfig.PHASES</code>, đổi ngẫu nhiên trong phase có nhiều lựa chọn.</p>
+            <p><code>PausePanel</code> giữ nút II trong HUD và menu pause (Resume, Restart, Home). Esc, P và phím back Android bật tắt pause; app xuống nền (<code>Game.EVENT_HIDE</code>) thì tự pause. Mọi thao tác đi qua <code>GameManager</code>; menu chỉ hiện khi state là <code>Paused</code>. <code>StartScreen</code> là màn hình bắt đầu: chạm (<code>TOUCH_END</code>) hoặc nhả phím (<code>KEY_UP</code>) thì gọi <code>startGame()</code> rồi tự ẩn. Home trong menu pause gọi <code>returnToTitle()</code> rồi <code>startScreen.show()</code>.</p>
+            <pre><code><span class="file">// controller/GameManager.ts</span>
+pause(): void {
+    if (this._state !== GameState.Playing) {
+        return;
+    }
+    this.setState(GameState.Paused);
+    director.pause();
+}
+
+resume(): void {
+    if (this._state !== GameState.Paused) {
+        return;
+    }
+    // NOTE: the director runs again before Playing is broadcast, so listeners see a live engine.
+    director.resume();
+    this.setState(GameState.Playing);
+}</code></pre>
+            <pre><code><span class="file">// ui/PausePanel.ts</span>
+private onStateChanged(state: GameState): void {
+    this.pauseButton.node.active = state === GameState.Playing;
+    const isPaused = state === GameState.Paused;
+    this.panel.active = isPaused;
+    if (isPaused) {
+        this.alignMenu();
+    }
+}
+
+private alignMenu(): void {
+    for (const widget of this.menuWidgets) {
+        widget.updateAlignment();
+    }
+}</code></pre>
+            <div class="why"><b>Vì sao chỉ <code>GameManager</code> gọi <code>director.pause()</code>:</b> state machine và engine phải luôn khớp nhau. Nếu một file khác pause engine mà state vẫn là <code>Playing</code> thì game đứng. <code>director.pause()</code> dừng update, lateUpdate, schedule, tween, animation và Widget, nhưng input, render và audio vẫn chạy. Vì thế menu bấm được nhưng không được mở bằng tween, và Widget của menu phải căn tay bằng <code>updateAlignment()</code> (danh sách Widget lấy một lần trong <code>onLoad</code>, căn lại cả khi đổi kích thước màn hình lúc đang pause). <code>AudioPlayer</code> nghe <code>Paused</code> để tạm dừng nhạc, nghe <code>Playing</code> để phát tiếp. <code>startGame()</code>, <code>returnToTitle()</code> và <code>onDestroy()</code> đều <code>director.resume()</code> trước nếu đang pause.</div>
+            <div class="ask"><div class="q">Hỏi: vì sao <code>StartScreen</code> bắt đầu khi nhả phím (<code>KEY_UP</code>) chứ không khi nhấn?</div><div class="a"><code>KEY_DOWN</code> của phím dash tới lúc game còn <code>Ready</code> nên bị bỏ qua. Bắt đầu lúc nhả phím thì cú nhấn đó không biến thành một cú dash ở đầu round. Esc, Tab, Alt, Ctrl bị bỏ qua vì hay được nhả khi Alt+Tab quay lại, và Esc không phải cử chỉ mở khoá audio trên trình duyệt.</div></div>
+          </div>
+        </details>
+
+        <details class="mod">
+          <summary><span><span class="t">BossBrain</span><span class="p">model/boss/BossBrain.ts · 148 dòng</span></span><span class="layer model">model</span></summary>
+          <div class="body">
+            <p>Quyết định boss làm gì: tính phase từ tỉ lệ HP, chọn move và shot từ bảng <code>BossConfig.PHASES</code>, đổi ngẫu nhiên trong phase có nhiều lựa chọn. <code>step()</code> trả về <code>true</code> khi shot đang chạy vừa bắn một loạt, để <code>BattleWorld</code> đếm.</p>
             <pre><code>private static phaseFromRatio(ratio: number): BossPhase {
-    if (ratio &gt;= BOSS.PHASE_HIGH_MIN_RATIO) { return BossPhase.High; }     // &gt;= 60%
-    if (ratio &gt;= BOSS.PHASE_MEDIUM_MIN_RATIO) { return BossPhase.Medium; } // &gt;= 30%
+    if (ratio &gt;= BOSS.PHASE_HIGH_MIN_RATIO) {
+        return BossPhase.High;
+    }
+    if (ratio &gt;= BOSS.PHASE_MEDIUM_MIN_RATIO) {
+        return BossPhase.Medium;
+    }
     return BossPhase.Low;
 }</code></pre>
             <pre><code>private updateMoveChoice(dt: number, boss: BossModel, target: Point, bounds: ArenaBounds): void {
     this.moveSwitchTimer -= dt;
-    if (this.moveSwitchTimer &gt; 0) { return; }
+    if (this.moveSwitchTimer &gt; 0) {
+        return;
+    }
     // NOTE: a dash in windup or charge is never cut: the timer stays expired, so this retries
     // every frame and switches as soon as the move becomes interruptible.
-    if (this.move !== null &amp;&amp; !this.move.isInterruptible) { return; }
+    if (this.move !== null &amp;&amp; !this.move.isInterruptible) {
+        return;
+    }
     const next = this.getMove(randomItem(this.phaseConfig.MOVES));
     ...
     this.moveSwitchTimer = BossBrain.nextSwitchDelay(this.phaseConfig.MOVES.length);
 }</code></pre>
             <ul>
-              <li><b>Phase chỉ đi tiến</b> trong một round (High → Medium → Low), vì enum có thứ tự tăng dần.</li>
-              <li><b>Move và shot đổi độc lập</b>, mỗi cái một timer ngẫu nhiên 2–4 s.</li>
+              <li><b>Phase chỉ đi tiến</b> trong một round (High → Medium → Low), vì enum có thứ tự tăng dần. <code>boss.phase</code> là bản ghi duy nhất của phase, view cũng đọc nó.</li>
+              <li><b>Move và shot đổi độc lập</b>, mỗi cái một timer ngẫu nhiên 2–4 s. Vào phase mới thì cả hai timer về 0 để chọn lại ngay (dash đang chạy vẫn chạy hết).</li>
               <li>Phase chỉ có một lựa chọn thì timer là <code>Infinity</code>: không bao giờ đổi, không cần cờ riêng.</li>
               <li>Mỗi move/shot tạo một lần rồi dùng lại (<code>Map</code> theo id).</li>
             </ul>
-            <div class="ask"><div class="q">Hỏi: nếu muốn thêm phase thứ tư (ví dụ "Enraged" dưới 10% HP)?</div><div class="a">Thêm giá trị vào enum <code>BossPhase</code>, thêm entry trong <code>BossConfig.PHASES</code> (thiếu là lỗi biên dịch), thêm ngưỡng trong <code>GameConfig.BOSS</code> và một nhánh trong <code>phaseFromRatio</code>.</div></div>
+            <div class="ask"><div class="q">Hỏi: nếu muốn thêm phase thứ tư (ví dụ "Enraged" dưới 10% HP)?</div><div class="a">Thêm giá trị vào enum <code>BossPhase</code>, thêm entry trong <code>BossConfig.PHASES</code> và <code>BANNER_TEXTS</code> của <code>PhaseBanner</code> (thiếu là lỗi biên dịch vì cả hai là <code>Record&lt;BossPhase, ...&gt;</code>), thêm ngưỡng trong <code>GameConfig.BOSS</code> và một nhánh trong <code>phaseFromRatio</code>. Orb khiên tự rơi thêm một lần vì world thưởng mỗi khi phase tăng.</div></div>
           </div>
         </details>
 
         <details class="mod">
-          <summary><span><span class="t">DashMove</span><span class="p">model/boss/DashMove.ts · 118 dòng</span></span><span class="layer model">model</span></summary>
+          <summary><span><span class="t">DashMove</span><span class="p">model/boss/DashMove.ts · 114 dòng</span></span><span class="layer model">model</span></summary>
           <div class="body">
-            <p>Vòng lặp ba giai đoạn: <b>Windup</b> (đứng yên, nháy trắng) → <b>Dash</b> (lao theo hướng đã khoá) → <b>Recover</b> (nghỉ) → Windup lại. Chỉ Recover mới được ngắt.</p>
+            <p>Vòng lặp ba giai đoạn: <b>Windup</b> (đứng yên, nháy trắng, hiện vạch báo hướng) → <b>Dash</b> (lao theo hướng đã khoá) → <b>Recover</b> (nghỉ) → Windup lại. Chỉ Recover mới được ngắt. Hướng khoá được lưu trên <code>BossModel</code> (<code>dashDirX</code>, <code>dashDirY</code>): một bản duy nhất, dùng cho cú lao và cho <code>DashTelegraphView</code> vẽ vạch.</p>
             <pre><code>private startWindup(boss: BossModel, target: Point, bounds: ArenaBounds): void {
-    // Aim point = target clamped into the rectangle the boss centre can reach.
     const dx = bounds.clampX(target.x, boss.halfSize) - boss.x;
     const dy = bounds.clampY(target.y, boss.halfSize) - boss.y;
     const distanceSqr = dx * dx + dy * dy;
     const minDistance = this.config.MIN_AIM_DISTANCE;
-    if (distanceSqr &lt; minDistance * minDistance) {   // already on the aim point: no direction
+    if (distanceSqr &lt; minDistance * minDistance) {
         this.startRecover(boss);
         return;
     }
     const scale = 1 / Math.sqrt(distanceSqr);
-    this.directionX = dx * scale;                      // direction locked here
-    this.directionY = dy * scale;
+    boss.dashDirX = dx * scale;
+    boss.dashDirY = dy * scale;
     ...
 }</code></pre>
-            <div class="why"><b>Cách hiểu "thời điểm kích hoạt":</b> hướng được khoá ngay khi bắt đầu windup, nên ánh nháy trắng báo trước một hướng cố định và player có thể né sang ngang. Nếu ngắm lúc hết windup thì boss gần như luôn trúng, không công bằng.</div>
+            <div class="why"><b>Cách hiểu "thời điểm kích hoạt":</b> hướng được khoá ngay khi bắt đầu windup, nên ánh nháy trắng và vạch báo trước một hướng cố định và player có thể né sang ngang. Nếu ngắm lúc hết windup thì boss gần như luôn trúng, không công bằng. Vạch dài đúng quãng một cú dash: 1200 × 0.45 = 540 px.</div>
             <div class="why"><b>Vì sao kẹp điểm ngắm:</b> player nhỏ hơn boss nên đứng sát tường được hơn. Ngắm thẳng vào player thì mọi cú dash đâm vào tường và boss bị kẹt. Kẹp điểm ngắm vào vùng tâm boss tới được thì boss lướt dọc tường.</div>
-            <div class="ask"><div class="q">Hỏi: dash kết thúc khi nào?</div><div class="a">Hết <code>DURATION</code> (0.45 s) hoặc khi bị tường chặn. Tường chặn được phát hiện bằng cách so vị trí sau khi kẹp với vị trí chưa kẹp; nhờ vậy boss đang đứng sát tường vẫn dash ra xa tường được.</div></div>
+            <div class="ask"><div class="q">Hỏi: dash kết thúc khi nào?</div><div class="a">Hết <code>DURATION</code> (0.45 s) hoặc khi bị tường chặn. Tường chặn được phát hiện bằng cách so vị trí sau khi kẹp với vị trí chưa kẹp; nhờ vậy boss đang đứng sát tường vẫn dash ra xa tường được. Vào Recover thì <code>clearActionFlags()</code> xoá cờ và hướng, vạch báo biến mất.</div></div>
           </div>
         </details>
 
         <details class="mod">
-          <summary><span><span class="t">FanShot</span><span class="p">model/boss/FanShot.ts · 58 dòng</span></span><span class="layer model">model</span></summary>
+          <summary><span><span class="t">FanShot</span><span class="p">model/boss/FanShot.ts · 62 dòng</span></span><span class="layer model">model</span></summary>
           <div class="body">
-            <p>Một class phục vụ mọi kiểu quạt; Normal và Crazy chỉ khác số liệu trong config.</p>
+            <p>Một class phục vụ mọi kiểu quạt; Normal và Crazy chỉ khác số liệu trong config. <code>step()</code> trả về <code>true</code> khi vừa bắn một loạt.</p>
             <pre><code>constructor(config: FanShotConfig) {
     this.config = config;
     const spread = degToRad(config.SPREAD_DEG);
-    // angle_i = base - spread/2 + spread * i / (count - 1); one bullet would divide by zero.
+    // angle_i = base - spread/2 + spread * i / (count - 1). NOTE: one bullet has no spread and
+    // would divide by zero, so it simply flies straight at the target.
     const hasSpread = config.COUNT &gt; 1;
     this.firstOffset = hasSpread ? -spread / 2 : 0;
     this.angleStep = hasSpread ? spread / (config.COUNT - 1) : 0;
 }
 
 private fireVolley(origin: Point, target: Point, emitter: IBulletEmitter): void {
-    // PERF: atan2 once per volley, not per frame.
+    // PERF: atan2 once per volley for the aim direction; the per-bullet cos/sin run only when a
+    // volley fires (about once a second), not every frame.
     const baseAngle = Math.atan2(target.y - origin.y, target.x - origin.x);
     const speed = this.config.SPEED;
     for (let i = 0; i &lt; this.config.COUNT; i++) {
@@ -485,28 +612,35 @@ private fireVolley(origin: Point, target: Point, emitter: IBulletEmitter): void 
         </details>
 
         <details class="mod">
-          <summary><span><span class="t">Collision</span><span class="p">utils/Collision.ts · 30 dòng</span></span><span class="layer model">utils</span></summary>
+          <summary><span><span class="t">Collision</span><span class="p">utils/Collision.ts · 32 dòng</span></span><span class="layer model">utils</span></summary>
           <div class="body">
-            <pre><code>export function circleOverlapsBox(cx: number, cy: number, r: number, boxX: number, boxY: number, halfSize: number): boolean {
-    // The point of the square closest to the circle centre; overlap if that point is inside the circle.
+            <pre><code>export function circleOverlapsBox(
+    cx: number, cy: number, r: number, boxX: number, boxY: number, halfSize: number,
+): boolean {
+    // The point of the square closest to the circle centre; the circle overlaps if that point is inside it.
     const nearestX = clamp(cx, boxX - halfSize, boxX + halfSize);
     const nearestY = clamp(cy, boxY - halfSize, boxY + halfSize);
     const dx = cx - nearestX;
     const dy = cy - nearestY;
-    return dx * dx + dy * dy &lt; r * r;   // PERF: squared distance, no Math.sqrt
+    // PERF: squared distance, no Math.sqrt.
+    return dx * dx + dy * dy &lt; r * r;
 }</code></pre>
-            <div class="why"><b>Vì sao không dùng physics engine:</b> chỉ có hai loại hình (tròn, vuông) và mỗi phe một mục tiêu. Tự tính trên khoảng cách bình phương là O(n), nhẹ hơn nhiều so với một rigid body cho mỗi viên đạn. Module physics cũng đã tắt trong Feature Cropping để build nhỏ hơn.</div>
+            <div class="why"><b>Vì sao không dùng physics engine:</b> chỉ có hai loại hình (tròn, vuông) và mỗi phe một mục tiêu. Tự tính trên khoảng cách bình phương là O(n), nhẹ hơn nhiều so với một rigid body cho mỗi viên đạn. Module physics cũng đã tắt trong Feature Cropping để build nhỏ hơn. Player nhặt orb dùng <code>circleOverlapsCircle</code> cùng file.</div>
             <div class="ask"><div class="q">Hỏi: có cần spatial grid không?</div><div class="a">Không: dưới 200 viên và chỉ một mục tiêu mỗi phe, mỗi frame vài trăm phép so sánh. Grid chỉ có lợi khi nhiều mục tiêu × nhiều đạn (nhiều địch, đạn va đạn), và nếu cần thì thêm vào trong <code>BulletStore.consumeHits*</code> mà không đổi chỗ gọi.</div></div>
           </div>
         </details>
 
         <details class="mod">
-          <summary><span><span class="t">PlayerModel và PlayerWeapon</span><span class="p">model/PlayerModel.ts · model/PlayerWeapon.ts</span></span><span class="layer model">model</span></summary>
+          <summary><span><span class="t">PlayerModel và PlayerWeapon</span><span class="p">model/PlayerModel.ts · 180 dòng · model/PlayerWeapon.ts · 45 dòng</span></span><span class="layer model">model</span></summary>
           <div class="body">
             <pre><code>private move(dt: number, dirX: number, dirY: number, bounds: ArenaBounds): void {
+    // Keyboard and joystick are added so either one works; the sum is normalised below.
     const lengthSqr = dirX * dirX + dirY * dirY;
-    if (lengthSqr === 0) { return; }
-    // only shrink, never grow: a diagonal key press is scaled to 1, a half-tilted stick keeps its slower speed.
+    if (lengthSqr === 0) {
+        return;
+    }
+    // NOTE: only shrink, never grow: a diagonal key press (length ~1.41) is scaled to 1 so it is not
+    // faster, while a half-tilted joystick (length &lt; 1) keeps its slower speed.
     if (lengthSqr &gt; 1) {
         const scale = 1 / Math.sqrt(lengthSqr);
         dirX *= scale;
@@ -515,11 +649,133 @@ private fireVolley(origin: Point, target: Point, emitter: IBulletEmitter): void 
     const distance = PLAYER.SPEED * dt;
     this.moveClamped(dirX * distance, dirY * distance, bounds);
 }</code></pre>
+            <pre><code>takeHit(damage: number): void {
+    // NOTE: `!(damage &gt; 0)` also rejects NaN, so a bad value never breaks the shield for free.
+    if (this.isInvulnerable || !(damage &gt; 0)) {
+        return;
+    }
+    if (this._hasShield) {
+        this._hasShield = false;
+        this.hitInvulnerableTimer = PLAYER.HIT_INVULNERABLE;
+        return;
+    }
+    if (this.health.applyDamage(damage) &gt; 0) {
+        this.hitInvulnerableTimer = PLAYER.HIT_INVULNERABLE;
+    }
+}</code></pre>
             <ul>
-              <li><b>Bất tử</b> = sau khi trúng (1 s, nhấp nháy) hoặc đang dash. Trúng đòn chí mạng thì không bật bất tử, để player chết không nhấp nháy sau màn DEFEAT.</li>
+              <li><b>Bất tử</b> = sau khi trúng (1 s, nhấp nháy) hoặc đang dash. Khi round kết thúc, <code>BattleWorld</code> gọi <code>clearTimedEffects()</code> để player không nhấp nháy mãi sau bảng kết quả.</li>
+              <li><b>Khiên</b>: một lần sạc, không cộng dồn. Khiên chặn đòn cũng bật bất tử 1 s, để các viên khác đang chồng lên player trong cùng frame không trúng ngay sau khi khiên vỡ.</li>
               <li><b>Dash</b>: hướng là hướng di chuyển gần nhất, luôn chuẩn hoá; bước cuối chỉ dùng phần thời gian còn lại nên quãng đường đúng 1100 × 0.15 = 165 px.</li>
-              <li><b>Súng</b>: tầm so bằng bình phương (<code>AUTO_AIM_RANGE_SQR</code> tính sẵn một lần), một <code>sqrt</code> mỗi phát bắn, không phải mỗi frame; khoảng cách 0 thì bỏ qua để không chia cho 0.</li>
+              <li><b>Súng</b>: tầm so bằng bình phương (<code>AUTO_AIM_RANGE_SQR</code> tính sẵn một lần), một <code>sqrt</code> mỗi phát bắn, không phải mỗi frame; khoảng cách 0 thì bỏ qua để không chia cho 0. <code>step()</code> trả về <code>true</code> khi vừa bắn, để world đếm phát bắn cho âm thanh.</li>
             </ul>
+            <div class="ask"><div class="q">Hỏi: player đang có khiên mà trúng 3 viên đạn cùng lúc thì sao?</div><div class="a"><code>hitPlayer()</code> gom cả 3 viên thành một lần <code>takeHit(30)</code>. Khiên chặn đòn đó, mất khiên, không mất HP, bật bất tử 1 s. Va chạm thân boss ngay sau trong cùng bước bị từ chối vì đã bất tử. <code>BattleWorld</code> thấy khiên mất nên tăng bộ đếm khiên vỡ.</div></div>
+          </div>
+        </details>
+
+        <details class="mod">
+          <summary><span><span class="t">PickupModel</span><span class="p">model/PickupModel.ts · 93 dòng</span></span><span class="layer model">model</span></summary>
+          <div class="body">
+            <p>Quả cầu khiên, tối đa một quả mỗi lúc. <code>BattleWorld</code> cho nó xuất hiện khi boss vào phase HP mới (cách xa boss, trong tường) và cho player nhặt khi chạm. <code>PickupView</code> vẽ nó, co giãn nhẹ theo thời gian cho dễ thấy.</p>
+            <pre><code>spawnAwayFrom(avoid: Point, bounds: ArenaBounds): void {
+    const minX = -bounds.halfWidth + WALL_MARGIN;
+    const maxX = bounds.halfWidth - WALL_MARGIN;
+    const minY = -bounds.halfHeight + WALL_MARGIN;
+    const maxY = bounds.halfHeight - WALL_MARGIN;
+    // PERF: a few random tries with plain numbers, no candidate list, so nothing is allocated.
+    for (let attempt = 0; attempt &lt; PICKUP.SPAWN_ATTEMPTS; attempt++) {
+        const x = randomRange(minX, maxX);
+        const y = randomRange(minY, maxY);
+        const dx = x - avoid.x;
+        const dy = y - avoid.y;
+        if (dx * dx + dy * dy &gt;= MIN_DISTANCE_SQR) {
+            this.spawn(x, y);
+            return;
+        }
+    }
+    ...
+    this.spawn(avoid.x &gt; 0 ? minX : maxX, avoid.y &gt; 0 ? minY : maxY);
+}</code></pre>
+            <pre><code><span class="file">// model/BattleWorld.ts</span>
+private spawnPickupOnPhaseUp(): void {
+    const phase = this.boss.phase;
+    if (phase &lt;= this.rewardedPhase) {
+        return;
+    }
+    this.rewardedPhase = phase;
+    this.pickup.spawnAwayFrom(this.boss, this.bounds);
+    this._pickupSpawnCount++;
+}</code></pre>
+            <div class="why"><b>Vì sao khiên chứ không hồi máu:</b> đề yêu cầu máu player cố định. Orb chỉ chặn một đòn, HP chỉ có thể giảm. Orb rơi cách boss ít nhất 500 px nên đi nhặt là một lựa chọn có rủi ro. Thử 8 điểm ngẫu nhiên; nếu cả 8 đều gần boss (rất hiếm) thì đặt ở góc xa boss nhất, điểm đó luôn đủ xa nếu có điểm nào đủ xa.</div>
+            <div class="ask"><div class="q">Hỏi: vì sao lưu <code>collectedX</code>/<code>collectedY</code> riêng thay vì dùng <code>x</code>/<code>y</code>?</div><div class="a">Một frame có nhiều bước. Player có thể nhặt orb ở bước đầu, rồi boss lên phase ở bước sau và orb mới xuất hiện chỗ khác, ghi đè <code>x</code>/<code>y</code>. Sự kiện <code>PICKUP_COLLECTED</code> chỉ phát sau vòng lặp, nên cần vị trí cũ riêng để hiệu ứng nổ đúng chỗ đã nhặt.</div></div>
+          </div>
+        </details>
+
+        <details class="mod">
+          <summary><span><span class="t">RoundTimer và SaveStore</span><span class="p">model/RoundTimer.ts · 56 dòng · core/SaveStore.ts · 78 dòng</span></span><span class="layer model">model</span></summary>
+          <div class="body">
+            <p><code>RoundTimer</code> giữ thời gian mô phỏng của round và kỷ lục thắng nhanh nhất; TypeScript thuần, không tự lưu. <code>GameManager</code> cộng thời gian theo từng bước, đọc kỷ lục từ <code>SaveStore</code> một lần trong <code>onLoad</code>, lưu lại khi thắng phá kỷ lục. <code>SaveStore</code> đọc ghi <code>sys.localStorage</code> và không bao giờ throw.</p>
+            <pre><code>recordVictory(): boolean {
+    const hasRecord = this._bestClearTime &gt; 0;
+    this._isNewBestTime = !hasRecord || this._roundTime &lt; this._bestClearTime;
+    if (this._isNewBestTime) {
+        this._bestClearTime = this._roundTime;
+    }
+    return this._isNewBestTime;
+}</code></pre>
+            <pre><code><span class="file">// core/SaveStore.ts</span>
+private static sanitize(value: unknown): SaveData {
+    const result = SaveStore.defaults();
+    if (typeof value !== 'object' || value === null) {
+        return result;
+    }
+    const data = value as Record&lt;string, unknown&gt;;
+    const version = typeof data.version === 'number' ? data.version : 0;
+    if (version &gt; SAVE_VERSION) {
+        console.warn(`[SaveStore] save version ${version} is newer than ${SAVE_VERSION}, using defaults`);
+        return result;
+    }
+    const best = data.bestClearTime;
+    // NOTE: Number.isFinite rejects NaN and Infinity, which typeof === 'number' accepts.
+    if (typeof best === 'number' &amp;&amp; Number.isFinite(best) &amp;&amp; best &gt;= 0) {
+        result.bestClearTime = best;
+    }
+    return result;
+}</code></pre>
+            <div class="why"><b>Vì sao thời gian mô phỏng:</b> frame dài bị cắt (chuyển tab, debugger) không được tính, lúc pause cũng không, nên thời gian thắng đúng bằng thời gian đã thực sự chơi. <code>RoundTimerView</code> chỉ dựng chuỗi và gán Label khi sang giây mới (Label dùng Cache Mode CHAR). <code>formatTime</code> làm tròn xuống, nên HUD không bao giờ hiện giây chưa tới; bảng Game Over hiện thêm phần mười giây để một lần thắng chậm hơn không trông giống kỷ lục.</div>
+            <div class="ask"><div class="q">Hỏi: dữ liệu save bị hỏng hoặc bị sửa tay thì sao?</div><div class="a"><code>getItem</code> và <code>JSON.parse</code> đều nằm trong <code>try/catch</code>, lỗi thì log và trả mặc định. Dữ liệu đọc được coi là <code>unknown</code>, kiểm từng trường; <code>NaN</code>, số âm, chuỗi đều bị bỏ. Bản save của phiên bản mới hơn cũng bị bỏ. <code>save()</code> lỗi (trình duyệt ẩn danh, hết dung lượng) thì trả <code>false</code>, kỷ lục vẫn sống trong bộ nhớ.</div></div>
+          </div>
+        </details>
+
+        <details class="mod">
+          <summary><span><span class="t">ImpactEffects và BurstPool</span><span class="p">view/ImpactEffects.ts · 156 dòng · view/BurstPool.ts · 162 dòng</span></span><span class="layer view">view</span></summary>
+          <div class="body">
+            <p><code>ImpactEffects</code> nghe sự kiện và chọn kiểu nổ: chớp khi player trúng đòn, tia lửa trên boss, vòng thu lại chỗ orb xuất hiện, nổ khi nhặt orb, bong bóng vỡ khi khiên chặn đòn, vòng sóng khi boss lên phase, nhiều vụ nổ khi boss chết. <code>BurstPool</code> (class thuần) giữ node và hoạt ảnh: một hình tròn to dần và mờ dần.</p>
+            <pre><code><span class="file">// view/BurstPool.ts</span>
+private pickSlot(): BurstSlot {
+    let closestToEnd = this.slots[0];
+    for (let i = 0; i &lt; this.slots.length; i++) {
+        const slot = this.slots[i];
+        if (!slot.isActive) {
+            return slot;
+        }
+        if (slot.duration - slot.age &lt; closestToEnd.duration - closestToEnd.age) {
+            closestToEnd = slot;
+        }
+    }
+    return closestToEnd;
+}
+
+private applyFrame(slot: BurstSlot, t: number): void {
+    // Ease-out growth (fast start, soft end) reads as an impact; alpha fades linearly.
+    const eased = 1 - (1 - t) * (1 - t);
+    const size = slot.startSize + (slot.endSize - slot.startSize) * eased;
+    slot.transform.setContentSize(size, size);
+    slot.color.a = Math.round(slot.startAlpha * (1 - t));
+    slot.sprite.color = slot.color;
+}</code></pre>
+            <div class="why"><b>Vì sao:</b> 24 node tạo hết trong constructor lúc load, sau đó chỉ bật tắt, không bao giờ instantiate hay destroy giữa trận. Hoạt ảnh tính theo thời gian trong <code>lateUpdate</code> (không tween), nên không có gì phải dừng khi một burst bị dùng lại, khi sang round mới (<code>stopAll</code>) hay khi pause. Hết slot thì lấy slot <b>còn ít thời gian nhất</b>, không phải slot cũ nhất, vì một vụ nổ dài bắt đầu sớm vẫn có thể còn nhiều để xem hơn một tia lửa ngắn. Tia lửa trên boss bị giới hạn 1 lần mỗi 0.1 s bằng <code>RateLimiter</code>, vì súng trúng nhiều lần mỗi giây. <code>tick()</code> thoát ngay khi không có burst nào chạy.</div>
+            <div class="ask"><div class="q">Hỏi: prefab burst bị gán sai (thiếu Sprite) thì sao?</div><div class="a"><code>createSlot()</code> kiểm Sprite và UITransform trên root; thiếu thì log một lỗi, huỷ node vừa tạo và dừng tạo tiếp. Pool rỗng, <code>play()</code> thoát sớm, game chạy bình thường không có hiệu ứng. <code>onDestroy</code> của <code>ImpactEffects</code> gọi <code>destroyAll()</code>, kiểm <code>isValid</code> từng node vì cha có thể đã bị huỷ trước.</div></div>
           </div>
         </details>
 
@@ -529,7 +785,9 @@ private fireVolley(origin: Point, target: Point, emitter: IBulletEmitter): void 
             <p>Vẽ đạn của một phe. Giữ danh sách node "slot" tạo sẵn; mỗi frame bật <code>count</code> slot đầu, đặt vị trí theo mảng, tắt phần còn lại. Đây chính là pool: node tạo một lần, chỉ bật tắt, không bao giờ huỷ khi đang chơi.</p>
             <pre><code>protected lateUpdate(): void {
     const store = this.store;
-    if (!store) { return; }
+    if (!store) {
+        return;
+    }
     const count = store.count;
     this.ensureSlots(count);
     const xs = store.x;
@@ -542,12 +800,16 @@ private fireVolley(origin: Point, target: Point, emitter: IBulletEmitter): void 
 
 private updateVisibleCount(count: number): void {
     // PERF: changing node.active walks the node's components, so never set it when unchanged.
-    for (let i = this.shownCount; i &lt; count; i++) { this.slots[i].active = true; }
-    for (let i = count; i &lt; this.shownCount; i++) { this.slots[i].active = false; }
+    for (let i = this.shownCount; i &lt; count; i++) {
+        this.slots[i].active = true;
+    }
+    for (let i = count; i &lt; this.shownCount; i++) {
+        this.slots[i].active = false;
+    }
     this.shownCount = count;
 }</code></pre>
             <div class="why"><b>Vì sao không dùng NodePool get/put:</b> mỗi lần put/get là gỡ node khỏi cha và gắn lại (tốn duyệt mảng con). Bật tắt <code>active</code> trên slot cố định rẻ hơn, và vì mọi viên đạn trông giống nhau nên không cần biết node nào là viên nào.</div>
-            <div class="ask"><div class="q">Hỏi: có tạo node giữa trận không?</div><div class="a">Gần như không: tạo sẵn 32 slot đạn player và 200 slot đạn boss lúc load. Chỉ khi số đạn vượt mức đó mới tạo thêm, tối đa bằng sức chứa của store (400), và chỉ một lần.</div></div>
+            <div class="ask"><div class="q">Hỏi: có tạo node giữa trận không?</div><div class="a">Gần như không: tạo sẵn 32 slot đạn player và 200 slot đạn boss lúc load. Chỉ khi số đạn vượt mức đó mới tạo thêm, tối đa bằng sức chứa của store (player 64, boss 400), và chỉ một lần.</div></div>
           </div>
         </details>
 
@@ -555,26 +817,29 @@ private updateVisibleCount(count: number): void {
           <summary><span><span class="t">Config và mở rộng boss</span><span class="p">config/BossConfig.ts · model/boss/BossActionFactory.ts</span></span><span class="layer cfg">config</span></summary>
           <div class="body">
             <pre><code>const PHASES: Readonly&lt;Record&lt;BossPhase, PhaseConfig&gt;&gt; = {
-    [BossPhase.High]:   { MOVES: [BossMoveId.Chase], SHOTS: [BossShotId.NormalFan] },
-    [BossPhase.Medium]: { MOVES: [BossMoveId.Chase, BossMoveId.Dash],
-                          SHOTS: [BossShotId.NormalFan, BossShotId.CrazyFan] },
-    [BossPhase.Low]:    { MOVES: [BossMoveId.Dash], SHOTS: [BossShotId.CrazyFan] },
+    [BossPhase.High]: { MOVES: [BossMoveId.Chase], SHOTS: [BossShotId.NormalFan] },
+    [BossPhase.Medium]: {
+        MOVES: [BossMoveId.Chase, BossMoveId.Dash],
+        SHOTS: [BossShotId.NormalFan, BossShotId.CrazyFan],
+    },
+    [BossPhase.Low]: { MOVES: [BossMoveId.Dash], SHOTS: [BossShotId.CrazyFan] },
 };
 
 const SHOTS: Readonly&lt;Record&lt;BossShotId, () =&gt; IBossShot&gt;&gt; = {
     [BossShotId.NormalFan]: () =&gt; new FanShot(BossConfig.SHOTS[BossShotId.NormalFan]),
-    [BossShotId.CrazyFan]:  () =&gt; new FanShot(BossConfig.SHOTS[BossShotId.CrazyFan]),
+    [BossShotId.CrazyFan]: () =&gt; new FanShot(BossConfig.SHOTS[BossShotId.CrazyFan]),
 };</code></pre>
             <div class="tbl"><table>
               <thead><tr><th>Muốn thêm</th><th>Cần làm</th></tr></thead>
               <tbody>
                 <tr><td>Quạt mới (ví dụ 30 viên)</td><td>1 giá trị <code>BossShotId</code> + 1 entry <code>BossConfig.SHOTS</code> + 1 dòng factory + thêm id vào phase. Không cần class mới.</td></tr>
-                <tr><td>Kiểu bắn mới (vòng tròn, xoắn ốc)</td><td>Class mới <code>implements IBossShot</code> + enum + 1 dòng factory + config.</td></tr>
+                <tr><td>Kiểu bắn mới (vòng tròn, xoắn ốc)</td><td>Class mới <code>implements IBossShot</code> (có <code>step()</code> trả về <code>boolean</code>) + enum + 1 dòng factory + config.</td></tr>
                 <tr><td>Kiểu di chuyển mới</td><td>Tương tự qua <code>IBossMove</code>.</td></tr>
                 <tr><td>Đổi hành vi từng phase</td><td>Chỉ sửa bảng <code>PHASES</code>, không đụng logic.</td></tr>
+                <tr><td>Chỉnh hiệu ứng (vạch dash, nổ, banner, rung)</td><td>Chỉ sửa <code>FeedbackConfig</code>; file này chỉ view và ui đọc, đổi số không bao giờ đổi luật chơi.</td></tr>
               </tbody>
             </table></div>
-            <div class="why"><b>Điểm đáng chú ý:</b> kiểu <code>Record&lt;Enum, ...&gt;</code> làm cho việc quên khai báo một entry thành lỗi biên dịch, không phải lỗi lúc chạy.</div>
+            <div class="why"><b>Điểm đáng chú ý:</b> kiểu <code>Record&lt;Enum, ...&gt;</code> làm cho việc quên khai báo một entry thành lỗi biên dịch, không phải lỗi lúc chạy. Config chia bốn file: <code>GameConfig</code> (số gameplay), <code>BossConfig</code> (move, shot, phase), <code>AudioConfig</code> (âm lượng, giới hạn nhịp âm thanh), <code>FeedbackConfig</code> (hiệu ứng nhìn).</div>
           </div>
         </details>
       </section>
@@ -587,13 +852,18 @@ const SHOTS: Readonly&lt;Record&lt;BossShotId, () =&gt; IBossShot&gt;&gt; = {
           <tbody>
             <tr><td>Đạn là dữ liệu trong <code>Float32Array</code></td><td><code>BulletStore</code></td><td>Không object mỗi viên, không rác cho GC</td></tr>
             <tr><td>Swap-remove O(1)</td><td><code>BulletStore.removeAt</code></td><td>Không dịch mảng như <code>splice</code></td></tr>
-            <tr><td>Một gameplay <code>update</code> cho cả game</td><td><code>GameManager</code></td><td>Khoảng 6 lời gọi update/lateUpdate mỗi frame dù có bao nhiêu đạn</td></tr>
-            <tr><td>Slot node tạo sẵn, chỉ bật tắt khi đổi</td><td><code>BulletLayerView</code></td><td>Không instantiate/destroy giữa trận</td></tr>
-            <tr><td>So khoảng cách bình phương</td><td><code>Collision</code>, <code>PlayerWeapon</code>, <code>ChaseMove</code></td><td>Không <code>Math.sqrt</code> trong vòng lặp nóng</td></tr>
-            <tr><td><code>atan2</code> một lần mỗi loạt</td><td><code>FanShot</code></td><td>Lượng giác chỉ chạy khi bắn, khoảng 1 lần/giây</td></tr>
-            <tr><td>Sự kiện chỉ khi giá trị đổi</td><td><code>GameManager.emitChanges</code></td><td>HUD không cập nhật mỗi frame</td></tr>
-            <tr><td>2 texture trắng tô màu</td><td>sprite tròn/vuông</td><td>Thế giới gom vào vài draw call</td></tr>
-            <tr><td>Cắt module engine không dùng</td><td>Feature Cropping</td><td>Build nhỏ hơn (physics, spine, particle... tắt)</td></tr>
+            <tr><td>Một gameplay <code>update</code> cho cả game</td><td><code>GameManager</code></td><td>1 <code>update</code> và 12 component có <code>lateUpdate</code>, không đổi theo số đạn</td></tr>
+            <tr><td>Slot node tạo sẵn, chỉ bật tắt khi đổi</td><td><code>BulletLayerView</code>, <code>BurstPool</code></td><td>Không instantiate/destroy giữa trận</td></tr>
+            <tr><td>Hoạt ảnh theo thời gian, không tween</td><td><code>BurstPool</code>, <code>PhaseBanner</code>, <code>DashTelegraphView</code>, <code>PlayerView</code>, <code>BossView</code></td><td>Không tạo object tween, không phải dừng hay dọn</td></tr>
+            <tr><td>So khoảng cách bình phương</td><td><code>Collision</code>, <code>PlayerWeapon</code>, <code>ChaseMove</code>, <code>PickupModel</code></td><td>Không <code>Math.sqrt</code> trong vòng lặp nóng</td></tr>
+            <tr><td><code>atan2</code> một lần mỗi loạt; vạch dash chỉ xoay khi hướng đổi</td><td><code>FanShot</code>, <code>DashTelegraphView</code></td><td>Lượng giác chỉ chạy khi cần, không mỗi frame</td></tr>
+            <tr><td>Sự kiện chỉ khi giá trị đổi, tối đa một lần mỗi frame</td><td><code>BattleBroadcaster</code></td><td>HUD không cập nhật mỗi frame; âm thanh không kêu chồng khi một frame có nhiều bước</td></tr>
+            <tr><td>Chỉ gán cho engine khi giá trị đổi</td><td><code>PlayerView.applyColor</code>, <code>PhaseBanner</code>, <code>DashTelegraphView</code>, <code>PickupView</code>, <code>DashButton</code></td><td>Không đánh dấu render data bẩn vô ích</td></tr>
+            <tr><td>Label đồng hồ đổi mỗi giây, Cache Mode CHAR</td><td><code>RoundTimerView</code></td><td>Không dựng chuỗi và layout lại Label mỗi frame</td></tr>
+            <tr><td>Giới hạn nhịp bằng <code>RateLimiter</code></td><td><code>ImpactEffects</code>, <code>AudioPlayer</code></td><td>Tia lửa và tiếng trúng boss không chiếm hết pool, không ồn</td></tr>
+            <tr><td>2 texture trắng trong một Auto Atlas, tô màu</td><td>sprite tròn/vuông</td><td>Thế giới gom vào rất ít draw call trên mọi nền tảng (native tắt dynamic atlas nên không dựa vào nó)</td></tr>
+            <tr><td>Widget <code>ON_WINDOW_RESIZE</code></td><td>scene</td><td>Không căn lại mỗi frame</td></tr>
+            <tr><td>Cắt module engine không dùng</td><td>Feature Cropping</td><td>Build nhỏ hơn (physics, spine, dragonbones, tiled map, video, webview, particle tắt)</td></tr>
           </tbody>
         </table></div>
         <p><b>Con số để nói:</b> đỉnh dưới 100 đạn boss trong một trận dài (theo README); sức chứa 400. Đạn player 900 px/s × 50 ms = 45 px mỗi bước, nhỏ hơn nhiều so với 136 px bề ngang boss cộng đạn, nên không xuyên qua được.</p>
@@ -606,18 +876,28 @@ const SHOTS: Readonly&lt;Record&lt;BossShotId, () =&gt; IBossShot&gt;&gt; = {
           <thead><tr><th>Mở</th><th>Đóng</th><th>Ở đâu</th></tr></thead>
           <tbody>
             <tr><td><code>EventBus.on</code> (HealthBarView, PhaseLabelView, GameOverPanel, CameraFollow, BossView)</td><td><code>EventBus.off</code> cùng handler và target</td><td><code>onEnable</code> ↔ <code>onDisable</code></td></tr>
-            <tr><td><code>input.on</code> KEY_DOWN / KEY_UP, <code>game.on(EVENT_HIDE)</code></td><td><code>input.off</code>, <code>game.off</code>, nhả phím đang giữ</td><td><code>onEnable</code> ↔ <code>onDisable</code></td></tr>
-            <tr><td><code>node.on</code> chạm (VirtualJoystick, DashButton), nút Restart</td><td><code>node.off</code></td><td><code>onEnable</code> ↔ <code>onDisable</code></td></tr>
-            <tr><td><code>view.on('canvas-resize')</code> (CameraFollow)</td><td><code>view.off</code></td><td><code>onEnable</code> ↔ <code>onDisable</code></td></tr>
-            <tr><td>Nhạc nền <code>AudioSource.play()</code> loop</td><td><code>stop()</code></td><td><code>onEnable</code> ↔ <code>onDisable</code></td></tr>
-            <tr><td>Slot đạn <code>instantiate(prefab)</code></td><td>Huỷ cùng layer; mảng slot được làm rỗng</td><td><code>onDestroy</code></td></tr>
+            <tr><td><code>input.on</code> KEY_DOWN / KEY_UP, <code>game.on(EVENT_HIDE)</code> (KeyboardInput)</td><td><code>input.off</code>, <code>game.off</code>, nhả phím đang giữ</td><td><code>onEnable</code> ↔ <code>onDisable</code></td></tr>
+            <tr><td><code>node.on</code> chạm (VirtualJoystick), nút Restart (GameOverPanel)</td><td><code>node.off</code></td><td><code>onEnable</code> ↔ <code>onDisable</code></td></tr>
+            <tr><td><code>view.on('canvas-resize')</code> (CameraFollow, ScreenAdapter)</td><td><code>view.off</code></td><td><code>onEnable</code> ↔ <code>onDisable</code></td></tr>
+            <tr><td><code>node.on(TOUCH_END)</code>, <code>input.on(KEY_UP)</code> (StartScreen)</td><td><code>off</code> (node tự ẩn khi round bắt đầu)</td><td><code>onEnable</code> ↔ <code>onDisable</code></td></tr>
+            <tr><td>Bốn nút click, <code>EventBus.on</code>, <code>input.on(KEY_DOWN)</code>, <code>game.on(EVENT_HIDE)</code>, <code>view.on('canvas-resize')</code> (PausePanel)</td><td><code>off</code> tương ứng; mảng Widget cache được làm rỗng</td><td><code>onEnable</code> ↔ <code>onDisable</code>, <code>onDestroy</code></td></tr>
+            <tr><td><code>director.pause()</code> (GameManager.pause)</td><td><code>director.resume()</code> trong resume / startGame / returnToTitle / <code>onDestroy</code></td><td>GameManager</td></tr>
+            <tr><td><code>node.on(TOUCH_START)</code> (DashButton)</td><td><code>node.off</code></td><td><code>onEnable</code> ↔ <code>onDisable</code></td></tr>
+            <tr><td>Nhạc nền <code>AudioSource.play()</code> loop, <code>EventBus.on</code> / <code>input.on</code> (AudioPlayer)</td><td><code>stop()</code>, <code>off</code></td><td><code>onEnable</code> ↔ <code>onDisable</code></td></tr>
+            <tr><td><code>scheduleOnce</code> nhạc thắng (AudioPlayer)</td><td><code>unschedule</code> khi vào Ready và trong <code>onDisable</code></td><td>AudioPlayer</td></tr>
+            <tr><td><code>EventBus.on</code> (ImpactEffects, PhaseBanner, CameraFollow)</td><td><code>EventBus.off</code></td><td><code>onEnable</code> ↔ <code>onDisable</code></td></tr>
+            <tr><td>Node burst <code>instantiate(prefab)</code> (BurstPool, tạo lúc load)</td><td>Con của <code>Effects</code>, huỷ cùng nó; mảng được làm rỗng</td><td><code>onDestroy</code></td></tr>
+            <tr><td>Đọc ghi <code>sys.localStorage</code> (SaveStore)</td><td>Không có gì phải đóng; mọi truy cập trong <code>try/catch</code>, không throw</td><td>SaveStore</td></tr>
+            <tr><td>Slot đạn <code>instantiate(prefab)</code> (BulletLayerView)</td><td>Con của layer, huỷ cùng layer; mảng slot được làm rỗng</td><td><code>onDestroy</code></td></tr>
+            <tr><td>Kho đạn (<code>Float32Array</code>)</td><td>Tạo một lần cho mỗi world, dùng lại qua các round (<code>clear()</code> chỉ đặt lại count)</td><td>BattleWorld</td></tr>
           </tbody>
         </table></div>
         <ul>
-          <li>Không tween, không schedule, không load asset động, không tham chiếu <code>static</code> tới node.</li>
-          <li>Đo thực tế: 20 lần Game Over → Restart liên tiếp, số node giữ nguyên 266, heap JS phẳng (16.0 MB → 15.7 MB).</li>
-          <li>Thiếu tham chiếu <code>@property</code>: <code>console.error</code> nêu tên node, <code>this.enabled = false</code>, không crash về sau.</li>
-          <li>Chia cho 0 được chặn ở mọi chỗ chuẩn hoá vector (súng, dash boss, dash player, quạt 1 viên).</li>
+          <li>Không tween, không load asset động, không tham chiếu <code>static</code> tới node; schedule duy nhất là nhạc thắng. Audio clip là tham chiếu trong scene, load và giải phóng cùng scene.</li>
+          <li>Đo thực tế (headless Chrome): 12 lần Game Over → Restart liên tiếp có hiệu ứng, số node giữ nguyên 307, mọi burst trở về trạng thái rảnh; console 0 cảnh báo, 0 lỗi.</li>
+          <li>Thiếu tham chiếu <code>@property</code>: <code>console.error</code> nêu tên class và node, <code>this.enabled = false</code>, không crash về sau. <code>StartScreen</code> còn tự ẩn node để lỗi gán không để lại một lớp che màn hình.</li>
+          <li>Chia cho 0 và giá trị hỏng được chặn: chuẩn hoá vector (súng, dash boss, dash player, quạt 1 viên), <code>Health.ratio</code> khi max HP là 0, rung camera có thời lượng 0, <code>!(x &gt; 0)</code> loại cả <code>NaN</code> trong <code>applyDamage</code>, <code>takeHit</code>, <code>RoundTimer.advance</code>.</li>
+          <li>Prefab sai (thiếu Sprite) ở <code>BulletLayerView</code> hoặc <code>BurstPool</code>: log một lỗi rồi tắt hoặc để pool rỗng, game vẫn chạy.</li>
         </ul>
       </section>
 
@@ -628,8 +908,12 @@ const SHOTS: Readonly&lt;Record&lt;BossShotId, () =&gt; IBossShot&gt;&gt; = {
           <thead><tr><th>Quyết định</th><th>Được gì</th><th>Mất gì</th></tr></thead>
           <tbody>
             <tr><td>Config bằng TS <code>as const</code>, không JSON</td><td>Kiểm tra kiểu lúc biên dịch, không có đường lỗi khi load</td><td>Đổi số phải build lại; muốn chỉnh trực tiếp thì chuyển sang JsonAsset có validate</td></tr>
-            <tr><td>Chơi lại không load lại scene</td><td>Nhanh, giữ nguyên node đạn đã tạo</td><td>Mọi model phải có <code>reset()</code> đúng</td></tr>
-            <tr><td>Không có trạng thái Pause</td><td>Đề không yêu cầu; tránh tác dụng phụ của <code>director.pause()</code></td><td>Không tạm dừng được</td></tr>
+            <tr><td>Chơi lại không load lại scene</td><td>Nhanh, giữ nguyên node đạn và node hiệu ứng đã tạo</td><td>Mọi model phải có <code>reset()</code> đúng, mọi view phải tự dọn khi nghe <code>Ready</code></td></tr>
+            <tr><td>Pause bằng <code>director.pause()</code>, chỉ qua <code>GameManager</code>; một state <code>Paused</code>, chỉ vào được từ <code>Playing</code></td><td>Đơn giản: update, schedule, tween, widget dừng cùng lúc, không phải chặn từng update bằng tay; state và engine luôn khớp</td><td>Mọi UI hiện lúc pause phải theo hai luật: không mở bằng tween, tự căn Widget bằng <code>updateAlignment()</code></td></tr>
+            <tr><td>Tách <code>BattleBroadcaster</code> khỏi <code>GameManager</code></td><td>GameManager ngắn lại, chỉ còn state machine; phần "cái gì đổi" đọc riêng</td><td>Thêm một class; phải nhớ đồng bộ "lần trước" khi đầu round (<code>emitRoundStart</code>)</td></tr>
+            <tr><td>Orb khiên thay vì hồi máu</td><td>Giữ đúng "máu cố định" của đề, thưởng cho việc di chuyển quanh arena</td><td>Thêm một luật phải giải thích; đề không yêu cầu</td></tr>
+            <tr><td>Thời gian round là thời gian mô phỏng</td><td>Không tính frame bị cắt và lúc pause; kỷ lục công bằng</td><td>Có thể lệch so với đồng hồ thật khi máy rất lag</td></tr>
+            <tr><td>Hiệu ứng tính theo thời gian, không tween</td><td>Không có gì phải dừng hay dọn; tự đóng băng khi pause</td><td>Tự viết easing và fade</td></tr>
             <tr><td>Ngưỡng phase 60% / 30%</td><td>Chia ba gần đều</td><td>Đề không nói, tự chọn và ghi README</td></tr>
             <tr><td>Boss dừng cách player 60 px</td><td>Vẫn chạm gây sát thương nhưng không đè lên tâm player (mất hướng ngắm)</td><td>Boss không bao giờ chồng khít lên player</td></tr>
             <tr><td>Joystick hiện theo khả năng cảm ứng</td><td>iPad, laptop cảm ứng cũng có</td><td>Màn cảm ứng có bàn phím vẫn thấy joystick</td></tr>
@@ -643,15 +927,19 @@ const SHOTS: Readonly&lt;Record&lt;BossShotId, () =&gt; IBossShot&gt;&gt; = {
         <p class="sub">Biết điểm yếu của chính code mình là cách tốt nhất để biết bước tiếp theo nên làm gì.</p>
         <div class="review">
           <div class="rv"><span class="sev ok">MẠNH</span><div><h4>Mô phỏng tách khỏi engine</h4><p><code>model/</code> không import <code>cc</code>, một update duy nhất, view chỉ chép dữ liệu. Luật chơi chạy và test được ngoài Cocos.</p></div></div>
-          <div class="rv"><span class="sev ok">MẠNH</span><div><h4>Đạn dạng dữ liệu, không rác</h4><p>Typed array cố định, swap-remove, slot node tạo sẵn: không cấp phát trong vòng lặp nóng.</p></div></div>
+          <div class="rv"><span class="sev ok">MẠNH</span><div><h4>Đạn và hiệu ứng không tạo rác</h4><p>Typed array cố định, swap-remove, slot node đạn và node burst tạo sẵn: không cấp phát trong vòng lặp nóng.</p></div></div>
           <div class="rv"><span class="sev ok">MẠNH</span><div><h4>Mở rộng boss bằng dữ liệu</h4><p>Interface + factory + bảng phase; thiếu entry là lỗi biên dịch.</p></div></div>
-          <div class="rv"><span class="sev mid">CẦN BIẾT</span><div><h4>Chưa có unit test</h4><p>Model thuần TS rất dễ test nhưng repo chưa có test nào.</p><p class="say">Hướng cải thiện: viết test cho <code>Collision</code>, góc của <code>FanShot</code> và chuyển phase của <code>BossBrain</code>, vì chúng không phụ thuộc engine.</p></div></div>
-          <div class="rv"><span class="sev mid">CẦN BIẾT</span><div><h4>Ngẫu nhiên không có seed</h4><p><code>Math.random</code> được dùng trực tiếp, nên không tái hiện được đúng một trận để debug hay replay.</p><p class="say">Cách sửa: truyền một bộ sinh số ngẫu nhiên có seed vào <code>BossBrain</code>.</p></div></div>
+          <div class="rv"><span class="sev ok">MẠNH</span><div><h4>Pause không làm lệch state</h4><p>Một nơi duy nhất gọi <code>director.pause()</code> / <code>resume()</code>; mọi đường thoát (Restart, Home, huỷ scene) đều resume trước.</p></div></div>
+          <div class="rv"><span class="sev ok">MẠNH</span><div><h4>Lưu game an toàn</h4><p><code>SaveStore</code> có <code>version</code>, coi dữ liệu là <code>unknown</code>, kiểm từng trường, không bao giờ throw.</p></div></div>
+          <div class="rv"><span class="sev mid">CẦN BIẾT</span><div><h4>Chưa có unit test</h4><p>Model thuần TS rất dễ test nhưng repo chưa có test nào.</p><p class="say">Hướng cải thiện: viết test cho <code>Collision</code>, góc của <code>FanShot</code>, chuyển phase của <code>BossBrain</code>, <code>RoundTimer.recordVictory</code>, <code>formatTime</code> và <code>SaveStore.sanitize</code>, vì chúng không phụ thuộc engine hoặc chỉ cần giả <code>localStorage</code>.</p></div></div>
+          <div class="rv"><span class="sev mid">CẦN BIẾT</span><div><h4>Ngẫu nhiên không có seed</h4><p><code>Math.random</code> được dùng trực tiếp trong <code>MathUtil</code> (chọn move/shot, vị trí orb) và rung camera, nên không tái hiện được đúng một trận để debug hay replay.</p><p class="say">Cách sửa: truyền một bộ sinh số ngẫu nhiên có seed vào <code>BossBrain</code> và <code>PickupModel</code>.</p></div></div>
           <div class="rv"><span class="sev mid">CẦN BIẾT</span><div><h4>Va chạm rời rạc, an toàn nhờ sub-step</h4><p>Không dùng va chạm quét (swept). Hiện an toàn vì bước tối đa 50 ms; nếu đạn player nhanh hơn khoảng 2700 px/s thì có thể xuyên qua boss.</p></div></div>
-          <div class="rv"><span class="sev mid">CẦN BIẾT</span><div><h4>Scene được sinh bằng script</h4><p><code>Main.scene</code> do <code>tools/gen-bullethell-scene.js</code> tạo, chưa từng được editor lưu lại.</p><p class="say">Hướng cải thiện: mở scene trong editor 3.7.4 và lưu lại một lần để scene có định dạng chuẩn của editor.</p></div></div>
-          <div class="rv"><span class="sev low">NHỎ</span><div><h4>Tên sự kiện kiểu <code>string</code></h4><p><code>emitHealthChange(..., hpEvent: string, hitEvent: string)</code> không ràng buộc payload theo từng sự kiện; sai tham số chỉ lộ ra lúc chạy.</p></div></div>
-          <div class="rv"><span class="sev low">NHỎ</span><div><h4>Kho đạn đầy thì bỏ viên mới</h4><p>Vượt 400 viên thì viên mới bị bỏ và có một <code>console.warn</code>. Với nhịp bắn hiện tại không xảy ra (đỉnh dưới 100), nhưng nên biết khi tăng độ khó.</p></div></div>
-          <div class="rv"><span class="sev low">NHỎ</span><div><h4>Phase chỉ đi tiến</h4><p>Đúng với đề vì boss không hồi máu; nếu thêm hồi máu thì phải bỏ điều kiện này trong <code>updatePhase</code>.</p></div></div>
+          <div class="rv"><span class="sev mid">CẦN BIẾT</span><div><h4>Luật riêng cho UI lúc pause</h4><p>Vì dùng <code>director.pause()</code>, popup nào hiện trong lúc pause cũng không được mở bằng tween và phải tự gọi <code>updateAlignment()</code>. Hiện chỉ có menu pause và nó làm đúng, nhưng người thêm UI mới phải biết luật này.</p></div></div>
+          <div class="rv"><span class="sev mid">CẦN BIẾT</span><div><h4>Phím có thể bị "kẹt" khi mất focus</h4><p><code>KeyboardInput</code> quên phím đang giữ khi trang bị ẩn (<code>EVENT_HIDE</code>). Nhưng nếu canvas chỉ mất focus mà trang vẫn hiện (bấm ra ngoài) thì không có sự kiện nào, player đi tiếp tới khi nhấn và nhả lại phím đó. Đã ghi trong comment là giới hạn chấp nhận.</p></div></div>
+          <div class="rv"><span class="sev low">NHỎ</span><div><h4>Tên sự kiện kiểu <code>string</code></h4><p><code>emitHealthChange(..., hpEvent: string, hitEvent: string)</code> trong <code>BattleBroadcaster</code> không ràng buộc payload theo từng sự kiện; sai tham số chỉ lộ ra lúc chạy.</p></div></div>
+          <div class="rv"><span class="sev low">NHỎ</span><div><h4>Vài comment chưa theo kịp việc tách BattleBroadcaster</h4><p>Đầu <code>GameEvents.ts</code> vẫn ghi "GameManager is the only emitter of gameplay events", <code>PickupModel</code> ghi "GameManager reports where it appeared", trong khi người phát thật là <code>BattleBroadcaster</code> (do GameManager sở hữu). README cũng còn ghi "about six lateUpdates" trong khi code có 12 component dùng <code>lateUpdate</code>.</p><p class="say">Hướng cải thiện: sửa các dòng này để comment khớp code.</p></div></div>
+          <div class="rv"><span class="sev low">NHỎ</span><div><h4>Kho đạn đầy thì bỏ viên mới</h4><p>Vượt sức chứa (player 64, boss 400) thì viên mới bị bỏ và có một <code>console.warn</code> mỗi kho. Với nhịp bắn hiện tại không xảy ra (đỉnh dưới 100 đạn boss), nhưng nên biết khi tăng độ khó.</p></div></div>
+          <div class="rv"><span class="sev low">NHỎ</span><div><h4>Phase chỉ đi tiến</h4><p>Đúng với đề vì boss không hồi máu; nếu thêm hồi máu thì phải bỏ điều kiện này trong <code>updatePhase</code>, và orb khiên cũng dựa vào phase chỉ tăng.</p></div></div>
           <div class="rv"><span class="sev low">NHỎ</span><div><h4>Chưa có bản build Windows</h4><p>Máy không có Visual Studio; nộp bản Android APK và web-mobile.</p></div></div>
         </div>
       </section>
@@ -675,24 +963,30 @@ const SHOTS: Readonly&lt;Record&lt;BossShotId, () =&gt; IBossShot&gt;&gt; = {
 <script>
 /* ---------- Quiz data ---------- */
 var QUIZ = [
-  ["Tóm tắt kiến trúc trong 30 giây.", "Luật chơi là TypeScript thuần trong model/, không phụ thuộc Cocos. GameManager là update gameplay duy nhất, mỗi frame gọi BattleWorld.step theo các bước tối đa 50 ms. View chỉ chép trạng thái model lên node trong lateUpdate; UI phản ứng theo sự kiện qua EventBus. Config tách riêng trong config/."],
+  ["Tóm tắt kiến trúc trong 30 giây.", "Luật chơi là TypeScript thuần trong model/, không phụ thuộc Cocos. GameManager là update gameplay duy nhất, mỗi frame gọi BattleWorld.step theo các bước tối đa 50 ms, giữ state machine và là nơi duy nhất pause engine. BattleBroadcaster (do GameManager sở hữu) biến thay đổi của world thành sự kiện EventBus, tối đa một lần mỗi frame. View chỉ chép trạng thái model lên node trong lateUpdate; UI phản ứng theo sự kiện. Config tách riêng trong config/."],
   ["Vì sao đạn không phải là node/component riêng?", "Hàng trăm component có update riêng tốn chi phí gọi hàm và cấp phát. Đạn lưu trong Float32Array theo phe, cập nhật trong một vòng lặp; view có một tập node slot tạo sẵn và chỉ bật tắt, đặt vị trí."],
   ["Swap-remove là gì và vì sao vòng lặp đi ngược?", "Xoá phần tử i bằng cách chép phần tử cuối vào i rồi giảm count: O(1). Đi ngược vì phần tử cuối được chép vào đã xử lý rồi, nên không bỏ sót hay xử lý hai lần."],
-  ["Boss chết thì xoá hết đạn 'ngay lập tức' bằng cách nào?", "GameManager.handleOutcome gọi BattleWorld.clearAllBullets(), đặt count của cả hai kho về 0 ngay trong tick đó; lateUpdate cùng frame tắt mọi slot đạn."],
+  ["Boss chết thì xoá hết đạn 'ngay lập tức' bằng cách nào?", "GameManager.handleOutcome gọi BattleWorld.clearAllBullets(), đặt count của cả hai kho về 0 ngay trong tick đó, ghi kỷ lục thời gian rồi phát GAME_OVER; lateUpdate cùng frame tắt mọi slot đạn."],
   ["Sub-stepping giải quyết vấn đề gì?", "Frame dài (máy yếu) được chia thành các bước tối đa 50 ms nên tốc độ game vẫn đúng thời gian thực và đạn nhanh không nhảy qua mục tiêu. Frame dài quá 250 ms (chuyển tab, debugger) bị cắt bớt để game không tua nhanh."],
   ["Boss chọn hành động theo HP thế nào?", "BossBrain tính tỉ lệ HP: >= 60% High, >= 30% Medium, còn lại Low. Bảng BossConfig.PHASES cho biết phase đó dùng move và shot nào. Ở Medium, move và shot được chọn ngẫu nhiên độc lập mỗi 2–4 giây."],
   ["Dash của boss có bị ngắt giữa chừng không?", "Không. DashMove chỉ cho ngắt ở giai đoạn Recover. Khi timer đổi move hết hạn mà dash đang windup hay đang lao, BossBrain giữ timer ở trạng thái hết hạn và thử lại mỗi frame, đổi ngay khi dash vào Recover."],
-  ["'Hướng khoá tại thời điểm kích hoạt' được hiểu thế nào?", "Kích hoạt là lúc bắt đầu windup. Hướng được tính và khoá ở đó, nên ánh nháy trắng báo trước một hướng cố định và player có thể né sang ngang."],
-  ["Thêm một kiểu bắn vòng tròn 24 viên cần sửa những gì?", "Viết class RingShot implements IBossShot, thêm giá trị BossShotId, thêm config, thêm một dòng trong BossActionFactory.SHOTS và thêm id vào phase muốn dùng. Quên dòng factory là lỗi biên dịch nhờ Record<BossShotId, ...>."],
+  ["'Hướng khoá tại thời điểm kích hoạt' được hiểu thế nào?", "Kích hoạt là lúc bắt đầu windup. Hướng được tính, lưu vào BossModel.dashDirX/dashDirY và khoá ở đó, nên ánh nháy trắng và vạch báo của DashTelegraphView chỉ trước một hướng cố định và player có thể né sang ngang."],
+  ["Thêm một kiểu bắn vòng tròn 24 viên cần sửa những gì?", "Viết class RingShot implements IBossShot (step trả về true khi bắn), thêm giá trị BossShotId, thêm config, thêm một dòng trong BossActionFactory.SHOTS và thêm id vào phase muốn dùng. Quên dòng factory là lỗi biên dịch nhờ Record<BossShotId, ...>."],
   ["Va chạm tròn với vuông tính thế nào?", "Kẹp tâm hình tròn vào hình vuông để được điểm gần nhất, rồi so bình phương khoảng cách từ tâm tới điểm đó với r²."],
   ["Vì sao không dùng physics engine của Cocos?", "Chỉ có hình tròn và hình vuông, mỗi phe một mục tiêu; tự tính O(n) trên bình phương khoảng cách rẻ hơn nhiều so với rigid body cho từng viên đạn, và module physics được tắt để build nhỏ hơn."],
   ["Nếu số đạn tăng 10 lần thì sao?", "Dữ liệu vẫn ổn (typed array, O(n)). Nút thắt sẽ là số node: setPosition cho mỗi slot mỗi frame. Khi đó có thể vẽ bằng một mesh chung (instancing hoặc custom assembler), và thêm spatial grid nếu có nhiều mục tiêu."],
-  ["Làm sao chắc chắn chơi lại không rò rỉ bộ nhớ?", "Mọi on có off cùng tham số trong onEnable/onDisable, không tween hay schedule, không load động, node đạn tạo một lần. Đã đo 20 lần Game Over → Restart: số node giữ 266, heap JS phẳng."],
-  ["Vì sao startGame() đi qua trạng thái Ready?", "Để mọi view nghe STATE_CHANGED(Ready) và tự dọn round cũ (ẩn bảng kết quả, camera nhảy về player) trước khi world reset và chuyển sang Playing."],
-  ["Player bất tử thì đạn boss thế nào?", "hitPlayer() thoát sớm khi player bất tử, nên đạn bay xuyên qua chứ không bị tiêu hao. Bất tử có sau khi trúng (1 giây) và trong lúc dash."],
-  ["Điểm yếu của code này là gì?", "Chưa có unit test dù model rất dễ test; random không có seed nên khó tái hiện; va chạm rời rạc nên phụ thuộc giới hạn bước 50 ms; scene sinh bằng script; tên sự kiện kiểu string chưa ràng buộc payload."],
-  ["Config tách khỏi logic thế nào, vì sao không dùng JSON?", "Mọi số nằm trong GameConfig và BossConfig dạng TS as const. Được kiểm tra kiểu lúc biên dịch và không có đường lỗi khi load; đánh đổi là đổi số phải build lại. Muốn chỉnh trực tiếp thì chuyển sang JsonAsset kèm validate."],
-  ["Điều khiển trên điện thoại hoạt động thế nào?", "VirtualJoystick nhận chạm ở nửa trái màn hình (joystick nổi), ghi stickX/stickY vào InputState; nút DASH ở góc phải. Joystick hiện khi thiết bị hỗ trợ cảm ứng; bàn phím luôn dùng được."]
+  ["Làm sao chắc chắn chơi lại không rò rỉ bộ nhớ?", "Mọi on có off cùng tham số trong onEnable/onDisable; không tween, không load động; schedule duy nhất (nhạc thắng) được unschedule khi vào Ready và trong onDisable; node đạn và node burst tạo một lần. Đã đo 12 lần Game Over → Restart có hiệu ứng: số node giữ 307, console 0 cảnh báo, 0 lỗi."],
+  ["Vì sao chuẩn bị round mới lại đi qua trạng thái Ready?", "prepareRound() phát STATE_CHANGED(Ready) trước khi reset world, để mọi view tự dọn round cũ (ẩn bảng kết quả, camera nhảy về player, dừng hiệu ứng, dừng nhạc). Restart chuyển tiếp sang Playing; lần mở game đầu và Home thì dừng ở Ready sau màn hình bắt đầu."],
+  ["Player bất tử thì đạn boss thế nào?", "hitPlayer() thoát sớm khi player bất tử, nên đạn bay xuyên qua chứ không bị tiêu hao. Bất tử có sau khi trúng (1 giây, kể cả khi khiên chặn đòn) và trong lúc dash."],
+  ["Điểm yếu của code này là gì?", "Chưa có unit test dù model rất dễ test; random không có seed nên khó tái hiện; va chạm rời rạc nên phụ thuộc giới hạn bước 50 ms; UI hiện lúc pause phải theo luật riêng (không tween, tự căn Widget); phím có thể kẹt khi canvas mất focus; tên sự kiện kiểu string chưa ràng buộc payload; vài comment còn ghi GameManager là người phát sự kiện."],
+  ["Config tách khỏi logic thế nào, vì sao không dùng JSON?", "Mọi số nằm trong config/: GameConfig, BossConfig, AudioConfig, FeedbackConfig, dạng TS as const. Được kiểm tra kiểu lúc biên dịch và không có đường lỗi khi load; đánh đổi là đổi số phải build lại. Muốn chỉnh trực tiếp thì chuyển sang JsonAsset kèm validate."],
+  ["Điều khiển trên điện thoại hoạt động thế nào?", "VirtualJoystick nhận chạm ở nửa trái màn hình (joystick nổi), ghi stickX/stickY vào InputState; nút DASH ở góc phải gọi GameManager.requestDash(); nút II ở góc trái trên hoặc phím back Android mở menu pause. Joystick hiện khi thiết bị hỗ trợ cảm ứng; bàn phím luôn dùng được."],
+  ["Pause hoạt động thế nào, vì sao chỉ GameManager được gọi director.pause()?", "PausePanel (nút II, Esc / P, phím back, app xuống nền) gọi GameManager.pause(): chỉ nhận khi Playing, đổi state sang Paused rồi director.pause(). resume() thì director.resume() trước rồi mới về Playing. Chỉ một nơi gọi director để state machine và engine luôn khớp; nếu không, game có thể đứng mà state vẫn là Playing. startGame, returnToTitle và onDestroy đều resume trước nếu đang pause."],
+  ["Vì sao menu pause không mở bằng tween và phải gọi updateAlignment()?", "director.pause() dừng update, lateUpdate, schedule, tween, animation và Widget, chỉ input, render, audio còn chạy. Tween mở menu sẽ bị đóng băng nên menu không hiện; Widget không tự căn lúc pause nên PausePanel lấy danh sách Widget một lần trong onLoad và gọi updateAlignment() khi mở menu và khi đổi kích thước màn hình lúc đang pause."],
+  ["BattleBroadcaster làm gì, vì sao dùng bộ đếm thay vì phát sự kiện ngay trong model?", "Nó so trạng thái world với lần phát trước: HP, phase đổi thì phát; bộ đếm phát bắn, loạt đạn, orb, khiên vỡ khác lần trước thì phát một sự kiện. Một frame có thể chạy tới 5 bước, phát trong từng bước sẽ làm âm thanh kêu chồng; model cũng giữ được thuần, chỉ tăng một số nguyên."],
+  ["Quả cầu khiên hoạt động thế nào, vì sao không hồi máu?", "Mỗi khi boss vào phase mới, BattleWorld gọi PickupModel.spawnAwayFrom: thử 8 điểm ngẫu nhiên cách boss ít nhất 500 px, không được thì đặt ở góc xa boss nhất. Player chạm thì có một lần sạc khiên (không cộng dồn), chặn đúng một đòn và bật bất tử 1 s. Không hồi máu vì đề yêu cầu máu player cố định."],
+  ["Thời gian round và kỷ lục được tính, lưu thế nào?", "GameManager cộng từng bước mô phỏng vào RoundTimer, nên frame bị cắt và lúc pause không được tính. Thắng thì recordVictory() so với kỷ lục; phá kỷ lục thì SaveStore.save lưu vào localStorage kèm version. Khi load, SaveStore bắt mọi lỗi, coi dữ liệu là unknown, kiểm từng trường, sai thì dùng mặc định, không bao giờ throw."],
+  ["Tia lửa và vụ nổ boss không cấp phát giữa trận bằng cách nào?", "BurstPool tạo sẵn 24 node lúc load, sau đó chỉ bật tắt. Hoạt ảnh tính theo thời gian trong lateUpdate (to dần, mờ dần), không tween nên không có gì phải dừng. Hết slot thì dùng lại burst còn ít thời gian nhất. Tia lửa trên boss giới hạn 1 lần mỗi 0.1 s bằng RateLimiter."]
 ];
 
 var KEY = "bullethell-study-done-v1";
