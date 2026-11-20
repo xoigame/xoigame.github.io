@@ -234,5 +234,16 @@
   "package": "com.xoigame.puzzlebox",
   "audience": "puzzle",
   "iosUrl": null
+ },
+ {
+  "slug": "trace-buddy",
+  "name": "Trace Buddy: ABC & 123 Tracing",
+  "genre": "Kids learning · Handwriting",
+  "status": "Coming soon",
+  "description": "Kids trace A–Z, a–z and 0–9 stroke by stroke with Buddy the owl. Stars, stickers, no ads.",
+  "image": "/assets/games/trace-buddy-hero.jpg",
+  "accent": "#1fa8f0",
+  "audience": "kids",
+  "package": "com.xoistudio.tracebuddy"
  }
 ]
