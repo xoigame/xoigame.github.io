@@ -270,5 +270,17 @@
   "package": "com.xoigame.sandypop",
   "audience": "puzzle",
   "released": "2026-11-20"
+ },
+ {
+  "slug": "bug-parade",
+  "name": "Bug Parade: Garden Spray",
+  "genre": "Arcade · One-thumb shooter",
+  "status": "Coming soon",
+  "description": "Hold to spray! Splash a cute parade of bugs into butterflies, pick power-up cards, beat giant centipedes and decorate your butterfly garden.",
+  "image": "/assets/games/bug-parade-hero.jpg",
+  "accent": "#e8473c",
+  "playUrl": null,
+  "package": "com.xoigame.bugparade",
+  "audience": "action"
  }
 ]
