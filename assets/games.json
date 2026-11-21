@@ -299,12 +299,13 @@
   "slug": "fruity-blast",
   "name": "Fruity Blast: Fruit Pop Puzzle",
   "genre": "Fruit pop puzzle · Relaxing",
-  "status": "Coming soon",
+  "status": "Available now",
   "description": "Tap groups of matching fruit to pop them, build rockets, bombs and rainbows, and set off giant combo chains. 300 relaxing levels, free undo and hints.",
   "image": "/assets/games/fruity-blast-hero.jpg",
   "accent": "#e8483b",
-  "playUrl": null,
+  "playUrl": "https://play.google.com/store/apps/details?id=com.xoigame.fruityblast",
   "package": "com.xoigame.fruityblast",
-  "audience": "puzzle"
+  "audience": "puzzle",
+  "released": "2026-11-21"
  }
 ]
