@@ -272,6 +272,18 @@
   "released": "2026-11-20"
  },
  {
+  "slug": "duckling-rush",
+  "name": "Duckling Rush: Gate Crowd",
+  "genre": "Arcade · Crowd runner",
+  "status": "Coming soon",
+  "description": "Drag to aim! Send a rush of ducklings through number gates, bump the raccoon thieves off the bridge, pick power-up cards and win back Mama Duck's eggs.",
+  "image": "/assets/games/duckling-rush-hero.jpg",
+  "accent": "#f5a623",
+  "playUrl": null,
+  "package": "com.xoigame.ducklingrush",
+  "audience": "action"
+ },
+ {
   "slug": "bug-parade",
   "name": "Bug Parade: Garden Spray",
   "genre": "Arcade · One-thumb shooter",
